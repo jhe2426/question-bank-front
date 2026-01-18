@@ -1,13 +1,14 @@
 import React from 'react';
 import './App.css';
-import { Outlet, Route, Routes } from 'react-router';
+import { Route, Routes } from 'react-router';
+import Layout from './layouts/Layout';
 
 function App() {
   return (
     <Routes>
       <Route path={'auth'} element={<>로그인 회원가입 페이지</>} />
 
-      <Route element={<Outlet/>}>
+      <Route element={<Layout />}>
         <Route path={'main'} element={<>메인 페이지</>} />
 
         <Route path={'mock-exam'}>
