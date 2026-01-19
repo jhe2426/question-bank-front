@@ -1,0 +1,20 @@
+@font-face {
+    font-family: 'Pretendard';
+    src: url(src/assets/fonts/Pretendard.ttf);
+}
+
+@font-face {
+    font-family: 'Cafe24Ssurround';
+    src: url(src/assets/fonts/Cafe24Ssurround.ttf);
+}
+
+:root {
+    --White: rgba(255, 255, 255, 1);
+    --Lightmode-Grey: rgba(226, 226, 226, 1);
+    --Lightmode-Grey2: rgba(128, 128, 128, 1);
+    --Primary: rgba(13, 84, 160, 1);
+}
+
+body {
+    font-family: 'Cafe24Ssurround';
+}
