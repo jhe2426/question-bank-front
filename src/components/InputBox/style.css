@@ -1,0 +1,55 @@
+.input-box {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.input-box > .label {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.input-box > .input-contents {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    font-family: 'Pretendard';
+}
+
+.input-box .input-area {
+    display: flex;
+    gap: 24px;
+}
+
+.input-box input {
+    flex: 1;
+    outline: none;
+
+    box-sizing: border-box;
+    border-radius: 6px;
+    border: 1px solid var(--Lightmode-Grey);
+    padding: 16px 15px;
+    height: 51px;
+
+    font-size: 16px;
+    font-weight: 400;
+}
+
+.input-box input::placeholder {
+    color: var(--Lightmode-Grey2);
+}
+
+.input-box .message {
+    height: 19px;
+    font-size: 16px;
+    font-weight: 400;
+}
+
+.input-box .message.success {
+    color: var(--PrimaryLight);
+}
+
+.input-box .message.error {
+    color: var(--Error);
+}

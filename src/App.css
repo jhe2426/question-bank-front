@@ -12,9 +12,76 @@
     --White: rgba(255, 255, 255, 1);
     --Lightmode-Grey: rgba(226, 226, 226, 1);
     --Lightmode-Grey2: rgba(128, 128, 128, 1);
+    --Lightmode-Grey3: rgba(241, 243, 244, 1);
+    --Lightmode-Grey4: rgba(96, 96, 96, 1);
+    --Lightmode-Grey5: rgba(191, 191, 191, 1);
     --Primary: rgba(13, 84, 160, 1);
+    --PrimaryLight: rgba(30, 144, 255, 1);
+    --Second: rgba(216, 235, 255, 1);
+    --Error: rgba(255, 84, 64, 1);
 }
 
 body {
     font-family: 'Cafe24Ssurround';
+}
+
+.button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border-radius: 6px;
+    width: 130px;
+    height: 51px;
+
+    font-family: 'Pretendard';
+    font-size: 16px;
+    font-weight: 400;
+    
+    cursor: pointer;
+}
+
+.button:hover {
+	opacity: 0.85;
+}
+
+.button.disable {
+    background-color: var(--Lightmode-Grey3);
+
+    color: var(--Lightmode-Grey4);
+
+    cursor: default;
+}
+
+.button.second {
+    background-color: var(--Second);
+
+    color: var(--PrimaryLight);
+}
+
+.button.primary {
+    background-color: var(--Primary);
+    text-align: center;
+    font-size: 30px;
+    font-weight: 700;
+
+    color: var(--White);
+}
+
+.button.disable:hover {
+	opacity: 1;
+}
+
+.link {
+    color: var(--Lightmode-Grey5);
+    text-align: center;
+    font-size: 30px;
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+.link:hover {
+    color: var(--Lightmode-Grey2);
+    font-weight: 800;
 }

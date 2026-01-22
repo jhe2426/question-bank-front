@@ -3,11 +3,12 @@ import './App.css';
 import { Route, Routes } from 'react-router';
 import Layout from './layouts/Layout';
 import { AUTH_PATH, GRADING_VIEW_PATH, INCORRECT_QUESTIONS_TEST_PATH, KILLER_EXAM_TEST_PATH, MAIN_PATH, MOCK_EXAM_TEST_PATH, MY_PAGE_CHANGE_PASSWORD_PATH, MY_PAGE_PATH, MY_PAGE_STUDY_HISTORY_PATH, OTHERS_PATH, PAST_EXAM_TEST_PATH } from './constants';
+import Auth from './views/Auth';
 
 function App() {
   return (
     <Routes>
-      <Route path={AUTH_PATH} element={<>로그인 회원가입 페이지</>} />
+      <Route path={AUTH_PATH} element={<Auth />} />
 
       <Route element={<Layout />}>
         <Route path={MAIN_PATH} element={<>메인 페이지</>} />
