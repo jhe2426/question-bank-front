@@ -9,26 +9,3 @@
     display: flex;
     min-width: 588px;
 }
-
-#auth-login-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 55px;
-    width: 588px;
-    min-height: 661px;
-}
-
-#auth-login-container .header {
-    color: var(--Primary);
-    font-size: 70px;
-    font-weight: 700;
-}
-
-#auth-login-container .input-container {   
-    align-self: stretch;
-
-    display: flex;
-    flex-direction: column;
-    gap: 35px;
-}

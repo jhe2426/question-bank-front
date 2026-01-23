@@ -1,0 +1,30 @@
+#auth-login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    width: 588px;
+    min-height: 661px;
+}
+
+#auth-login-container .header {
+    color: var(--Primary);
+    font-size: 70px;
+    font-weight: 700;
+}
+
+#auth-login-container .input-container {   
+    align-self: stretch;
+
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+#auth-login-container .button-container {
+    align-self: stretch;
+
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
