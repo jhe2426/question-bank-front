@@ -1,7 +1,14 @@
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from 'react';
 
 import './style.css';
 import InputBox from 'src/components/InputBox';
+import { useNavigate } from 'react-router';
+import { SignInRequestDto } from 'src/apis/dto/request/auth';
+import { ResponseDto } from 'src/apis/dto/response';
+import { SignInResponseDto } from 'src/apis/dto/response/auth';
+import { useAuthStroe } from 'src/stores';
+import { MAIN_ABSOLUTE_PATH } from 'src/constants';
+import { signInRequest } from 'src/apis/dto';
 
 // component: 로그인 컴포넌트 //
 export default function SignIn() {
@@ -14,6 +21,36 @@ export default function SignIn() {
     const [userIdMessage, setUserIdMessage] = useState<string>('');
     // state: 유저 비밀번호 메세지 상태
     const [userPasswordMessage, setUserPasswordMessage] = useState<string>('');
+
+    // state: 로그인 유저 정보 상태 //
+    const { setAccessToken } = useAuthStroe();
+
+    // reference: 유저 비밀번호 InputBox 요소 참조 //
+    const userPasswordInputBoxRef = useRef<HTMLInputElement | null>(null);
+
+    // function: 네비게이터 함수 //
+    const navigator = useNavigate();
+
+    // function: sign in response 처리 함수 //
+    const signInResponse = (responseBody: SignInResponseDto | ResponseDto | null) => {
+        const message =
+            !responseBody ? '서버에 문제가 있습니다' :
+            responseBody.code === 'DBE' ? '서버에 문제가 있습니다' :
+            responseBody.code === 'ROF' ? '서버에 문제가 있습니다' :
+            responseBody.code === 'AE' ? '승인번호 사용기간이 지났습니다' :
+            responseBody.code === 'SF' ? '로그인 정보가 일치하지 않습니다' : '';
+
+        const isSuccess = responseBody !== null && responseBody.code === 'SU';
+        if (!isSuccess) {
+            setUserPasswordMessage(message);
+            return;
+        }
+
+        const { accessToken } = responseBody as SignInResponseDto;
+        setAccessToken(accessToken);
+
+        navigator(MAIN_ABSOLUTE_PATH);
+    };
 
     // event handler: 유저 아이디 변경 이벤트 처리 //
     const onUserIdChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
@@ -31,10 +68,36 @@ export default function SignIn() {
     const onLoginButtonClick = () => {
         if (!userId) setUserIdMessage('아이디를 입력하세요');
         if (!userPassword) setUserPasswordMessage('비밀번호를 입력하세요');
-
         if (!userId || !userPassword) return;
 
-        // todo: 로그인 처리 로직 //
+        const requestBody: SignInRequestDto = {
+            userId, userPassword
+        };
+        signInRequest(requestBody).then(signInResponse);
+    };
+
+    // event handler: 아이디 입력창에서 엔터 시 호출 //
+    const onUserIdKeyDownHandler = (event: KeyboardEvent<HTMLInputElement>) => {
+        if (!userPasswordInputBoxRef.current || event.key !== 'Enter') return;
+
+        if (!userId) {
+            setUserIdMessage('아이디를 입력하세요');
+            return;
+        }
+
+        userPasswordInputBoxRef.current.focus();
+    };
+
+    // event handler: 비밀번호 입력창에서 엔터 시 호출 //
+    const onUserPasswordKeyDownHandler = (event: KeyboardEvent<HTMLInputElement>) => {
+        if (!userPasswordInputBoxRef.current || event.key !== 'Enter') return;
+
+        if (!userPassword) {
+            setUserPasswordMessage('비밀번호를 입력하세요');
+            return;
+        }
+
+        onLoginButtonClick();
     };
 
     // effect: 아이디 혹은 비밀번호 변경 시 실행할 함수 //
@@ -49,8 +112,8 @@ export default function SignIn() {
             <div className="header">Login</div>
 
             <div className="input-container">
-                <InputBox type={'text'} label={'아이디'} value={userId} placeholder={'아이디를 입력해주세요'} message={userIdMessage} isErrorMessage onChange={onUserIdChangeHandler} />
-                <InputBox type={'password'} label={'비밀번호'} value={userPassword} placeholder={'비밀번호를 입력해주세요'} message={userPasswordMessage} isErrorMessage onChange={onUserPasswordChangeHandler} />
+                <InputBox type={'text'} label={'아이디'} value={userId} placeholder={'아이디를 입력해주세요'} message={userIdMessage} isErrorMessage onChange={onUserIdChangeHandler} onKeyDown={onUserIdKeyDownHandler} />
+                <InputBox ref={userPasswordInputBoxRef} type={'password'} label={'비밀번호'} value={userPassword} placeholder={'비밀번호를 입력해주세요'} message={userPasswordMessage} isErrorMessage onChange={onUserPasswordChangeHandler} onKeyDown={onUserPasswordKeyDownHandler} />
             </div>
 
             <div className="button-container">
