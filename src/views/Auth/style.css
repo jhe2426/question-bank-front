@@ -1,11 +1,9 @@
 #auth-wrapper {
-    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;    
-}
+    min-height: 100vh;
 
-#auth-wrapper .auth-box {
-    display: flex;
-    min-width: 588px;
+    padding: 50px 0;
+    box-sizing: border-box;
 }

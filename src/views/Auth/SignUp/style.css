@@ -1,0 +1,203 @@
+#auth-sign-up-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 588px;
+}
+
+#auth-sign-up-container .header {
+    color: var(--Primary);
+    font-size: 60px;
+    font-weight: 700;
+}
+
+#auth-sign-up-container .input-container {
+    align-self: stretch;
+
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.university-selector-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    margin-bottom: 27px;
+}
+
+.university-selector-container .label {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.university-selector-container .selector {
+    display: flex;
+    align-items: center;
+
+    box-sizing: border-box;
+    border: 1px solid var(--Lightmode-Grey);
+    padding: 16px 15px;
+    width: 588px;
+    height: 51px;
+
+    font-family: 'Pretendard';
+}
+
+.university-selector-container .selector.close {
+    border-radius: 6px;
+}
+
+.university-selector-container .selector.open {
+    position: relative;
+    border-radius: 6px 6px 0 0;
+    border-bottom: none;
+}
+
+.university-selector-container .selector .selected-item {
+    flex: 1;
+
+    font-size: 16px;
+    font-weight: 400;
+
+    height: 17px;
+}
+
+.university-selector-container .selector .selector-box {
+    z-index: 9999;
+
+    position: absolute;
+    top: 50px;
+    left: -1px;
+
+    box-sizing: border-box;
+    border-radius: 0 0 6px 6px;
+    border: 1px solid var(--Lightmode-Grey);
+    border-top: none;
+
+    background-color: var(--White);
+
+    width: 588px;
+    max-height: 255px;
+
+    overflow-y: auto;
+}
+
+.university-selector-container .selector .selector-box::-webkit-scrollbar {
+    width: 12px;
+    background: none;
+}
+
+.university-selector-container .selector .selector-box::-webkit-scrollbar-thumb {
+    background-color: var(--PrimaryLight2);
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+} 
+
+.university-selector-container .selector .selector-option {
+    height: 51px;
+    box-sizing: border-box;
+
+    border-top: 1px solid var(--Lightmode-Grey);
+    padding: 16px 15px;
+
+    cursor: pointer;
+    user-select: none;
+}
+
+.university-selector-container .selector .arrow-down-button {
+    width: 24px;
+    height: 24px;
+
+    background-image: url('/src/assets/images/arrow-down.png');
+    background-size: cover;
+
+    cursor: pointer;
+}
+
+.university-selector-container .selector .arrow-up-button {
+    width: 24px;
+    height: 24px;
+
+    background-image: url('/src/assets/images/arrow-up.png');
+    background-size: cover;
+
+    cursor: pointer;
+}
+
+.gender-selector-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.gender-selector-container .label {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.gender-selector-container .gender-selector-box {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.gender-selector-container .gender-options {
+    display: flex;
+    gap: 18px;
+
+    font-family: 'Pretendard';
+    font-size: 18px;
+    font-weight: 400;
+}
+
+.gender-selector-container .gender-option {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+
+    width: 55px;
+}
+
+.gender-selector-container .gender-options .check-icon {
+    width: 20px;
+    height: 20px;
+
+    background-image: url('src/assets/images/check-ring.png');
+    background-size: 100% 100%;
+
+    cursor: pointer;
+}
+
+.gender-selector-container .gender-options .check-icon.active {
+    width: 18px;
+    height: 18px;
+
+    background-image: url('src/assets/images/checked-ring.png');
+    background-size: 100% 100%;
+
+    cursor: default;
+}
+
+.gender-selector-container .message {
+    height: 19px;
+
+    font-family: 'Pretendard';
+    font-size: 16px;
+    font-weight: 400;
+}
+
+.gender-selector-container .message.error {
+    color: var(--Error);
+}
+
+#auth-sign-up-container .button-container {
+    align-self: stretch;
+
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}

@@ -15,8 +15,10 @@
     --Lightmode-Grey3: rgba(241, 243, 244, 1);
     --Lightmode-Grey4: rgba(96, 96, 96, 1);
     --Lightmode-Grey5: rgba(191, 191, 191, 1);
+    --Lightmode-Grey6: rgba(222, 225, 230, 1);
     --Primary: rgba(13, 84, 160, 1);
     --PrimaryLight: rgba(30, 144, 255, 1);
+    --PrimaryLight2: rgba(102, 178, 255, 1);
     --PrimaryDark: rgba(10, 68, 130, 1);
     --Second: rgba(216, 235, 255, 1);
     --Error: rgba(255, 84, 64, 1);
@@ -76,18 +78,30 @@ body {
 .button.fullwidth {
     box-sizing: border-box;
     width: 100%;
-    height: 70px;
+    height: 60px;
+}
+
+.button.disable.fullwidth {
+    background-color: var(--Lightmode-Grey6);
+
+    color: var(--White);
+
+    font-size: 30px;
+    font-weight: 700;
 }
 
 .link {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
     color: var(--Lightmode-Grey5);
-    text-align: center;
     font-size: 30px;
     font-weight: 700;
 
     cursor: pointer;
 
-    height: 70px;
+    height: 60px;
 }
 
 .link:hover {
