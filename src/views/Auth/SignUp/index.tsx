@@ -7,20 +7,62 @@ import Gender from 'src/types/aliases/gender.alias';
 // component: 회원가입 컴포넌트 //
 export default function SignUp() {
 
+    // state: 사용자 입력 정보 상태 //
+    const [userName, setUserName] = useState<string>('');
+    const [userId, setUserId] = useState<string>('');
+    const [userPassword, setUserPassword] = useState<string>('');
+    const [userPasswordCheck, setUserPasswordCheck] = useState<string>('');
+    const [userPhoneNumber, setUserPhoneNumber] = useState<string>('');
+    // state: 사용자 인증번호 상태 //
+    const [userAuthCode, setUserAuthCode] = useState<string>('');
+    const [userBirthDate, setUserBirthDate] = useState<string>('');
+    const [userAddress, setUserAddress] = useState<string>('');
+    const [userUniversity, setUserUniversity] = useState<string>('');
+    // state: 사용자 승인번호 상태 //
+    const [userApprovalCode, setUserApprovalCode] = useState<string>('');
+    const [userGender, setUserGender] = useState<Gender | ''>('');
+
+    // state: 사용자 입력 메시지 상태 //
+    const [userNameMessage, setUserNameMessage] = useState<string>('');
+    const [userIdMessage, setUserIdMessage] = useState<string>('');
+    const [userPasswordMessage, setUserPasswordMessage] = useState<string>('');
+    const [userPasswordCheckMessage, setUserPasswordCheckMessage] = useState<string>('');
+    const [userPhoneNumberMessage, setUserPhoneNumberMessage] = useState<string>('');
+    const [userAuthCodeMessage, setUserAuthCodeMessage] = useState<string>('');
+    const [userBirthDateMessage, setUserBirthDateMessage] = useState<string>('');
+    const [userAddressMessage, setUserAddressMessage] = useState<string>('');
+    const [userApprovalCodeMessage, setUserApprovalCodeMessage] = useState<string>('');
+
+    // state: 사용자 정보 메세지 에러 상태 //
+    const [userIdMessageError, setUserIdMessageError] = useState<boolean>(false);
+    const [userPhoneNumberMessageError, setUserPhoneNumberMessageError] = useState<boolean>(false);
+    const [userAuthCodeMessageError, setUserAuthCodeMessageError] = useState<boolean>(false);
+    const [userApprovalCodeMessageError, setUserApprovalCodeMessageError] = useState<boolean>(false);
+
+    // state: 사용자 성별 에러 상태 //
+    const [isGenderError, setIsGenderError] = useState<boolean>(false);
+
+    // state: 사용자 입력 유효성 및 중복 확인 상태 //
+    const [isUserIdChecked, setIsUserIdChecked] = useState<boolean>(false);
+    const [isUserPasswordChecked, setIsUserPasswordChecked] = useState<boolean>(false);
+    const [isUserAuthCodeChecked, setIsUserAuthCodeChecked] = useState<boolean>(false);
+    const [isUserApprovalCodeChecked, setIsUserApprovalCodeChecked] = useState<boolean>(false);
+
+    // state: 사용자 입력 패턴 일치 상태 //
+    const [isUserNamePatternMatched, setIsUserNamePatternMatched] = useState<boolean>(false);
+    const [isUserIdPatternMatched, setIsUserIdPatternMatched] = useState<boolean>(false);
+    const [isUserPasswordPatternMatched, setIsUserPasswordPatternMatched] = useState<boolean>(false);
+    const [isUserPhoneNumberPatternMatched, setIsUserPhoneNumberPatternMatched] = useState<boolean>(false);
+    const [isUserBirthDatePatternMatched, setIsUserBirthDatePatternMatched] = useState<boolean>(false);
+    
     // state: 대학교 선택 셀럭터 오픈 여부 상태 //
     const [showUniversitySelector, setUniversityShowSelector] = useState<boolean>(false);
 
-    // state: 성별 상태 //
-    const [gender, setGender] = useState<Gender | ''>('');
+    // variable: 사용자 성별 아이콘 클래스 //
+    const  femaleIconClass = userGender === '여성' ? 'check-icon active': 'check-icon';
+    const  maleIconClass = userGender === '남성' ? 'check-icon active': 'check-icon';
 
-    // state: 성별 메시지 상태 //
-    const [isGenderError, setIsGenderError] = useState<boolean>(false);
-
-    // variable: 성별 아이콘 클래스 //
-    const  femaleIconClass = gender === '여성' ? 'check-icon active': 'check-icon';
-    const  maleIconClass = gender === '남성' ? 'check-icon active': 'check-icon';
-
-    // variable: 성별 메시지 클래스 //
+    // variable: 사용자 성별 메시지 클래스 //
     const genderMessageClass = `message ${isGenderError ? 'error' : ''}`;
 
     // reference: 대학교 셀렉터 컨테이너 요소 참조 //
@@ -33,7 +75,7 @@ export default function SignUp() {
 
     // event handler: 성별 변경 이벤트 처리 //
     const onGenderChangeHandler= (gender: Gender) => {
-        setGender(gender);
+        setUserGender(gender);
         setIsGenderError(false);
     };
 
@@ -77,10 +119,10 @@ export default function SignUp() {
                     <div className='label'>대학교 선택</div>
 
                     {showUniversitySelector ? 
-                    <div className='selector open'>
+                    <div ref={selectorRef} className='selector open' onClick={onUniversitySelectorClickHandler}>
                         <div className='selected-item'>기타</div>
-                        <div className='arrow-up-button' onClick={onUniversitySelectorClickHandler}></div>
-                        <div ref={selectorRef} className='selector-box'>
+                        <div className='arrow-up-button'></div>
+                        <div className='selector-box'>
                             <div className='selector-option'>기타</div>
                             <div className='selector-option'>가야대학교</div>
                             <div className='selector-option'>가야대학교</div>

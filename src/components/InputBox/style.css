@@ -1,25 +1,25 @@
 .input-box {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-}
+    gap: 7px;
+} 
 
 .input-box > .label {
-    font-size: 22px;
+    font-size: 15px;
     font-weight: 700;
 }
 
 .input-box > .input-contents {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 5px;
 
     font-family: 'Pretendard';
 }
 
 .input-box .input-area {
     display: flex;
-    gap: 24px;
+    gap: 10px;
 }
 
 .input-box input {
@@ -29,10 +29,10 @@
     box-sizing: border-box;
     border-radius: 6px;
     border: 1px solid var(--Lightmode-Grey);
-    padding: 16px 15px;
-    height: 51px;
+    padding: 0 10px;
+    height: 35px;
 
-    font-size: 16px;
+    font-size: 13px;
     font-weight: 400;
 }
 
@@ -41,8 +41,8 @@
 }
 
 .input-box .message {
-    height: 19px;
-    font-size: 16px;
+    height: 13px;
+    font-size: 13px;
     font-weight: 400;
 }
 

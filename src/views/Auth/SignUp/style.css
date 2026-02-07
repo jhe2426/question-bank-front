@@ -3,12 +3,12 @@
     flex-direction: column;
     align-items: center;
     gap: 20px;
-    width: 588px;
+    min-width: 588px;
 }
 
 #auth-sign-up-container .header {
     color: var(--Primary);
-    font-size: 60px;
+    font-size: 40px;
     font-weight: 700;
 }
 
@@ -17,19 +17,18 @@
 
     display: flex;
     flex-direction: column;
-    gap: 10px;
 }
 
 .university-selector-container {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 7px;
 
-    margin-bottom: 27px;
+    margin-bottom: 20px;
 }
 
 .university-selector-container .label {
-    font-size: 22px;
+    font-size: 15px;
     font-weight: 700;
 }
 
@@ -39,11 +38,13 @@
 
     box-sizing: border-box;
     border: 1px solid var(--Lightmode-Grey);
-    padding: 16px 15px;
+    padding: 1px 10px 0 10px;
     width: 588px;
-    height: 51px;
+    height: 35px;
 
     font-family: 'Pretendard';
+
+    cursor: pointer;
 }
 
 .university-selector-container .selector.close {
@@ -53,23 +54,22 @@
 .university-selector-container .selector.open {
     position: relative;
     border-radius: 6px 6px 0 0;
-    border-bottom: none;
+    border-bottom-color: transparent;
 }
+
 
 .university-selector-container .selector .selected-item {
     flex: 1;
 
-    font-size: 16px;
+    font-size: 13px;
     font-weight: 400;
-
-    height: 17px;
 }
 
 .university-selector-container .selector .selector-box {
     z-index: 9999;
 
     position: absolute;
-    top: 50px;
+    top: 34px;
     left: -1px;
 
     box-sizing: border-box;
@@ -80,7 +80,7 @@
     background-color: var(--White);
 
     width: 588px;
-    max-height: 255px;
+    max-height: 175px;
 
     overflow-y: auto;
 }
@@ -98,13 +98,13 @@
 } 
 
 .university-selector-container .selector .selector-option {
-    height: 51px;
+    height: 35px;
     box-sizing: border-box;
 
     border-top: 1px solid var(--Lightmode-Grey);
-    padding: 16px 15px;
+    padding: 10px 10px 0 10px;
+    font-size: 13px;
 
-    cursor: pointer;
     user-select: none;
 }
 
@@ -115,7 +115,6 @@
     background-image: url('/src/assets/images/arrow-down.png');
     background-size: cover;
 
-    cursor: pointer;
 }
 
 .university-selector-container .selector .arrow-up-button {
@@ -131,11 +130,11 @@
 .gender-selector-container {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 7px;
 }
 
 .gender-selector-container .label {
-    font-size: 22px;
+    font-size: 15px;
     font-weight: 700;
 }
 
@@ -150,7 +149,7 @@
     gap: 18px;
 
     font-family: 'Pretendard';
-    font-size: 18px;
+    font-size: 15px;
     font-weight: 400;
 }
 
@@ -173,8 +172,8 @@
 }
 
 .gender-selector-container .gender-options .check-icon.active {
-    width: 18px;
-    height: 18px;
+    width: 19px;
+    height: 19px;
 
     background-image: url('src/assets/images/checked-ring.png');
     background-size: 100% 100%;
@@ -183,7 +182,7 @@
 }
 
 .gender-selector-container .message {
-    height: 19px;
+    height: 13px;
 
     font-family: 'Pretendard';
     font-size: 16px;
@@ -199,5 +198,5 @@
 
     display: flex;
     flex-direction: column;
-    gap: 22px;
+    gap: 5px;
 }

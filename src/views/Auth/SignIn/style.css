@@ -2,14 +2,13 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 30px;
-    width: 588px;
-    min-height: 661px;
+    gap: 18px;
+    width: 450px;
 }
 
 #auth-login-container .header {
     color: var(--Primary);
-    font-size: 70px;
+    font-size: 60px;
     font-weight: 700;
 }
 
@@ -18,7 +17,7 @@
 
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 15px;
 }
 
 #auth-login-container .button-container {
@@ -26,5 +25,5 @@
 
     display: flex;
     flex-direction: column;
-    gap: 22px;
+    gap: 5px;
 }
