@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 
 import './style.css';
 import InputBox from 'src/components/InputBox';
@@ -34,13 +34,13 @@ export default function SignUp() {
     const [userApprovalCodeMessage, setUserApprovalCodeMessage] = useState<string>('');
 
     // state: 사용자 정보 메세지 에러 상태 //
-    const [userIdMessageError, setUserIdMessageError] = useState<boolean>(false);
-    const [userPhoneNumberMessageError, setUserPhoneNumberMessageError] = useState<boolean>(false);
-    const [userAuthCodeMessageError, setUserAuthCodeMessageError] = useState<boolean>(false);
-    const [userApprovalCodeMessageError, setUserApprovalCodeMessageError] = useState<boolean>(false);
+    const [isUserIdMessageError, setIsUserIdMessageError] = useState<boolean>(false);
+    const [isUserPhoneNumberMessageError, setIsUserPhoneNumberMessageError] = useState<boolean>(false);
+    const [isUserAuthCodeMessageError, setIsUserAuthCodeMessageError] = useState<boolean>(false);
+    const [isUserApprovalCodeMessageError, setIsUserApprovalCodeMessageError] = useState<boolean>(false);
 
     // state: 사용자 성별 에러 상태 //
-    const [isGenderError, setIsGenderError] = useState<boolean>(false);
+    const [isUserGenderError, setIsUserGenderError] = useState<boolean>(false);
 
     // state: 사용자 입력 유효성 및 중복 확인 상태 //
     const [isUserIdChecked, setIsUserIdChecked] = useState<boolean>(false);
@@ -53,6 +53,7 @@ export default function SignUp() {
     const [isUserIdPatternMatched, setIsUserIdPatternMatched] = useState<boolean>(false);
     const [isUserPasswordPatternMatched, setIsUserPasswordPatternMatched] = useState<boolean>(false);
     const [isUserPhoneNumberPatternMatched, setIsUserPhoneNumberPatternMatched] = useState<boolean>(false);
+    const [isUserAuthCodeSend, setIsUserAuthCodeSend] = useState<boolean>(false);
     const [isUserBirthDatePatternMatched, setIsUserBirthDatePatternMatched] = useState<boolean>(false);
     
     // state: 대학교 선택 셀럭터 오픈 여부 상태 //
@@ -63,21 +64,187 @@ export default function SignUp() {
     const  maleIconClass = userGender === '남성' ? 'check-icon active': 'check-icon';
 
     // variable: 사용자 성별 메시지 클래스 //
-    const genderMessageClass = `message ${isGenderError ? 'error' : ''}`;
+    const genderMessageClass = `message ${isUserGenderError ? 'error' : ''}`;
 
     // reference: 대학교 셀렉터 컨테이너 요소 참조 //
     const selectorRef = useRef<HTMLDivElement>(null);
+
+    // function: 사용자 전화번호 입력 포멧 변경 함수 //
+    const formatPhoneNumber = (value: string) => {
+        const phoneNumber = value.replace(/[^\d]/g, '');
+
+        if (phoneNumber.length <= 3) {
+            return phoneNumber;
+        }
+
+        if (phoneNumber.length <= 7) {
+            return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3)}`;
+        }
+
+        return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3, 7)}-${phoneNumber.slice(7, 11)}`;
+    };
+
+    // function: 사용자 생년월일 검증 함수 //
+    const validateBirth = (birth: string) => {
+        if (!/^[0-9]{8}$/.test(birth)) return false;
+
+        const year = Number(birth.substring(0, 4));
+        const month = Number(birth.substring(4, 6));
+        const day = Number(birth.substring(6, 8));
+
+        if (month < 1 || month > 12 || day < 1 || day > 31) return false;
+
+        const date = new Date(year, month - 1, day);
+
+        return date.getFullYear() === year && date.getMonth() + 1 === month && date.getDate() === day;
+    };
+
+    // function: 공통적으로 쓰일 입력 정보 빈 값 체크 함수 //
+    const clearErrorMessageIfEmpty = (value: string, setMessage: (messge: string) => void) => {
+        if (value === '') {
+            setMessage('');
+            return true;
+        }
+        
+        return false;
+    };
+
+    // event handler: 사용자 이름 변경 이벤트 처리 //
+    const onUserNameChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        setUserName(value);
+
+        if (clearErrorMessageIfEmpty(value, setUserNameMessage)) return;
+
+        const regexp = /^[가-힣]{2,6}$/;
+        const isMatch = regexp.test(value);
+        const message = isMatch ? '' : '이름은 2자 이상, 6자 이하 한글로 입력해주세요';
+        setUserNameMessage(message);
+        setIsUserNamePatternMatched(isMatch);
+    };
+
+    // event handler: 사용자 아이디 변경 이벤트 처리 //
+    const onUserIdChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        setUserId(value);
+
+        if (clearErrorMessageIfEmpty(value, setUserIdMessage)) return;
+
+        const regexp = /^(?=.*[a-z])(?=.*[0-9])[a-z0-9]{3,15}$/;
+        const isMatch = regexp.test(value);
+        const message = isMatch ? '' : '영문, 숫자를 혼용하여 3 ~ 15자 입력해주세요';
+        setUserIdMessage(message);
+        setIsUserIdMessageError(!isMatch);
+        setIsUserIdPatternMatched(isMatch);
+        setIsUserIdChecked(false);
+    };
+    
+    // event handler: 사용자 비밀번호 변경 이벤트 처리 //
+    const onUserPasswordChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        setUserPassword(value);
+
+        if (clearErrorMessageIfEmpty(value, setUserPasswordMessage)) return;
+
+        const regexp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*-_?])[a-zA-Z0-9!@#$%^&*-_?]{8,20}$/;
+        const isMatch = regexp.test(value);
+        const message = isMatch ? '' : '영대소문자 + 숫자 + 특수문자(!@#$%^&*-_?)를 혼용하여 8 ~ 20자 입력해주세요';
+        setUserPasswordMessage(message);
+        setIsUserPasswordPatternMatched(isMatch);
+    };
+
+    // event handler: 사용자 비밀번호 확인 변경 이벤트 처리 //
+    const onUserPasswordCheckChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        setUserPasswordCheck(value);
+    };
+    
+    // event handler: 사용자 전화번호 변경 이벤트 처리 //
+    const onUserPhoneNumberChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        
+        const onlyNumber = value.replace(/[^\d]/g, '');
+
+        if (onlyNumber.length > 11) return;
+
+        const formattedValue = formatPhoneNumber(onlyNumber);
+        setUserPhoneNumber(formattedValue);
+
+        if (clearErrorMessageIfEmpty(onlyNumber, setUserPhoneNumberMessage)) return;
+        
+        const regexp = /^010-\d{4}-\d{4}$/;
+        const isMatch = regexp.test(value);
+        const message = isMatch ? '' : '전화번호 11자 입력해주세요';
+        
+        setUserPhoneNumberMessage(message);
+        setIsUserPhoneNumberMessageError(!isMatch);
+        setIsUserPhoneNumberPatternMatched(isMatch);
+        setIsUserAuthCodeSend(false);
+    };
+
+    // event handler: 사용자 인증번호 변경 이벤트 처리 //
+    const onUserAuthCodeChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+    
+        if (value.length > 4) return;
+
+        setUserAuthCode(value);
+
+        setUserAuthCodeMessage('');
+        setIsUserAuthCodeMessageError(false);
+        setIsUserAuthCodeChecked(false);
+    };
+
+    // event handler: 사용자 생년월일 변경 이벤트 처리 //
+    const onUserBirthDateChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+
+        const onlyNumber = value.replace(/[^\d]/g, '');
+        if (onlyNumber.length > 8) return;
+
+        setUserBirthDate(onlyNumber);
+
+        if (clearErrorMessageIfEmpty(onlyNumber, setUserBirthDateMessage)) return;
+
+        const isMatch = validateBirth(onlyNumber);
+
+        const message = isMatch ? '' : '생년월일 8자 입력해주세요';
+        setUserBirthDateMessage(message);
+        setIsUserBirthDatePatternMatched(isMatch);
+    };
+
+    // TODO: 대학교 선택 변경 이벤트 처리 //
+
+    // event handler: 사용자 인증번호 변경 이벤트 처리 //
+    const onUserApprovalCodeChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        setUserApprovalCode(value);
+
+        setUserApprovalCodeMessage('');
+        setIsUserApprovalCodeMessageError(false);
+        setIsUserApprovalCodeChecked(false);
+    };    
+
+    // event handler: 성별 변경 이벤트 처리 //
+    const onGenderChangeHandler= (gender: Gender) => {
+        setUserGender(gender);
+        setIsUserGenderError(false);
+    };
 
     // event handler: 대학교 셀렉터 오픈 이벤트 처리 //
     const onUniversitySelectorClickHandler = () => {
         setUniversityShowSelector(!showUniversitySelector);
     };
 
-    // event handler: 성별 변경 이벤트 처리 //
-    const onGenderChangeHandler= (gender: Gender) => {
-        setUserGender(gender);
-        setIsGenderError(false);
-    };
+    // effect: 사용자 비밀번호 또는 비밀번호 확인이 변경될 시 실행할 함수 //
+    useEffect(() => {
+        if (clearErrorMessageIfEmpty(userPasswordCheck, setUserPasswordCheckMessage)) return;
+
+        const isMatch = userPasswordCheck === userPassword;
+        const message = isMatch ? '' : '비밀번호가 일치하지 않습니다';
+        setUserPasswordCheckMessage(message);
+        setIsUserPasswordChecked(isMatch);
+    }, [userPassword, userPasswordCheck]);
 
     // effect: 대학교 셀렉터 컨테이너 상태가 변경될 시 실행할 함수 //
     useEffect(() => {
@@ -99,21 +266,21 @@ export default function SignUp() {
         <div id='auth-sign-up-container'>
             <div className='header'>회원가입</div>
             <div className='input-container'>
-                <InputBox label={'이름'} type={'text'} value={''} placeholder={'이름을 입력해주세요'} onChange={() => {}} message={''} isErrorMessage />
+                <InputBox label={'이름'} type={'text'} value={userName} placeholder={'이름을 입력해주세요'} onChange={onUserNameChangeHandler} message={userNameMessage} isErrorMessage />
                 
-                <InputBox label={'아이디'} type={'text'} value={''} placeholder={'아이디를 입력해주세요'} onChange={() => {}} message={''} buttonName={'중복확인'} onButtonClick={() => {}} isErrorMessage isButtonActive={false} />
+                <InputBox label={'아이디'} type={'text'} value={userId} placeholder={'아이디를 입력해주세요'} onChange={onUserIdChangeHandler} message={userIdMessage} buttonName={'중복확인'} onButtonClick={() => {}} isErrorMessage isButtonActive={false} />
 
-                <InputBox label={'비밀번호'} type={'password'} value={''} placeholder={'특수문자 !@#$%^&*-_? 중 1개 이상을 포함해 입력해주세요'} onChange={() => {}} message={''} isErrorMessage />
+                <InputBox label={'비밀번호'} type={'password'} value={userPassword} placeholder={'특수문자 !@#$%^&*-_? 중 1개 이상을 포함해 입력해주세요'} onChange={onUserPasswordChangeHandler} message={userPasswordMessage} isErrorMessage />
 
-                <InputBox label={'비밀번호 확인'} type={'password'} value={''} placeholder={'비밀번호를 입력해주세요'} onChange={() => {}} message={''} isErrorMessage />
+                <InputBox label={'비밀번호 확인'} type={'password'} value={userPasswordCheck} placeholder={'비밀번호를 입력해주세요'} onChange={onUserPasswordCheckChangeHandler} message={userPasswordCheckMessage} isErrorMessage />
 
-                <InputBox label={'전화번호'} type={'text'} value={''} placeholder={'-빼고 입력해주세요'} onChange={() => {}} message={''} buttonName={'전화번호 인증'} onButtonClick={() => {}} isErrorMessage isButtonActive={false} />
+                <InputBox label={'전화번호'} type={'text'} value={userPhoneNumber} placeholder={'-빼고 입력해주세요'} onChange={onUserPhoneNumberChangeHandler} message={userPhoneNumberMessage} buttonName={'전화번호 인증'} onButtonClick={() => {}} isErrorMessage isButtonActive={false} />
 
-                <InputBox label={'인증번호'} type={'text'} value={''} placeholder={'인증번호 4자리를 입력해주세요'} onChange={() => {}} message={''} buttonName={'인증 확인'} onButtonClick={() => {}} isErrorMessage isButtonActive={false} />
+                <InputBox label={'인증번호'} type={'text'} value={userAuthCode} placeholder={'인증번호 4자리를 입력해주세요'} onChange={onUserAuthCodeChangeHandler} message={userAuthCodeMessage} buttonName={'인증 확인'} onButtonClick={() => {}} isErrorMessage isButtonActive={false} />
 
-                <InputBox label={'생년월일'} type={'text'} value={''} placeholder={'생년월일 8자리 입력해주세요 (예: 19871009)'} onChange={() => {}} message={''} isErrorMessage />
+                <InputBox label={'생년월일'} type={'text'} value={userBirthDate} placeholder={'생년월일 8자리 입력해주세요 (예: 19871009)'} onChange={onUserBirthDateChangeHandler} message={userBirthDateMessage} isErrorMessage />
 
-                <InputBox label={'주소'} type={'text'} value={''} placeholder={'주소를 입력해주세요'} onChange={() => {}} message={''} buttonName={'주소검색'} onButtonClick={() => {}} isErrorMessage isButtonActive={true} readOnly/>
+                <InputBox label={'주소'} type={'text'} value={userAddress} placeholder={'주소를 입력해주세요'} onChange={() => {}} message={userAddressMessage} buttonName={'주소검색'} onButtonClick={() => {}} isErrorMessage isButtonActive={true} readOnly/>
 
                 <div className='university-selector-container'>
                     <div className='label'>대학교 선택</div>
@@ -141,7 +308,7 @@ export default function SignUp() {
                     }
                 </div>
 
-                <InputBox label={'승인번호'} type={'text'} value={''} placeholder={'승인번호를 입력해주세요'} onChange={() => {}} message={''} buttonName={'승인번호 확인'} onButtonClick={() => {}} isErrorMessage isButtonActive={false} />    
+                <InputBox label={'승인번호'} type={'text'} value={userApprovalCode} placeholder={'승인번호를 입력해주세요'} onChange={onUserApprovalCodeChangeHandler} message={userApprovalCodeMessage} buttonName={'승인번호 확인'} onButtonClick={() => {}} isErrorMessage isButtonActive={false} />    
 
                 <div className='gender-selector-container'>
                     <div className='label'>성별</div>
@@ -156,7 +323,7 @@ export default function SignUp() {
                                 <div className={maleIconClass}></div>
                             </div>
                         </div>
-                        <div className={genderMessageClass}>{isGenderError ? '성별을 선택해주세요' : ''}</div>
+                        <div className={genderMessageClass}>{isUserGenderError ? '성별을 선택해주세요' : ''}</div>
                     </div>
                 </div>
             </div>

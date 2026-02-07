@@ -12,7 +12,7 @@
 .input-box > .input-contents {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 2px;
 
     font-family: 'Pretendard';
 }
