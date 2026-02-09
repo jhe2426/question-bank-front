@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { ResponseDto } from './response';
-import { IdCheckRequestDto, PhoneNumberAuthRequestDto, SignInRequestDto } from './request/auth';
+import { IdCheckRequestDto, PhoneNumberAuthRequestDto, PhoneNumberAuthVerifyRequestDto, SignInRequestDto } from './request/auth';
 import { GetUniversityListResponseDto, SignInResponseDto } from './response/auth';
 
 // variable: URL 상수 //
@@ -12,6 +12,7 @@ const SIGN_IN_URL = `${AUTH_MODULE_URL}/sign-in`;
 const GET_UNIVERSITY_LIST_API_URL = `${AUTH_MODULE_URL}/universities`;
 const ID_CHECK_URL = `${AUTH_MODULE_URL}/id-check`;
 const PHONE_NUMBER_AUTH_URL = `${AUTH_MODULE_URL}/phone-number/auth-code`;
+const PHONE_NUMBER_AUTH_VERIFY_URL = `${AUTH_MODULE_URL}/phone-number/auth-code/verify`;
 
 // function: response 성공 처리 함수 //
 const responseSuccessHandler = <T = ResponseDto>(response: AxiosResponse<T>) => {
@@ -50,6 +51,14 @@ export const phoneNumberAuthRequest = async (requestBody: PhoneNumberAuthRequest
     return responseBody;
 };
 
+// function: 전화번호 인증 확인 API 요청 함수 //
+export const phoneNumberAuthVerifyRequest = async (requestBody: PhoneNumberAuthVerifyRequestDto) => {
+    const responseBody = await axios.post(PHONE_NUMBER_AUTH_VERIFY_URL, requestBody)
+        .then(responseSuccessHandler)
+        .catch(responseErrorHandler);
+    return responseBody;
+};
+ 
 // function: get university list 요청 함수 //
 export const getUniversityListRequest = async () => {
     const responseBody = await axios.get(GET_UNIVERSITY_LIST_API_URL)

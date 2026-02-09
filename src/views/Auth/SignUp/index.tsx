@@ -4,11 +4,11 @@ import { Address, useDaumPostcodePopup } from 'react-daum-postcode';
 import './style.css';
 import InputBox from 'src/components/InputBox';
 import Gender from 'src/types/aliases/gender.alias';
-import { getUniversityListRequest, idCheckRequest, phoneNumberAuthRequest } from 'src/apis/dto';
+import { getUniversityListRequest, idCheckRequest, phoneNumberAuthRequest, phoneNumberAuthVerifyRequest } from 'src/apis/dto';
 import { GetUniversityListResponseDto } from 'src/apis/dto/response/auth';
 import { ResponseDto } from 'src/apis/dto/response';
 import { University } from 'src/types/interfaces';
-import { IdCheckRequestDto, PhoneNumberAuthRequestDto } from 'src/apis/dto/request/auth';
+import { IdCheckRequestDto, PhoneNumberAuthRequestDto, PhoneNumberAuthVerifyRequestDto } from 'src/apis/dto/request/auth';
 
 // component: 회원가입 컴포넌트 //
 export default function SignUp() {
@@ -60,7 +60,6 @@ export default function SignUp() {
     const [isUserIdPatternMatched, setIsUserIdPatternMatched] = useState<boolean>(false);
     const [isUserPasswordPatternMatched, setIsUserPasswordPatternMatched] = useState<boolean>(false);
     const [isUserPhoneNumberPatternMatched, setIsUserPhoneNumberPatternMatched] = useState<boolean>(false);
-    const [isUserAuthCodeSend, setIsUserAuthCodeSend] = useState<boolean>(false);
     const [isUserBirthDatePatternMatched, setIsUserBirthDatePatternMatched] = useState<boolean>(false);
 
     // state: 전화번호 인증 재전송 상태 //
@@ -76,7 +75,16 @@ export default function SignUp() {
     const isUserIdCheckButtonActive = userId !== '' && isUserIdPatternMatched;
 
     // variable: 전화번호 인증 버튼 활성화 //
-    const isUserPhoneNumberAuthButtonActive = userPhoneNumber !== '' && isUserPhoneNumberPatternMatched;
+    const isUserPhoneNumberAuthButtonActive = userPhoneNumber !== '' && isUserPhoneNumberPatternMatched && !isUserAuthCodeChecked;
+
+    // variable: 전화번호 인증 확인 버튼 활성화 //
+    const isUserAuthCodeButtonActive = userAuthCode !== '' && userAuthCode.length == 4 && !isUserAuthCodeChecked;
+
+    // variable: 전화번호 인증 버튼 재전송 모드 //
+    const isPhoneNumberEditMode = isUserPhoneNumberSend && !isUserAuthCodeChecked;
+
+    // variable: 전화번호 인증 버튼 이름 클래스 //
+    const phoneNumberButtonClass = isPhoneNumberEditMode ? '수정' : '전화번호 인증';
 
     // variable: 사용자 성별 아이콘 클래스 //
     const  femaleIconClass = userGender === '여성' ? 'check-icon active': 'check-icon';
@@ -152,7 +160,7 @@ export default function SignUp() {
         setIsUserIdChecked(isSuccess);
     };
 
-    // function: 전화번호 인증 Response 처리 함수 //
+    // function: 전화번호 인증 response 처리 함수 //
     const phoneNumberAuthResponse = (responseBody: ResponseDto | null) => {
         const message = 
             !responseBody ? '서버에 문제가 있습니다' : 
@@ -162,11 +170,34 @@ export default function SignUp() {
             responseBody.code === 'SSF' ? '서버에 문제가 있습니다' : '인증번호가 전송되었습니다';
         
         const isSuccess = responseBody !== null && responseBody.code === 'SU';
+        const isAlreadySent = responseBody?.code === 'AR';
+
         setUserPhoneNumberMessage(message);
         setIsUserPhoneNumberMessageError(!isSuccess);
-        setIsUserPhoneNumberSend(isSuccess);
-        if (responseBody?.code === 'AR') setIsPhoneNumberRetryError(true);
+        setIsUserPhoneNumberSend(isSuccess || isAlreadySent);
+        if (responseBody?.code === 'AR') {
+            setIsPhoneNumberRetryError(true);
+        }
     }; 
+
+    // function: 전화번호 인증 확인 response body 처리 함수 //
+    const phoneNumberAuthVerifyResponse = (responseBody: ResponseDto | null) => {
+        const message =
+            !responseBody ? '서버에 문제가 있습니다' : 
+            responseBody.code === 'RE' ? '서버에 문제가 있습니다' :
+            responseBody.code === 'PAF' ? '인증번호가 일치하지 않습니다' : '인증번호가 확인되었습니다';
+
+        const isSuccess = responseBody !== null && responseBody.code === 'SU';
+        setUserAuthCodeMessage(message);
+        setIsUserAuthCodeMessageError(!isSuccess);
+        setIsUserAuthCodeChecked(isSuccess);
+
+        if (isSuccess) {
+            setUserPhoneNumberMessage('');
+            setIsUserPhoneNumberMessageError(false);
+            setIsPhoneNumberRetryError(false);
+        }
+    };
 
     // function: get university list response 처리 함수 //
     const getUniversityListResponse = (responseBody: GetUniversityListResponseDto | ResponseDto | null) => {
@@ -254,7 +285,7 @@ export default function SignUp() {
         setUserPhoneNumberMessage(message);
         setIsUserPhoneNumberMessageError(!isMatch);
         setIsUserPhoneNumberPatternMatched(isMatch);
-        setIsUserAuthCodeSend(false);
+        setIsUserPhoneNumberSend(false);
     };
 
     // event handler: 사용자 인증번호 변경 이벤트 처리 //
@@ -268,6 +299,7 @@ export default function SignUp() {
         setUserAuthCodeMessage('');
         setIsUserAuthCodeMessageError(false);
         setIsUserAuthCodeChecked(false);
+
         if (isPhoneNumberRetryError) {
             setUserPhoneNumberMessage('');
             setIsUserPhoneNumberMessageError(false);
@@ -338,13 +370,37 @@ export default function SignUp() {
 
     // event handler: 전화번호 인증 버튼 클릭 이벤트 처리 //
     const onSendAuthCodeClickHandler = () => {
-        if (!userPhoneNumber) return;
+        if (!isUserPhoneNumberAuthButtonActive) return;
+
+        if (isPhoneNumberEditMode) {
+            setIsUserPhoneNumberSend(false);
+            setUserAuthCode('');
+            setUserPhoneNumberMessage('');
+            setIsUserPhoneNumberMessageError(false);
+            setUserAuthCodeMessage('');
+            setIsUserAuthCodeMessageError(false);
+            return;
+        }
 
         const phoneNumberWithoutHyphen = userPhoneNumber.replace(/[^\d]/g, '');
 
         const requestBody: PhoneNumberAuthRequestDto = { phoneNumber: phoneNumberWithoutHyphen };
         phoneNumberAuthRequest(requestBody).then(phoneNumberAuthResponse);
     };
+
+    // event handler: 전화번호 인증 확인 버튼 클릭 이벤트 처리 //
+    const onAuthCodeCheckClickHandler = () => {
+        if (!isUserAuthCodeButtonActive) return;
+
+        const phoneNumberWithoutHyphen = userPhoneNumber.replace(/[^\d]/g, '');
+
+        const requestBody: PhoneNumberAuthVerifyRequestDto = {
+            phoneNumber: phoneNumberWithoutHyphen,
+            authCode: userAuthCode
+        }
+        
+        phoneNumberAuthVerifyRequest(requestBody).then(phoneNumberAuthVerifyResponse);
+    };  
 
     // event handler: 주소 검색 버튼 클릭 이벤트 처리 //
     const onSearchAddressClickHandler = () => {
@@ -400,15 +456,15 @@ export default function SignUp() {
             <div className='input-container'>
                 <InputBox label={'이름'} type={'text'} value={userName} placeholder={'이름을 입력해주세요'} onChange={onUserNameChangeHandler} message={userNameMessage} isErrorMessage />
                 
-                <InputBox label={'아이디'} type={'text'} value={userId} placeholder={'아이디를 입력해주세요'} onChange={onUserIdChangeHandler} message={userIdMessage} buttonName={'중복확인'} onButtonClick={onCheckUserIdClickHandler} isErrorMessage isButtonActive={isUserIdCheckButtonActive} />
+                <InputBox label={'아이디'} type={'text'} value={userId} placeholder={'아이디를 입력해주세요'} onChange={onUserIdChangeHandler} message={userIdMessage} buttonName={'중복확인'} onButtonClick={onCheckUserIdClickHandler} isErrorMessage={isUserIdMessageError} isButtonActive={isUserIdCheckButtonActive} />
 
                 <InputBox label={'비밀번호'} type={'password'} value={userPassword} placeholder={'특수문자 !@#$%^&*-_? 중 1개 이상을 포함해 입력해주세요'} onChange={onUserPasswordChangeHandler} message={userPasswordMessage} isErrorMessage />
 
                 <InputBox label={'비밀번호 확인'} type={'password'} value={userPasswordCheck} placeholder={'비밀번호를 입력해주세요'} onChange={onUserPasswordCheckChangeHandler} message={userPasswordCheckMessage} isErrorMessage />
 
-                <InputBox label={'전화번호'} type={'text'} value={userPhoneNumber} placeholder={'-빼고 입력해주세요'} onChange={onUserPhoneNumberChangeHandler} message={userPhoneNumberMessage} buttonName={'전화번호 인증'} onButtonClick={onSendAuthCodeClickHandler} isErrorMessage isButtonActive={isUserPhoneNumberAuthButtonActive} />
+                <InputBox label={'전화번호'} type={'text'} value={userPhoneNumber} placeholder={'-빼고 입력해주세요'} onChange={onUserPhoneNumberChangeHandler} message={userPhoneNumberMessage} buttonName={phoneNumberButtonClass} onButtonClick={onSendAuthCodeClickHandler} isErrorMessage={isUserPhoneNumberMessageError} isButtonActive={isUserPhoneNumberAuthButtonActive} readOnly={isUserPhoneNumberSend}/>
 
-                <InputBox label={'인증번호'} type={'text'} value={userAuthCode} placeholder={'인증번호 4자리를 입력해주세요'} onChange={onUserAuthCodeChangeHandler} message={userAuthCodeMessage} buttonName={'인증 확인'} onButtonClick={() => {}} isErrorMessage isButtonActive={false} />
+                <InputBox label={'인증번호'} type={'text'} value={userAuthCode} placeholder={'인증번호 4자리를 입력해주세요'} onChange={onUserAuthCodeChangeHandler} message={userAuthCodeMessage} buttonName={'인증 확인'} onButtonClick={onAuthCodeCheckClickHandler} isErrorMessage={isUserAuthCodeMessageError} isButtonActive={isUserAuthCodeButtonActive} readOnly={isUserAuthCodeChecked}/>
 
                 <InputBox label={'생년월일'} type={'text'} value={userBirthDate} placeholder={'생년월일 8자리 입력해주세요 (예: 19871009)'} onChange={onUserBirthDateChangeHandler} message={userBirthDateMessage} isErrorMessage />
 
