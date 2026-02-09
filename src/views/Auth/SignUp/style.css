@@ -96,6 +96,7 @@
     border-radius: 10px;
     border: 2px solid transparent;
     background-clip: padding-box;
+    min-height: 70px;
 } 
 
 .university-selector-container .selector .selector-option {

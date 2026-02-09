@@ -3,6 +3,10 @@ import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 import './style.css';
 import InputBox from 'src/components/InputBox';
 import Gender from 'src/types/aliases/gender.alias';
+import { getUniversityListRequest } from 'src/apis/dto';
+import { GetUniversityListResponseDto } from 'src/apis/dto/response/auth';
+import { ResponseDto } from 'src/apis/dto/response';
+import { University } from 'src/types/interfaces';
 
 // component: 회원가입 컴포넌트 //
 export default function SignUp() {
@@ -17,7 +21,7 @@ export default function SignUp() {
     const [userAuthCode, setUserAuthCode] = useState<string>('');
     const [userBirthDate, setUserBirthDate] = useState<string>('');
     const [userAddress, setUserAddress] = useState<string>('');
-    const [userUniversity, setUserUniversity] = useState<string>('');
+    const [userUniversity, setUserUniversity] = useState<University | null>(null);
     // state: 사용자 승인번호 상태 //
     const [userApprovalCode, setUserApprovalCode] = useState<string>('');
     const [userGender, setUserGender] = useState<Gender | ''>('');
@@ -56,8 +60,11 @@ export default function SignUp() {
     const [isUserAuthCodeSend, setIsUserAuthCodeSend] = useState<boolean>(false);
     const [isUserBirthDatePatternMatched, setIsUserBirthDatePatternMatched] = useState<boolean>(false);
     
+    // state: 대학교 리스트 상태 //
+    const [userUniversityList, setUserUniversityList] = useState<University[]>([]);
+
     // state: 대학교 선택 셀럭터 오픈 여부 상태 //
-    const [showUniversitySelector, setUniversityShowSelector] = useState<boolean>(false);
+    const [showUniversitySelector, setShowUniversityShowSelector] = useState<boolean>(false);
 
     // variable: 사용자 성별 아이콘 클래스 //
     const  femaleIconClass = userGender === '여성' ? 'check-icon active': 'check-icon';
@@ -107,6 +114,22 @@ export default function SignUp() {
         }
         
         return false;
+    };
+
+    // function: get university list response 처리 함수 //
+    const getUniversityListResponse = (responseBody: GetUniversityListResponseDto | ResponseDto | null) => {
+        const message =
+            !responseBody ? '서버에 문제가 있습니다.' :
+            responseBody.code === 'DBE' ? '서버에 문제가 있습니다.' : '';
+        
+        const isSuccessed = responseBody !== null && responseBody.code === 'SU';
+        if (!isSuccessed) {
+            alert(message);
+            return;
+        }
+
+        const { universities } = responseBody as GetUniversityListResponseDto;
+        setUserUniversityList(universities);
     };
 
     // event handler: 사용자 이름 변경 이벤트 처리 //
@@ -213,7 +236,11 @@ export default function SignUp() {
         setIsUserBirthDatePatternMatched(isMatch);
     };
 
-    // TODO: 대학교 선택 변경 이벤트 처리 //
+    // event handler: 사용자 대학교 선택 이벤트 처리 //
+    const onUniversitySelectHandler = (universitiy: University) => {
+        setUserUniversity(universitiy);
+        setShowUniversityShowSelector(false);
+    };
 
     // event handler: 사용자 인증번호 변경 이벤트 처리 //
     const onUserApprovalCodeChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
@@ -233,8 +260,13 @@ export default function SignUp() {
 
     // event handler: 대학교 셀렉터 오픈 이벤트 처리 //
     const onUniversitySelectorClickHandler = () => {
-        setUniversityShowSelector(!showUniversitySelector);
+        setShowUniversityShowSelector(!showUniversitySelector);
     };
+    
+    // effect: 컴포넌트 로드 시 실행할 함수 //
+    useEffect(() => {
+        getUniversityListRequest().then(getUniversityListResponse);
+    }, []);
 
     // effect: 사용자 비밀번호 또는 비밀번호 확인이 변경될 시 실행할 함수 //
     useEffect(() => {
@@ -250,7 +282,7 @@ export default function SignUp() {
     useEffect(() => {
         const onOutsidClickHanlder= (event: MouseEvent) => {
             if (selectorRef.current && !selectorRef.current.contains(event.target as Node)) {
-                setUniversityShowSelector(false);
+                setShowUniversityShowSelector(false);
             }
         };
 
@@ -287,22 +319,16 @@ export default function SignUp() {
 
                     {showUniversitySelector ? 
                     <div ref={selectorRef} className='selector open' onClick={onUniversitySelectorClickHandler}>
-                        <div className='selected-item'>기타</div>
+                        <div className='selected-item'>{userUniversity ? userUniversity.universityName : '기타'}</div>
                         <div className='arrow-up-button'></div>
                         <div className='selector-box'>
-                            <div className='selector-option'>기타</div>
-                            <div className='selector-option'>가야대학교</div>
-                            <div className='selector-option'>가야대학교</div>
-                            <div className='selector-option'>가천대학교</div>
-                            <div className='selector-option'>가톨릭관동대학교</div>
-                            <div className='selector-option'>가톨릭꽃동네대학교</div>
-                            <div className='selector-option'>가톨릭대학교</div>
-                            <div className='selector-option'>가톨릭상지대학교</div>
-                            <div className='selector-option'>감리교신학대학교</div>
+                            {userUniversityList.map((university, index) => 
+                            <div key={index} className='selector-option' onClick={() => onUniversitySelectHandler(university)}>{university.universityName}</div>
+                            )}
                     </div>
                     </div> :
                     <div className='selector close' onClick={onUniversitySelectorClickHandler}>
-                        <div className='selected-item'>기타</div>
+                        <div className='selected-item'>{userUniversity ? userUniversity.universityName : '기타'}</div>
                         <div className='arrow-down-button'></div>
                     </div>
                     }
