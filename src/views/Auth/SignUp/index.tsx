@@ -1,4 +1,5 @@
 import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { Address, useDaumPostcodePopup } from 'react-daum-postcode';
 
 import './style.css';
 import InputBox from 'src/components/InputBox';
@@ -114,6 +115,16 @@ export default function SignUp() {
         }
         
         return false;
+    };
+
+    // function: 다음 포스트 코드 팝업 오픈 함수 //
+    const open = useDaumPostcodePopup();
+
+    // function: 다음 포스트 코드 완료 처리 함수 //
+    const daumPostCompleteHandler = (data: Address) => {
+        const { address } = data;
+        setUserAddress(address);
+        setUserAddressMessage('');
     };
 
     // function: get university list response 처리 함수 //
@@ -236,6 +247,12 @@ export default function SignUp() {
         setIsUserBirthDatePatternMatched(isMatch);
     };
 
+    // event handler: 사용자 주소 변경 이벤트 처리 //
+    const onUserAddressChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        setUserAddress(value);
+    };
+
     // event handler: 사용자 대학교 선택 이벤트 처리 //
     const onUniversitySelectHandler = (universitiy: University) => {
         setUserUniversity(universitiy);
@@ -261,6 +278,23 @@ export default function SignUp() {
     // event handler: 대학교 셀렉터 오픈 이벤트 처리 //
     const onUniversitySelectorClickHandler = () => {
         setShowUniversityShowSelector(!showUniversitySelector);
+    };
+
+    // event handler: 주소 검색 버튼 클릭 이벤트 처리 //
+    const onSearchAddressClickHandler = () => {
+        const width = 500;
+        const height = 500;
+
+        const left = window.screenLeft +  (window.innerWidth / 2) - (width / 2);
+        const top = Math.ceil((window.screen.height - height) / 2);
+
+        open({ 
+            onComplete: daumPostCompleteHandler,
+            width,
+            height,
+            left,
+            top 
+        });
     };
     
     // effect: 컴포넌트 로드 시 실행할 함수 //
@@ -312,7 +346,7 @@ export default function SignUp() {
 
                 <InputBox label={'생년월일'} type={'text'} value={userBirthDate} placeholder={'생년월일 8자리 입력해주세요 (예: 19871009)'} onChange={onUserBirthDateChangeHandler} message={userBirthDateMessage} isErrorMessage />
 
-                <InputBox label={'주소'} type={'text'} value={userAddress} placeholder={'주소를 입력해주세요'} onChange={() => {}} message={userAddressMessage} buttonName={'주소검색'} onButtonClick={() => {}} isErrorMessage isButtonActive={true} readOnly/>
+                <InputBox label={'주소'} type={'text'} value={userAddress} placeholder={'주소를 입력해주세요'} onChange={onUserAddressChangeHandler} message={userAddressMessage} buttonName={'주소검색'} onButtonClick={onSearchAddressClickHandler} isErrorMessage isButtonActive={true} readOnly/>
 
                 <div className='university-selector-container'>
                     <div className='label'>대학교 선택</div>
