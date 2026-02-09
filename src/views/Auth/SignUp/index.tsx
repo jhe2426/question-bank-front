@@ -4,11 +4,11 @@ import { Address, useDaumPostcodePopup } from 'react-daum-postcode';
 import './style.css';
 import InputBox from 'src/components/InputBox';
 import Gender from 'src/types/aliases/gender.alias';
-import { getUniversityListRequest, idCheckRequest, phoneNumberAuthRequest, phoneNumberAuthVerifyRequest } from 'src/apis/dto';
+import { approvalCodeVerifyRequest, getUniversityListRequest, idCheckRequest, phoneNumberAuthRequest, phoneNumberAuthVerifyRequest } from 'src/apis/dto';
 import { GetUniversityListResponseDto } from 'src/apis/dto/response/auth';
 import { ResponseDto } from 'src/apis/dto/response';
 import { University } from 'src/types/interfaces';
-import { IdCheckRequestDto, PhoneNumberAuthRequestDto, PhoneNumberAuthVerifyRequestDto } from 'src/apis/dto/request/auth';
+import { ApprovalCodeVerifyRequestDto, IdCheckRequestDto, PhoneNumberAuthRequestDto, PhoneNumberAuthVerifyRequestDto } from 'src/apis/dto/request/auth';
 
 // component: 회원가입 컴포넌트 //
 export default function SignUp() {
@@ -72,13 +72,16 @@ export default function SignUp() {
     const [showUniversitySelector, setShowUniversityShowSelector] = useState<boolean>(false);
 
     // variable: 중복 확인 버튼 활성화 //
-    const isUserIdCheckButtonActive = userId !== '' && isUserIdPatternMatched;
+    const isUserIdCheckButtonActive = userId !== '' && isUserIdPatternMatched && !isUserApprovalCodeChecked;
 
     // variable: 전화번호 인증 버튼 활성화 //
     const isUserPhoneNumberAuthButtonActive = userPhoneNumber !== '' && isUserPhoneNumberPatternMatched && !isUserAuthCodeChecked;
 
     // variable: 전화번호 인증 확인 버튼 활성화 //
     const isUserAuthCodeButtonActive = userAuthCode !== '' && userAuthCode.length == 4 && !isUserAuthCodeChecked;
+
+    // variable: 승인번호 확인 버튼 활성화 //
+    const isUserApprovalCodeButtonActive = userApprovalCode !== '' && !isUserApprovalCodeChecked && isUserIdChecked;
 
     // variable: 전화번호 인증 버튼 재전송 모드 //
     const isPhoneNumberEditMode = isUserPhoneNumberSend && !isUserAuthCodeChecked;
@@ -197,6 +200,21 @@ export default function SignUp() {
             setIsUserPhoneNumberMessageError(false);
             setIsPhoneNumberRetryError(false);
         }
+    };
+
+    // function: 승인번호 확인 response body 처리 함수 //
+    const approvalCodeVerifyResponse = (responseBody: ResponseDto | null) => {
+        const message =
+            !responseBody ? '서버에 문제가 있습니다' : 
+            responseBody.code === 'DBE' ? '서버에 문제가 있습니다' :
+            responseBody.code === 'EUI' ? '이미 사용중인 아이디입니다. 아이디를 변경 후 다시 시도해주세요' :
+            responseBody.code === 'AAF' ? '승인번호가 일치하지 않습니다' : 
+            responseBody.code === 'AU' ? '이미 사용된 승인번호입니다' : '승인번호가 확인되었습니다';
+        
+        const isSuccess = responseBody !== null && responseBody.code === 'SU';
+        setUserApprovalCodeMessage(message);
+        setIsUserApprovalCodeMessageError(!isSuccess);
+        setIsUserApprovalCodeChecked(isSuccess);
     };
 
     // function: get university list response 처리 함수 //
@@ -397,7 +415,7 @@ export default function SignUp() {
         const requestBody: PhoneNumberAuthVerifyRequestDto = {
             phoneNumber: phoneNumberWithoutHyphen,
             authCode: userAuthCode
-        }
+        };
         
         phoneNumberAuthVerifyRequest(requestBody).then(phoneNumberAuthVerifyResponse);
     };  
@@ -418,6 +436,19 @@ export default function SignUp() {
             top 
         });
     };
+
+    // event handler: 승인번호 확인 버튼 클릭 이벤트 처리 //
+    const onApprovalCodeCheckClickHandler = () => {
+        if (!isUserApprovalCodeButtonActive) return;
+
+        const requestBody: ApprovalCodeVerifyRequestDto = {
+            userId,
+            approvalCode: userApprovalCode
+        };
+
+        approvalCodeVerifyRequest(requestBody).then(approvalCodeVerifyResponse);
+    };
+
     
     // effect: 컴포넌트 로드 시 실행할 함수 //
     useEffect(() => {
@@ -456,7 +487,7 @@ export default function SignUp() {
             <div className='input-container'>
                 <InputBox label={'이름'} type={'text'} value={userName} placeholder={'이름을 입력해주세요'} onChange={onUserNameChangeHandler} message={userNameMessage} isErrorMessage />
                 
-                <InputBox label={'아이디'} type={'text'} value={userId} placeholder={'아이디를 입력해주세요'} onChange={onUserIdChangeHandler} message={userIdMessage} buttonName={'중복확인'} onButtonClick={onCheckUserIdClickHandler} isErrorMessage={isUserIdMessageError} isButtonActive={isUserIdCheckButtonActive} />
+                <InputBox label={'아이디'} type={'text'} value={userId} placeholder={'아이디를 입력해주세요'} onChange={onUserIdChangeHandler} message={userIdMessage} buttonName={'중복확인'} onButtonClick={onCheckUserIdClickHandler} isErrorMessage={isUserIdMessageError} isButtonActive={isUserIdCheckButtonActive} readOnly={isUserApprovalCodeChecked} />
 
                 <InputBox label={'비밀번호'} type={'password'} value={userPassword} placeholder={'특수문자 !@#$%^&*-_? 중 1개 이상을 포함해 입력해주세요'} onChange={onUserPasswordChangeHandler} message={userPasswordMessage} isErrorMessage />
 
@@ -490,7 +521,7 @@ export default function SignUp() {
                     }
                 </div>
 
-                <InputBox label={'승인번호'} type={'text'} value={userApprovalCode} placeholder={'승인번호를 입력해주세요'} onChange={onUserApprovalCodeChangeHandler} message={userApprovalCodeMessage} buttonName={'승인번호 확인'} onButtonClick={() => {}} isErrorMessage isButtonActive={false} />    
+                <InputBox label={'승인번호'} type={'text'} value={userApprovalCode} placeholder={'승인번호를 입력해주세요'} onChange={onUserApprovalCodeChangeHandler} message={userApprovalCodeMessage} buttonName={'승인번호 확인'} onButtonClick={onApprovalCodeCheckClickHandler} isErrorMessage={isUserApprovalCodeMessageError} isButtonActive={isUserApprovalCodeButtonActive} readOnly={isUserApprovalCodeChecked} />    
 
                 <div className='gender-selector-container'>
                     <div className='label'>성별</div>
