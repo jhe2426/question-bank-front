@@ -4,11 +4,11 @@ import { Address, useDaumPostcodePopup } from 'react-daum-postcode';
 import './style.css';
 import InputBox from 'src/components/InputBox';
 import Gender from 'src/types/aliases/gender.alias';
-import { getUniversityListRequest, idCheckRequest } from 'src/apis/dto';
+import { getUniversityListRequest, idCheckRequest, phoneNumberAuthRequest } from 'src/apis/dto';
 import { GetUniversityListResponseDto } from 'src/apis/dto/response/auth';
 import { ResponseDto } from 'src/apis/dto/response';
 import { University } from 'src/types/interfaces';
-import { IdCheckRequestDto } from 'src/apis/dto/request/auth';
+import { IdCheckRequestDto, PhoneNumberAuthRequestDto } from 'src/apis/dto/request/auth';
 
 // component: 회원가입 컴포넌트 //
 export default function SignUp() {
@@ -51,6 +51,7 @@ export default function SignUp() {
     // state: 사용자 입력 유효성 및 중복 확인 상태 //
     const [isUserIdChecked, setIsUserIdChecked] = useState<boolean>(false);
     const [isUserPasswordChecked, setIsUserPasswordChecked] = useState<boolean>(false);
+    const [isUserPhoneNumberSend, setIsUserPhoneNumberSend] = useState<boolean>(false);
     const [isUserAuthCodeChecked, setIsUserAuthCodeChecked] = useState<boolean>(false);
     const [isUserApprovalCodeChecked, setIsUserApprovalCodeChecked] = useState<boolean>(false);
 
@@ -61,6 +62,9 @@ export default function SignUp() {
     const [isUserPhoneNumberPatternMatched, setIsUserPhoneNumberPatternMatched] = useState<boolean>(false);
     const [isUserAuthCodeSend, setIsUserAuthCodeSend] = useState<boolean>(false);
     const [isUserBirthDatePatternMatched, setIsUserBirthDatePatternMatched] = useState<boolean>(false);
+
+    // state: 전화번호 인증 재전송 상태 //
+    const [isPhoneNumberRetryError, setIsPhoneNumberRetryError] = useState<boolean>(false);
     
     // state: 대학교 리스트 상태 //
     const [userUniversityList, setUserUniversityList] = useState<University[]>([]);
@@ -70,6 +74,9 @@ export default function SignUp() {
 
     // variable: 중복 확인 버튼 활성화 //
     const isUserIdCheckButtonActive = userId !== '' && isUserIdPatternMatched;
+
+    // variable: 전화번호 인증 버튼 활성화 //
+    const isUserPhoneNumberAuthButtonActive = userPhoneNumber !== '' && isUserPhoneNumberPatternMatched;
 
     // variable: 사용자 성별 아이콘 클래스 //
     const  femaleIconClass = userGender === '여성' ? 'check-icon active': 'check-icon';
@@ -140,11 +147,26 @@ export default function SignUp() {
             responseBody.code == 'VF' ? '아이디를 영문, 숫자를 혼용하여 3 ~ 15자 입력해주세요' : '사용 가능한 아이디입니다';
 
         const isSuccess = responseBody !== null && responseBody.code === 'SU';
-        
         setUserIdMessage(message);
         setIsUserIdMessageError(!isSuccess);
         setIsUserIdChecked(isSuccess);
     };
+
+    // function: 전화번호 인증 Response 처리 함수 //
+    const phoneNumberAuthResponse = (responseBody: ResponseDto | null) => {
+        const message = 
+            !responseBody ? '서버에 문제가 있습니다' : 
+            responseBody.code === 'RE' ? '서버에 문제가 있습니다' :
+            responseBody.code === 'EUP' ? '이미 사용중인 전화번호입니다' :
+            responseBody.code === 'AR' ? '이미 인증번호가 발송되었습니다' :
+            responseBody.code === 'SSF' ? '서버에 문제가 있습니다' : '인증번호가 전송되었습니다';
+        
+        const isSuccess = responseBody !== null && responseBody.code === 'SU';
+        setUserPhoneNumberMessage(message);
+        setIsUserPhoneNumberMessageError(!isSuccess);
+        setIsUserPhoneNumberSend(isSuccess);
+        if (responseBody?.code === 'AR') setIsPhoneNumberRetryError(true);
+    }; 
 
     // function: get university list response 처리 함수 //
     const getUniversityListResponse = (responseBody: GetUniversityListResponseDto | ResponseDto | null) => {
@@ -246,6 +268,11 @@ export default function SignUp() {
         setUserAuthCodeMessage('');
         setIsUserAuthCodeMessageError(false);
         setIsUserAuthCodeChecked(false);
+        if (isPhoneNumberRetryError) {
+            setUserPhoneNumberMessage('');
+            setIsUserPhoneNumberMessageError(false);
+            setIsPhoneNumberRetryError(false);
+        }
     };
 
     // event handler: 사용자 생년월일 변경 이벤트 처리 //
@@ -301,18 +328,26 @@ export default function SignUp() {
 
 
     // event handler: 중복 확인 버튼 클릭 이벤트 처리 //
-    const onCheckUserIdButtonClickHandler = () => {
+    const onCheckUserIdClickHandler = () => {
         if (!isUserIdCheckButtonActive) return;
 
-        const requestBody: IdCheckRequestDto = {
-            userId
-        };
+        const requestBody: IdCheckRequestDto = { userId };
 
         idCheckRequest(requestBody).then(idCheckResponse);
     };
 
+    // event handler: 전화번호 인증 버튼 클릭 이벤트 처리 //
+    const onSendAuthCodeClickHandler = () => {
+        if (!userPhoneNumber) return;
+
+        const phoneNumberWithoutHyphen = userPhoneNumber.replace(/[^\d]/g, '');
+
+        const requestBody: PhoneNumberAuthRequestDto = { phoneNumber: phoneNumberWithoutHyphen };
+        phoneNumberAuthRequest(requestBody).then(phoneNumberAuthResponse);
+    };
+
     // event handler: 주소 검색 버튼 클릭 이벤트 처리 //
-    const onSearchAddressButtonClickHandler = () => {
+    const onSearchAddressClickHandler = () => {
         const width = 500;
         const height = 500;
 
@@ -365,19 +400,19 @@ export default function SignUp() {
             <div className='input-container'>
                 <InputBox label={'이름'} type={'text'} value={userName} placeholder={'이름을 입력해주세요'} onChange={onUserNameChangeHandler} message={userNameMessage} isErrorMessage />
                 
-                <InputBox label={'아이디'} type={'text'} value={userId} placeholder={'아이디를 입력해주세요'} onChange={onUserIdChangeHandler} message={userIdMessage} buttonName={'중복확인'} onButtonClick={onCheckUserIdButtonClickHandler} isErrorMessage isButtonActive={isUserIdCheckButtonActive} />
+                <InputBox label={'아이디'} type={'text'} value={userId} placeholder={'아이디를 입력해주세요'} onChange={onUserIdChangeHandler} message={userIdMessage} buttonName={'중복확인'} onButtonClick={onCheckUserIdClickHandler} isErrorMessage isButtonActive={isUserIdCheckButtonActive} />
 
                 <InputBox label={'비밀번호'} type={'password'} value={userPassword} placeholder={'특수문자 !@#$%^&*-_? 중 1개 이상을 포함해 입력해주세요'} onChange={onUserPasswordChangeHandler} message={userPasswordMessage} isErrorMessage />
 
                 <InputBox label={'비밀번호 확인'} type={'password'} value={userPasswordCheck} placeholder={'비밀번호를 입력해주세요'} onChange={onUserPasswordCheckChangeHandler} message={userPasswordCheckMessage} isErrorMessage />
 
-                <InputBox label={'전화번호'} type={'text'} value={userPhoneNumber} placeholder={'-빼고 입력해주세요'} onChange={onUserPhoneNumberChangeHandler} message={userPhoneNumberMessage} buttonName={'전화번호 인증'} onButtonClick={() => {}} isErrorMessage isButtonActive={false} />
+                <InputBox label={'전화번호'} type={'text'} value={userPhoneNumber} placeholder={'-빼고 입력해주세요'} onChange={onUserPhoneNumberChangeHandler} message={userPhoneNumberMessage} buttonName={'전화번호 인증'} onButtonClick={onSendAuthCodeClickHandler} isErrorMessage isButtonActive={isUserPhoneNumberAuthButtonActive} />
 
                 <InputBox label={'인증번호'} type={'text'} value={userAuthCode} placeholder={'인증번호 4자리를 입력해주세요'} onChange={onUserAuthCodeChangeHandler} message={userAuthCodeMessage} buttonName={'인증 확인'} onButtonClick={() => {}} isErrorMessage isButtonActive={false} />
 
                 <InputBox label={'생년월일'} type={'text'} value={userBirthDate} placeholder={'생년월일 8자리 입력해주세요 (예: 19871009)'} onChange={onUserBirthDateChangeHandler} message={userBirthDateMessage} isErrorMessage />
 
-                <InputBox label={'주소'} type={'text'} value={userAddress} placeholder={'주소를 입력해주세요'} onChange={onUserAddressChangeHandler} message={userAddressMessage} buttonName={'주소검색'} onButtonClick={onSearchAddressButtonClickHandler} isErrorMessage isButtonActive={true} readOnly/>
+                <InputBox label={'주소'} type={'text'} value={userAddress} placeholder={'주소를 입력해주세요'} onChange={onUserAddressChangeHandler} message={userAddressMessage} buttonName={'주소검색'} onButtonClick={onSearchAddressClickHandler} isErrorMessage isButtonActive={true} readOnly/>
 
                 <div className='university-selector-container'>
                     <div className='label'>대학교 선택</div>
