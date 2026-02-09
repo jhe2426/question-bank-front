@@ -4,10 +4,11 @@ import { Address, useDaumPostcodePopup } from 'react-daum-postcode';
 import './style.css';
 import InputBox from 'src/components/InputBox';
 import Gender from 'src/types/aliases/gender.alias';
-import { getUniversityListRequest } from 'src/apis/dto';
+import { getUniversityListRequest, idCheckRequest } from 'src/apis/dto';
 import { GetUniversityListResponseDto } from 'src/apis/dto/response/auth';
 import { ResponseDto } from 'src/apis/dto/response';
 import { University } from 'src/types/interfaces';
+import { IdCheckRequestDto } from 'src/apis/dto/request/auth';
 
 // component: 회원가입 컴포넌트 //
 export default function SignUp() {
@@ -66,6 +67,9 @@ export default function SignUp() {
 
     // state: 대학교 선택 셀럭터 오픈 여부 상태 //
     const [showUniversitySelector, setShowUniversityShowSelector] = useState<boolean>(false);
+
+    // variable: 중복 확인 버튼 활성화 //
+    const isUserIdCheckButtonActive = userId !== '' && isUserIdPatternMatched;
 
     // variable: 사용자 성별 아이콘 클래스 //
     const  femaleIconClass = userGender === '여성' ? 'check-icon active': 'check-icon';
@@ -127,11 +131,26 @@ export default function SignUp() {
         setUserAddressMessage('');
     };
 
+    // function: id check response 처리 함수 //
+    const idCheckResponse = (responseBody: ResponseDto | null) => {
+        const message = 
+            !responseBody ? '서버에 문제가 있습니다' :
+            responseBody.code === 'DBE' ? '서버에 문제가 있습니다' :
+            responseBody.code === 'EUI' ? '이미 사용중인 아이디입니다' :
+            responseBody.code == 'VF' ? '아이디를 영문, 숫자를 혼용하여 3 ~ 15자 입력해주세요' : '사용 가능한 아이디입니다';
+
+        const isSuccess = responseBody !== null && responseBody.code === 'SU';
+        
+        setUserIdMessage(message);
+        setIsUserIdMessageError(!isSuccess);
+        setIsUserIdChecked(isSuccess);
+    };
+
     // function: get university list response 처리 함수 //
     const getUniversityListResponse = (responseBody: GetUniversityListResponseDto | ResponseDto | null) => {
         const message =
-            !responseBody ? '서버에 문제가 있습니다.' :
-            responseBody.code === 'DBE' ? '서버에 문제가 있습니다.' : '';
+            !responseBody ? '서버에 문제가 있습니다' :
+            responseBody.code === 'DBE' ? '서버에 문제가 있습니다' : '';
         
         const isSuccessed = responseBody !== null && responseBody.code === 'SU';
         if (!isSuccessed) {
@@ -280,8 +299,20 @@ export default function SignUp() {
         setShowUniversityShowSelector(!showUniversitySelector);
     };
 
+
+    // event handler: 중복 확인 버튼 클릭 이벤트 처리 //
+    const onCheckUserIdButtonClickHandler = () => {
+        if (!isUserIdCheckButtonActive) return;
+
+        const requestBody: IdCheckRequestDto = {
+            userId
+        };
+
+        idCheckRequest(requestBody).then(idCheckResponse);
+    };
+
     // event handler: 주소 검색 버튼 클릭 이벤트 처리 //
-    const onSearchAddressClickHandler = () => {
+    const onSearchAddressButtonClickHandler = () => {
         const width = 500;
         const height = 500;
 
@@ -334,7 +365,7 @@ export default function SignUp() {
             <div className='input-container'>
                 <InputBox label={'이름'} type={'text'} value={userName} placeholder={'이름을 입력해주세요'} onChange={onUserNameChangeHandler} message={userNameMessage} isErrorMessage />
                 
-                <InputBox label={'아이디'} type={'text'} value={userId} placeholder={'아이디를 입력해주세요'} onChange={onUserIdChangeHandler} message={userIdMessage} buttonName={'중복확인'} onButtonClick={() => {}} isErrorMessage isButtonActive={false} />
+                <InputBox label={'아이디'} type={'text'} value={userId} placeholder={'아이디를 입력해주세요'} onChange={onUserIdChangeHandler} message={userIdMessage} buttonName={'중복확인'} onButtonClick={onCheckUserIdButtonClickHandler} isErrorMessage isButtonActive={isUserIdCheckButtonActive} />
 
                 <InputBox label={'비밀번호'} type={'password'} value={userPassword} placeholder={'특수문자 !@#$%^&*-_? 중 1개 이상을 포함해 입력해주세요'} onChange={onUserPasswordChangeHandler} message={userPasswordMessage} isErrorMessage />
 
@@ -346,7 +377,7 @@ export default function SignUp() {
 
                 <InputBox label={'생년월일'} type={'text'} value={userBirthDate} placeholder={'생년월일 8자리 입력해주세요 (예: 19871009)'} onChange={onUserBirthDateChangeHandler} message={userBirthDateMessage} isErrorMessage />
 
-                <InputBox label={'주소'} type={'text'} value={userAddress} placeholder={'주소를 입력해주세요'} onChange={onUserAddressChangeHandler} message={userAddressMessage} buttonName={'주소검색'} onButtonClick={onSearchAddressClickHandler} isErrorMessage isButtonActive={true} readOnly/>
+                <InputBox label={'주소'} type={'text'} value={userAddress} placeholder={'주소를 입력해주세요'} onChange={onUserAddressChangeHandler} message={userAddressMessage} buttonName={'주소검색'} onButtonClick={onSearchAddressButtonClickHandler} isErrorMessage isButtonActive={true} readOnly/>
 
                 <div className='university-selector-container'>
                     <div className='label'>대학교 선택</div>

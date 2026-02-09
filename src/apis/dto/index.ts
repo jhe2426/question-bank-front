@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { ResponseDto } from './response';
-import { SignInRequestDto } from './request/auth';
+import { IdCheckRequestDto, SignInRequestDto } from './request/auth';
 import { GetUniversityListResponseDto, SignInResponseDto } from './response/auth';
 
 // variable: URL 상수 //
@@ -10,6 +10,7 @@ const AUTH_MODULE_URL = `${API_DOMAIN}/api/v1/auth`;
 
 const SIGN_IN_URL = `${AUTH_MODULE_URL}/sign-in`;
 const GET_UNIVERSITY_LIST_API_URL = `${AUTH_MODULE_URL}/universities`;
+const ID_CHECK_URL = `${AUTH_MODULE_URL}/id-check`;
 
 // function: response 성공 처리 함수 //
 const responseSuccessHandler = <T = ResponseDto>(response: AxiosResponse<T>) => {
@@ -28,6 +29,14 @@ const responseErrorHandler = (error: AxiosError<ResponseDto>) => {
 export const signInRequest = async (requestBody: SignInRequestDto) => {
     const responseBody = await axios.post(SIGN_IN_URL, requestBody)
         .then(responseSuccessHandler<SignInResponseDto>)
+        .catch(responseErrorHandler);
+    return responseBody;
+};
+
+// function: id check API 요청 함수 //
+export const idCheckRequest = async (requestBody: IdCheckRequestDto) => {
+    const responseBody = await axios.post(ID_CHECK_URL, requestBody)
+        .then(responseSuccessHandler)
         .catch(responseErrorHandler);
     return responseBody;
 };
