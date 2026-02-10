@@ -9,9 +9,17 @@ import { SignInResponseDto } from 'src/apis/dto/response/auth';
 import { useAuthStroe } from 'src/stores';
 import { MAIN_ABSOLUTE_PATH } from 'src/constants';
 import { signInRequest } from 'src/apis/dto';
+import AuthPage from 'src/types/aliases/auth-page.alias';
+
+// interface: 로그인 컴포넌트 속성 //
+interface Props {
+    onPageChange: (page: AuthPage) => void;
+}
 
 // component: 로그인 컴포넌트 //
-export default function SignIn() {
+export default function SignIn(props: Props) {
+
+    const { onPageChange } = props;
 
     // state: 유저 아이디 상태 //
     const [userId, setUserId] = useState<string>('');
@@ -108,17 +116,17 @@ export default function SignIn() {
 
     // render: 로그인 컴포넌트 렌더링 //
     return (
-        <div id="auth-login-container">
-            <div className="header">Login</div>
+        <div id='auth-login-container'>
+            <div className='header'>Login</div>
 
-            <div className="input-container">
+            <div className='input-container'>
                 <InputBox type={'text'} label={'아이디'} value={userId} placeholder={'아이디를 입력해주세요'} message={userIdMessage} isErrorMessage onChange={onUserIdChangeHandler} onKeyDown={onUserIdKeyDownHandler} />
                 <InputBox ref={userPasswordInputBoxRef} type={'password'} label={'비밀번호'} value={userPassword} placeholder={'비밀번호를 입력해주세요'} message={userPasswordMessage} isErrorMessage onChange={onUserPasswordChangeHandler} onKeyDown={onUserPasswordKeyDownHandler} />
             </div>
 
-            <div className="button-container">
-                <div className="button primary fullwidth" onClick={onLoginButtonClick}>로그인</div>
-                <div className="link">회원가입</div>
+            <div className='button-container'>
+                <div className='button primary fullwidth' onClick={onLoginButtonClick}>로그인</div>
+                <div className='link' onClick={() => onPageChange('sign-up')}>회원가입</div>
             </div>
         </div>
     )

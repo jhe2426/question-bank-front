@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { ResponseDto } from './response';
-import { ApprovalCodeVerifyRequestDto, IdCheckRequestDto, PhoneNumberAuthRequestDto, PhoneNumberAuthVerifyRequestDto, SignInRequestDto } from './request/auth';
+import { ApprovalCodeVerifyRequestDto, IdCheckRequestDto, PhoneNumberAuthRequestDto, PhoneNumberAuthVerifyRequestDto, SignInRequestDto, SignUpRequestDto } from './request/auth';
 import { GetUniversityListResponseDto, SignInResponseDto } from './response/auth';
 
 // variable: URL 상수 //
@@ -14,6 +14,7 @@ const ID_CHECK_URL = `${AUTH_MODULE_URL}/id-check`;
 const PHONE_NUMBER_AUTH_URL = `${AUTH_MODULE_URL}/phone-number/auth-code`;
 const PHONE_NUMBER_AUTH_VERIFY_URL = `${AUTH_MODULE_URL}/phone-number/auth-code/verify`;
 const APPROVAL_CODE_VERIFY_URL = `${AUTH_MODULE_URL}/approval-code/verify`;
+const SIGN_UP_URL = `${AUTH_MODULE_URL}/sign-up`;
 
 // function: response 성공 처리 함수 //
 const responseSuccessHandler = <T = ResponseDto>(response: AxiosResponse<T>) => {
@@ -72,6 +73,14 @@ export const getUniversityListRequest = async () => {
 export const approvalCodeVerifyRequest = async (requestBody: ApprovalCodeVerifyRequestDto) => {
     const responseBody = await axios.post(APPROVAL_CODE_VERIFY_URL, requestBody)
         .then(responseSuccessHandler)
-        .catch(responseErrorHandler)
+        .catch(responseErrorHandler);
+    return responseBody;
+};
+
+// function: sign up API 요청 함수 //
+export const signUpRequest = async (requestBody: SignUpRequestDto) => {
+    const responseBody = await axios.post(SIGN_UP_URL, requestBody)
+        .then(responseSuccessHandler)
+        .catch(responseErrorHandler);
     return responseBody;
 };

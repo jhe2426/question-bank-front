@@ -4,14 +4,22 @@ import { Address, useDaumPostcodePopup } from 'react-daum-postcode';
 import './style.css';
 import InputBox from 'src/components/InputBox';
 import Gender from 'src/types/aliases/gender.alias';
-import { approvalCodeVerifyRequest, getUniversityListRequest, idCheckRequest, phoneNumberAuthRequest, phoneNumberAuthVerifyRequest } from 'src/apis/dto';
+import { approvalCodeVerifyRequest, getUniversityListRequest, idCheckRequest, phoneNumberAuthRequest, phoneNumberAuthVerifyRequest, signUpRequest } from 'src/apis/dto';
 import { GetUniversityListResponseDto } from 'src/apis/dto/response/auth';
 import { ResponseDto } from 'src/apis/dto/response';
 import { University } from 'src/types/interfaces';
-import { ApprovalCodeVerifyRequestDto, IdCheckRequestDto, PhoneNumberAuthRequestDto, PhoneNumberAuthVerifyRequestDto } from 'src/apis/dto/request/auth';
+import { ApprovalCodeVerifyRequestDto, IdCheckRequestDto, PhoneNumberAuthRequestDto, PhoneNumberAuthVerifyRequestDto, SignUpRequestDto } from 'src/apis/dto/request/auth';
+import AuthPage from 'src/types/aliases/auth-page.alias';
+
+// interface: 회원가입 컴포넌트 속성 //
+interface Props {
+    onPageChange: (page: AuthPage) => void;
+}
 
 // component: 회원가입 컴포넌트 //
-export default function SignUp() {
+export default function SignUp(props: Props) {
+
+    const { onPageChange } = props;
 
     // state: 사용자 입력 정보 상태 //
     const [userName, setUserName] = useState<string>('');
@@ -23,7 +31,7 @@ export default function SignUp() {
     const [userAuthCode, setUserAuthCode] = useState<string>('');
     const [userBirthDate, setUserBirthDate] = useState<string>('');
     const [userAddress, setUserAddress] = useState<string>('');
-    const [userUniversity, setUserUniversity] = useState<University | null>(null);
+    const [userUniversity, setUserUniversity] = useState<University>({universityId:1, universityName:'기타'});
     // state: 사용자 승인번호 상태 //
     const [userApprovalCode, setUserApprovalCode] = useState<string>('');
     const [userGender, setUserGender] = useState<Gender | ''>('');
@@ -83,6 +91,18 @@ export default function SignUp() {
     // variable: 승인번호 확인 버튼 활성화 //
     const isUserApprovalCodeButtonActive = userApprovalCode !== '' && !isUserApprovalCodeChecked && isUserIdChecked;
 
+    // variable: 회원가입 버튼 활성화 //
+    const isFormFilled = 
+        userName && userId && userPassword && userPasswordCheck && userPhoneNumber && userAuthCode && userBirthDate &&
+        userAddress && userApprovalCode && userGender;
+    const isVerified = 
+        isUserIdChecked && isUserPasswordChecked && isUserPhoneNumberSend && isUserAuthCodeChecked && 
+        isUserApprovalCodeChecked
+    const isValidated =
+        isUserNamePatternMatched && isUserIdPatternMatched && isUserPasswordPatternMatched && isUserPhoneNumberPatternMatched &&
+        isUserBirthDatePatternMatched;
+    const isSignUpButtonActive = isFormFilled && isVerified && isValidated;
+
     // variable: 전화번호 인증 버튼 재전송 모드 //
     const isPhoneNumberEditMode = isUserPhoneNumberSend && !isUserAuthCodeChecked;
 
@@ -95,6 +115,9 @@ export default function SignUp() {
 
     // variable: 사용자 성별 메시지 클래스 //
     const genderMessageClass = `message ${isUserGenderError ? 'error' : ''}`;
+
+    // variable: 회원가입 버튼 클래스 //
+    const signUpButtonClass = `button ${isSignUpButtonActive ? 'primary' : 'disable'} fullwidth`;
 
     // reference: 대학교 셀렉터 컨테이너 요소 참조 //
     const selectorRef = useRef<HTMLDivElement>(null);
@@ -231,6 +254,48 @@ export default function SignUp() {
 
         const { universities } = responseBody as GetUniversityListResponseDto;
         setUserUniversityList(universities);
+    };
+
+    // function: sign up response 처리 함수 //
+    const signUpResponse = (responseBody: ResponseDto | null) => {
+        const message =
+            !responseBody ? '서버에 문제가 있습니다' :
+            responseBody.code === 'DBE' ? '서버에 문제가 있습니다' :
+            responseBody.code === 'RE' ? '서버에 문제가 있습니다' :
+            responseBody.code === 'EUI' ? '이미 사용중인 아이디입니다' :
+            responseBody.code === 'EUP' ? '이미 사용중인 전화번호입니다' :
+            responseBody.code === 'PAF' ? '전화번호 인증에 실패했습니다' :
+            responseBody.code === 'AAF' ? '승인번호 인증에 실패했습니다' : '';
+
+        const isSuccess = responseBody !== null && responseBody.code === 'SU';
+        if (!isSuccess) {
+            if (responseBody && responseBody.code === 'EUI') {
+                setUserIdMessage(message);
+                setIsUserIdMessageError(true);
+                return;
+            }
+            if (responseBody && responseBody.code === 'EUP') {
+                setUserPhoneNumberMessage(message);
+                setIsUserPhoneNumberMessageError(true);
+                return;
+            }
+            if (responseBody && responseBody.code === 'PAF') {
+                setUserAuthCodeMessage(message);
+                setIsUserAuthCodeMessageError(true);
+                return;
+            }
+            if (responseBody && responseBody.code === 'AAF') {
+                setUserApprovalCodeMessage(message);
+                setIsUserApprovalCodeMessageError(true);
+                return;
+            }
+
+            alert(message);
+            return;
+        }
+
+        alert('정상적으로 회원가입이 처리됐습니다');
+        onPageChange('sign-in');
     };
 
     // event handler: 사용자 이름 변경 이벤트 처리 //
@@ -449,6 +514,46 @@ export default function SignUp() {
         approvalCodeVerifyRequest(requestBody).then(approvalCodeVerifyResponse);
     };
 
+    // event handler: 회원가입 버튼 클릭 이벤트 처리 //
+    const onSignUpClickHandler = () => {
+        if (!userName) setUserNameMessage('이름을 입력해주세요');
+        if (!userPassword) setUserPasswordMessage('비밀번호를 입력해주세요');
+        if (!userAddress) setUserAddressMessage('주소를 입력해주세요');
+        if (!isUserIdChecked) {
+            setUserIdMessage('아이디 중복 확인해주세요');
+            setIsUserIdMessageError(true);
+        }
+        if (!isUserPhoneNumberSend) {
+            setUserPhoneNumberMessage('전화번호 인증을 해주세요');
+            setIsUserPhoneNumberMessageError(true);
+        }
+        if (!isUserAuthCodeChecked) {
+            setUserAuthCodeMessage('인증번호 확인해주세요');
+            setIsUserAuthCodeMessageError(true);
+        }
+        if (!isUserApprovalCodeChecked) {
+            setUserApprovalCodeMessage('승인번호 확인해주세요');
+            setIsUserApprovalCodeMessageError(true);
+        }
+        if (!userBirthDate) setUserBirthDateMessage('생년월일 8자를 입력해주세요');
+        if (!userGender) setIsUserGenderError(true);
+        if (!isSignUpButtonActive) return;
+        
+        const phoneNumberWithoutHyphen = userPhoneNumber.replace(/[^\d]/g, '');
+
+        const requestBody: SignUpRequestDto = {
+            userId,
+            password: userPassword,
+            phoneNumber: phoneNumberWithoutHyphen,
+            approvalCode: userApprovalCode,
+            name: userName,
+            birthDate: userBirthDate,
+            address: userAddress,
+            universityId: userUniversity.universityId,
+            gender: userGender
+        };
+        signUpRequest(requestBody).then(signUpResponse);
+    };
     
     // effect: 컴포넌트 로드 시 실행할 함수 //
     useEffect(() => {
@@ -542,8 +647,8 @@ export default function SignUp() {
             </div>
 
             <div className='button-container'>
-                <div className='button disable fullwidth'>회원가입</div>
-                <div className='link'>로그인</div>
+                <div className={signUpButtonClass} onClick={onSignUpClickHandler}>회원가입</div>
+                <div className='link' onClick={() => onPageChange('sign-in')}>로그인</div>
             </div>
         </div>
     )
