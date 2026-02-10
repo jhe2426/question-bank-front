@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { ResponseDto } from './response';
 import { ApprovalCodeVerifyRequestDto, IdCheckRequestDto, PhoneNumberAuthRequestDto, PhoneNumberAuthVerifyRequestDto, SignInRequestDto, SignUpRequestDto } from './request/auth';
-import { GetUniversityListResponseDto, SignInResponseDto } from './response/auth';
+import { GetUniversityListResponseDto, RefreshAccessTokenResponseDto, SignInResponseDto } from './response/auth';
 
 // variable: URL 상수 //
 const API_DOMAIN = process.env.REACT_APP_API_DOMAIN;
@@ -15,6 +15,7 @@ const PHONE_NUMBER_AUTH_URL = `${AUTH_MODULE_URL}/phone-number/auth-code`;
 const PHONE_NUMBER_AUTH_VERIFY_URL = `${AUTH_MODULE_URL}/phone-number/auth-code/verify`;
 const APPROVAL_CODE_VERIFY_URL = `${AUTH_MODULE_URL}/approval-code/verify`;
 const SIGN_UP_URL = `${AUTH_MODULE_URL}/sign-up`;
+const REFRESH_ACCESS_TOKEN_URL = `${AUTH_MODULE_URL}/refresh`;
 
 // function: response 성공 처리 함수 //
 const responseSuccessHandler = <T = ResponseDto>(response: AxiosResponse<T>) => {
@@ -81,6 +82,19 @@ export const approvalCodeVerifyRequest = async (requestBody: ApprovalCodeVerifyR
 export const signUpRequest = async (requestBody: SignUpRequestDto) => {
     const responseBody = await axios.post(SIGN_UP_URL, requestBody)
         .then(responseSuccessHandler)
+        .catch(responseErrorHandler);
+    return responseBody;
+};
+
+// function: refresh access token API 요청 함수 //
+export const refreshAccessTokenRequest = async (csrfToken: string) => {
+    const responseBody = await axios.post(REFRESH_ACCESS_TOKEN_URL, {}, 
+            { 
+                headers: { 'X-CSRF-TOKEN': csrfToken },
+                withCredentials: true
+            }
+        )
+        .then(responseSuccessHandler<RefreshAccessTokenResponseDto>)
         .catch(responseErrorHandler);
     return responseBody;
 };

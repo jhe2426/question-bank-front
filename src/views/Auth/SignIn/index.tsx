@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router';
 import { SignInRequestDto } from 'src/apis/dto/request/auth';
 import { ResponseDto } from 'src/apis/dto/response';
 import { SignInResponseDto } from 'src/apis/dto/response/auth';
-import { useAuthStroe } from 'src/stores';
+import { useAuthStore } from 'src/stores';
 import { MAIN_ABSOLUTE_PATH } from 'src/constants';
 import { signInRequest } from 'src/apis/dto';
 import AuthPage from 'src/types/aliases/auth-page.alias';
@@ -30,8 +30,8 @@ export default function SignIn(props: Props) {
     // state: 유저 비밀번호 메세지 상태
     const [userPasswordMessage, setUserPasswordMessage] = useState<string>('');
 
-    // state: 로그인 유저 정보 상태 //
-    const { setAccessToken } = useAuthStroe();
+    // state: accessToken 정보 상태 //
+    const { setAccessToken } = useAuthStore();
 
     // reference: 유저 비밀번호 InputBox 요소 참조 //
     const userPasswordInputBoxRef = useRef<HTMLInputElement | null>(null);

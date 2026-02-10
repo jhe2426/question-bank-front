@@ -1,5 +1,5 @@
-import useAuthStroe from './auth.store';
+import useAuthStore from './auth.store';
 
 export {
-    useAuthStroe
+    useAuthStore
 }
