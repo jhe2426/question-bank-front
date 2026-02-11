@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router';
 
 import './style.css';
-import { refreshAccessTokenRequest } from 'src/apis';
+import { logoutRequest, refreshAccessTokenRequest } from 'src/apis';
 import { useAuthStore } from 'src/stores';
 import { useCookies } from 'react-cookie';
 import { RefreshAccessTokenResponseDto } from 'src/apis/dto/response/auth';
@@ -16,7 +16,10 @@ export default function Layout() {
     const[cookies] = useCookies();
 
     // state: accessToken 정보 상태 //
-    const { accessToken, setAccessToken } = useAuthStore();
+    const { accessToken, setAccessToken, clearAuth } = useAuthStore();
+
+    // variable: csrf token //
+    const csrfToken = cookies['csrfToken'];
 
     // function: 네비게이터 함수 //
     const navigator = useNavigate();
@@ -33,13 +36,31 @@ export default function Layout() {
         setAccessToken(accessToken);
     };
 
-    // effect: AuthStore의 accessToken이 변경될 시 실행할 함수 //
-    useEffect(() => {
-        if(accessToken) return;
-        const csrfToken = cookies['csrfToken'];
+    // function: logout response 처리 함수 //
+    const logoutResponse = (responseBody: ResponseDto | null) => {
+        const isSuccess = responseBody !== null && responseBody.code === 'SU';
+        if (isSuccess) {
+            clearAuth();
+            navigator(AUTH_ABSOLUTE_PATH);
+        }
+    };
 
-        refreshAccessTokenRequest(csrfToken).then(refreshAccessTokenResponse);
-    }, [accessToken]);
+    // event handler: 로그아웃 클릭 이벤트 처리 //
+    const onLogoutClickHandler = () => {
+        if (accessToken == null) {
+            navigator(AUTH_ABSOLUTE_PATH);
+            return;
+        }
+        
+        logoutRequest(accessToken).then(logoutResponse);
+    };
+
+    // effect: 컴포넌트 로드 시 실행할 함수 //
+    useEffect(() => {
+        if (!accessToken && csrfToken) {
+            refreshAccessTokenRequest(csrfToken).then(refreshAccessTokenResponse);
+        }
+    }, []);
 
     // render: 공통 레이아웃 컴포넌트 렌더링 //
     return (
@@ -47,7 +68,7 @@ export default function Layout() {
             <div id='top-bar'>
                 <div className='navigation-list'>
                     <div>마이페이지</div>
-                    <div>로그아웃</div>
+                    <div onClick={onLogoutClickHandler}>로그아웃</div>
                 </div>
             </div>
             

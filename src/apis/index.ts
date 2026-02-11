@@ -19,6 +19,7 @@ const PHONE_NUMBER_AUTH_VERIFY_URL = `${AUTH_MODULE_URL}/phone-number/auth-code/
 const APPROVAL_CODE_VERIFY_URL = `${AUTH_MODULE_URL}/approval-code/verify`;
 const SIGN_UP_URL = `${AUTH_MODULE_URL}/sign-up`;
 const REFRESH_ACCESS_TOKEN_URL = `${AUTH_MODULE_URL}/refresh`;
+const LOGOUT_URL = `${AUTH_MODULE_URL}/logout`;
 
 // variable: refresh 토큰을 사용하여 access Token 발급 진행 여부 //
 let isRefreshing = false;
@@ -95,6 +96,9 @@ api.interceptors.response.use(
     }
 
 );
+
+// function: Authorization Bearer 헤더 //
+const bearerAuthorization = (accessToken: string) => ({ headers: { 'Authorization': `Bearer ${accessToken}` } })
 
 // function: response 성공 처리 함수 //
 const responseSuccessHandler = <T = ResponseDto>(response: AxiosResponse<T>) => {
@@ -176,4 +180,12 @@ export const refreshAccessTokenRequest = async (csrfToken: string) => {
         .then(responseSuccessHandler<RefreshAccessTokenResponseDto>)
         .catch(responseErrorHandler);
     return responseBody;
+};
+
+// function: logout API 요청 함수 //
+export const logoutRequest = async (accessToken: string) => {
+    const responesBody = await api.post(LOGOUT_URL, {}, bearerAuthorization(accessToken)) 
+        .then(responseSuccessHandler)
+        .catch(responseErrorHandler);
+    return responesBody;
 };
