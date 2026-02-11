@@ -8,7 +8,7 @@ import { ResponseDto } from 'src/apis/dto/response';
 import { SignInResponseDto } from 'src/apis/dto/response/auth';
 import { useAuthStore } from 'src/stores';
 import { MAIN_ABSOLUTE_PATH } from 'src/constants';
-import { signInRequest } from 'src/apis/dto';
+import { signInRequest } from 'src/apis';
 import AuthPage from 'src/types/aliases/auth-page.alias';
 
 // interface: 로그인 컴포넌트 속성 //

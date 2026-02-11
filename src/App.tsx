@@ -47,7 +47,7 @@ function Index() {
   // function: 네비게이터 함수 //
   const navigator = useNavigate();
 
-  // effect: 컴포넌트가 렌더링도리 때 실행할 함수 //
+  // effect: 컴포넌트가 렌더링될 때 실행할 함수 //
   useEffect(() => {
     if (accessToken) navigator(MAIN_ABSOLUTE_PATH);
     else navigator(AUTH_ABSOLUTE_PATH);

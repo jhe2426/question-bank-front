@@ -4,7 +4,7 @@ import { Address, useDaumPostcodePopup } from 'react-daum-postcode';
 import './style.css';
 import InputBox from 'src/components/InputBox';
 import Gender from 'src/types/aliases/gender.alias';
-import { approvalCodeVerifyRequest, getUniversityListRequest, idCheckRequest, phoneNumberAuthRequest, phoneNumberAuthVerifyRequest, signUpRequest } from 'src/apis/dto';
+import { approvalCodeVerifyRequest, getUniversityListRequest, idCheckRequest, phoneNumberAuthRequest, phoneNumberAuthVerifyRequest, signUpRequest } from 'src/apis';
 import { GetUniversityListResponseDto } from 'src/apis/dto/response/auth';
 import { ResponseDto } from 'src/apis/dto/response';
 import { University } from 'src/types/interfaces';
