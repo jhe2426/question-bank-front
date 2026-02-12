@@ -1,7 +1,6 @@
 import React, { ChangeEvent, useState } from 'react';
 
 import './style.css';
-import InputBox from 'src/components/InputBox';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
 import AuthPage from 'src/types/aliases/auth-page.alias';

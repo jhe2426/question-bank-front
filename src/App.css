@@ -8,6 +8,11 @@
     src: url(src/assets/fonts/Cafe24Ssurround.ttf);
 }
 
+@font-face {
+    font-family: 'Cafe24SsurroundAir';
+    src: url(src/assets/fonts/Cafe24SsurroundAir.ttf);
+}
+
 :root {
     --White: rgba(255, 255, 255, 1);
     --Lightmode-Grey: rgba(226, 226, 226, 1);
@@ -16,6 +21,8 @@
     --Lightmode-Grey4: rgba(96, 96, 96, 1);
     --Lightmode-Grey5: rgba(191, 191, 191, 1);
     --Lightmode-Grey6: rgba(222, 225, 230, 1);
+    --Lightmode-Grey7: rgba(236, 238, 240, 1);
+    --Lightmode-Grey8: rgba(254, 254, 254, 1);
     --Primary: rgba(13, 84, 160, 1);
     --PrimaryLight: rgba(30, 144, 255, 1);
     --PrimaryLight2: rgba(102, 178, 255, 1);

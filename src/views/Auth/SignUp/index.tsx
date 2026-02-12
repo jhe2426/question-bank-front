@@ -76,7 +76,7 @@ export default function SignUp(props: Props) {
     // state: 대학교 리스트 상태 //
     const [userUniversityList, setUserUniversityList] = useState<University[]>([]);
 
-    // state: 대학교 선택 셀럭터 오픈 여부 상태 //
+    // state: 대학교 선택 셀렉터 오픈 여부 상태 //
     const [showUniversitySelector, setShowUniversityShowSelector] = useState<boolean>(false);
 
     // variable: 중복 확인 버튼 활성화 //
@@ -617,7 +617,7 @@ export default function SignUp(props: Props) {
                             {userUniversityList.map((university, index) => 
                             <div key={index} className='selector-option' onClick={() => onUniversitySelectHandler(university)}>{university.universityName}</div>
                             )}
-                    </div>
+                        </div>
                     </div> :
                     <div className='selector close' onClick={onUniversitySelectorClickHandler}>
                         <div className='selected-item'>{userUniversity ? userUniversity.universityName : '기타'}</div>

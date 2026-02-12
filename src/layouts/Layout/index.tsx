@@ -57,6 +57,11 @@ export default function Layout() {
 
     // effect: 컴포넌트 로드 시 실행할 함수 //
     useEffect(() => {
+        if(!accessToken) {
+            navigator(AUTH_ABSOLUTE_PATH);
+            return;
+        }
+
         if (!accessToken && csrfToken) {
             refreshAccessTokenRequest(csrfToken).then(refreshAccessTokenResponse);
         }
