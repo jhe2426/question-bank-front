@@ -6,7 +6,7 @@ import IncorrectType from 'src/types/aliases/incorrect-type.alias';
 import { getPastExamRoundListRequest } from 'src/apis';
 import { useAuthStore } from 'src/stores';
 import { useNavigate } from 'react-router';
-import { AUTH_ABSOLUTE_PATH, PAST_EXAM_TEST_ABSOLUTE_PATH } from 'src/constants';
+import { INCORRECT_QUESTIONS_TEST_ABSOLUTE_PATH, KILLER_EXAM_TEST_ABSOLUTE_PATH, PAST_EXAM_TEST_ABSOLUTE_PATH } from 'src/constants';
 import GetPastExamRoundListResponseDto from 'src/apis/dto/response/pastExam/get-past-exam-round-list.response.dto';
 import { ResponseDto } from 'src/apis/dto/response';
 import PastExamRound from 'src/types/interfaces/past-exam-round.interface';
@@ -18,16 +18,16 @@ export default function Main() {
     const { accessToken } = useAuthStore();
 
     // state: 선택한 단원 상태 //
-    const [seletedUnit, setSeletedUnit] = useState<string>('');
+    const [selectedUnit, setSelectedUnit] = useState<string>('');
     // state: 챕터 리스트 상태 //
     const [chpaterList, setChapterList] = useState<string[]>([]);
     // state: 선택한 챕터 상태 //
-    const [seletedChapter, setSeletedChapter] = useState<string>('');
+    const [selectedChapter, setSelectedChapter] = useState<string>('');
 
     // state: 기출문제 회차 리스트 상태 //
     const [pastExamRoundList, setPastExamRoundList] = useState<PastExamRound[]>([]);
     // state: 선택한 기출문제 회차 상태 //
-    const [seletedPastExamRound, setSeletedPastExamRound] = useState<PastExamRound | null>(null);
+    const [selectedPastExamRound, setSelectedPastExamRound] = useState<PastExamRound | null>(null);
 
     // state: 단원 셀렉터 오픈 여부 상태 //
     const [showUnitSelector, setShowUnitSelector] = useState<boolean>(false);
@@ -37,8 +37,8 @@ export default function Main() {
     // state: 기출문제 셀렉터 오픈 여부 상태 //
     const [showPastSelector, setShowPastSelector] = useState<boolean>(false);
 
-    // state: 오답문제 타입 상태 //
-    const [incorrectType, setIncorrectType] = useState<IncorrectType | ''>('');
+    // state: 선택한 오답문제 타입 상태 //
+    const [selectedIncorrectType, setSelectedIncorrectType] = useState<IncorrectType | ''>('');
 
     // variable: 테스트 단원 배열 //
     const units: string[] = ['데이터이해', '데이터 분석 기회', '데이터분석'];
@@ -50,15 +50,15 @@ export default function Main() {
     };
 
     // variable: 선택된 기출문제 아이템 클래스 //
-    const pastSelectedItemClass = seletedPastExamRound !== null ? 'past-selected-item' : 'past-selected-item inactive';
+    const pastSelectedItemClass = selectedPastExamRound !== null ? 'past-selected-item' : 'past-selected-item inactive';
 
     // variable: 오답문제 타입 버튼 활성화 //
-    const isIncorrectTypeButtonActive = incorrectType !== '';
+    const isIncorrectTypeButtonActive = selectedIncorrectType !== '';
 
     // variable: 오답문제 타입 아이콘 클래스 //
-    const mockIncorrectTypeIconClass = incorrectType === '모의고사' ? `check-icon active` : `check-icon`;
-    const pastIncorrectTypeIconClass = incorrectType === '기출문제' ? `check-icon active` : `check-icon`;
-    const killerIncorrectTypeIconClass = incorrectType === '킬러문제' ? `check-icon active` : `check-icon`;
+    const mockIncorrectTypeIconClass = selectedIncorrectType === '모의고사' ? `check-icon active` : `check-icon`;
+    const pastIncorrectTypeIconClass = selectedIncorrectType === '기출문제' ? `check-icon active` : `check-icon`;
+    const killerIncorrectTypeIconClass = selectedIncorrectType === '킬러문제' ? `check-icon active` : `check-icon`;
 
     // variable: 오답문제 타입 버튼 클래스 //
     const incorrectTypeButtonClass = `incorrect-button ${isIncorrectTypeButtonActive ? 'active' : 'disable'}`;
@@ -94,9 +94,9 @@ export default function Main() {
 
     // event handler: 단원 선택 이벤트 처리 //
     const onUnitOptionSelectHandler = (unit: string) => {
-        setSeletedUnit(unit);
+        setSelectedUnit(unit);
         setChapterList(chapterMap[unit]);
-        setSeletedChapter('');
+        setSelectedChapter('');
         setShowUnitSelector(false);
     };
 
@@ -107,7 +107,7 @@ export default function Main() {
 
     // event handler: 챕터 선택 이벤트 처리 //
     const onChapterOptionSelectHandler = (chpater: string) => {
-        setSeletedChapter(chpater);
+        setSelectedChapter(chpater);
         setShowChapterSelector(false);
     };
 
@@ -118,13 +118,25 @@ export default function Main() {
 
     // event handler: 기출문제 회차 선택 이벤트 처리 //
     const onPastExamRoundSelectHandler = (pastExamRound: PastExamRound) => {
-        setSeletedPastExamRound(pastExamRound);
+        setSelectedPastExamRound(pastExamRound);
         setShowPastSelector(false);
     };
     
     // event handler: 오답문제 타입 변경 이벤트 처리 //
     const onIncorrectTypeChangeHandler = (incorrectType: IncorrectType) => {
-        setIncorrectType(incorrectType);
+        setSelectedIncorrectType(incorrectType);
+    };
+
+    // event handler: 킬러문제 버튼 클릭 이벤트 처리 //
+    const onKillerClickHandler = () => {
+        navigator(KILLER_EXAM_TEST_ABSOLUTE_PATH);
+    };
+
+    // event handler: 오답문제 버튼 클릭 이벤트 처리 //
+    const onIncorrectClickHanlder = () => {
+        if (!selectedIncorrectType) return;
+
+        navigator(INCORRECT_QUESTIONS_TEST_ABSOLUTE_PATH(selectedIncorrectType));
     };
 
     // effect: accessToken이 변경될 시 실행할 함수 //
@@ -137,12 +149,12 @@ export default function Main() {
 
     // effect: 기출문제 회차를 선택할 시 실행할 함수 //
     useEffect(() => {
-        if (seletedPastExamRound == null) {
+        if (selectedPastExamRound == null) {
             return;
         }
 
-        navigator(PAST_EXAM_TEST_ABSOLUTE_PATH(seletedPastExamRound.pastExamId, seletedPastExamRound.pastExamRound));
-    }, [seletedPastExamRound]);
+        navigator(PAST_EXAM_TEST_ABSOLUTE_PATH(selectedPastExamRound.pastExamId, selectedPastExamRound.pastExamRound));
+    }, [selectedPastExamRound]);
 
     // render: 메인 화면 컴포넌트 렌더링 //
     return (
@@ -172,9 +184,9 @@ export default function Main() {
                                 </div>
                             </div>
                             <div className='unit-container'>
-                                <UnitSelector title={'단원별 문제'} options={units} showUnitSelector={showUnitSelector} selectedItem={seletedUnit} onSelectorClickHandler={onUnitSelectorClickHandler} onOptionClickHanlder={onUnitOptionSelectHandler} />
-                                { seletedUnit &&
-                                <UnitSelector title={'챕터별 문제'} options={chpaterList} showUnitSelector={showChapterSelector} selectedItem={seletedChapter} onSelectorClickHandler={onChapterSelectorClickHandler} onOptionClickHanlder={onChapterOptionSelectHandler} />
+                                <UnitSelector title={'단원별 문제'} options={units} showUnitSelector={showUnitSelector} selectedItem={selectedUnit} onSelectorClickHandler={onUnitSelectorClickHandler} onOptionClickHanlder={onUnitOptionSelectHandler} />
+                                { selectedUnit &&
+                                <UnitSelector title={'챕터별 문제'} options={chpaterList} showUnitSelector={showChapterSelector} selectedItem={selectedChapter} onSelectorClickHandler={onChapterSelectorClickHandler} onOptionClickHanlder={onChapterOptionSelectHandler} />
                                 }
 
                             </div>
@@ -189,7 +201,7 @@ export default function Main() {
                         <div className='title'>기출문제</div>
                         { showPastSelector ?
                         <div className='past-selector open' onClick={onPastSelectorClickHandler}>
-                            <div className={pastSelectedItemClass}>{seletedPastExamRound ? `${seletedPastExamRound.pastExamRound}회차` : '회차를 선택하세요'}</div>
+                            <div className={pastSelectedItemClass}>{selectedPastExamRound ? `${selectedPastExamRound.pastExamRound}회차` : '회차를 선택하세요'}</div>
                             <div className='arrow-up-button'></div>
                             <div className='past-selector-box'>
                                 {pastExamRoundList.map((pastExamRound, index) =>
@@ -198,12 +210,12 @@ export default function Main() {
                             </div>
                         </div> :
                         <div className='past-selector close' onClick={onPastSelectorClickHandler}>
-                            <div className={pastSelectedItemClass}>{seletedPastExamRound ? `${seletedPastExamRound.pastExamRound}회차` : '회차를 선택하세요'}</div>
+                            <div className={pastSelectedItemClass}>{selectedPastExamRound ? `${selectedPastExamRound.pastExamRound}회차` : '회차를 선택하세요'}</div>
                             <div className='arrow-down-button'></div>
                         </div>
                         }   
                     </div>
-                    <div className='killer-section'>
+                    <div className='killer-section' onClick={onKillerClickHandler}>
                         <div className='title'>킬러문제</div>
                     </div>
                     <div className='incorrect-section'>
@@ -225,7 +237,7 @@ export default function Main() {
                             </div>
                             
                         </div>
-                        <div className={incorrectTypeButtonClass}>선택한 오답 풀기</div>
+                        <div className={incorrectTypeButtonClass} onClick={onIncorrectClickHanlder}>선택한 오답 풀기</div>
                     </div>
                 </div>
             </div>

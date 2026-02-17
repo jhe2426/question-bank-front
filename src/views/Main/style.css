@@ -278,7 +278,7 @@
 .mock-button.primary,
 .incorrect-section .incorrect-button.active  {
     background-color: var(--Primary);
-    
+    cursor: pointer;
 }
 
 .mock-button.primary:hover {
@@ -413,6 +413,8 @@
     border: 1px solid var(--PrimaryLight);
 
     line-height: 46px;
+
+    cursor: pointer;
 }
 
 #main-wrapper .side-panel .killer-section:hover {
@@ -464,6 +466,7 @@
     background-repeat: no-repeat;
     background-position: center;
 
+    cursor: pointer;
 }
 
 .incorrect-option .check-icon.active {
@@ -473,6 +476,7 @@
     background-image: url('/src/assets/images/square-active.png');
     background-size: cover;
 
+    cursor: default;
 }
 
 .incorrect-section .incorrect-button {
@@ -488,5 +492,4 @@
     color: var(--White);
     font-size: 15px;
     font-weight: 700;
-
 }
