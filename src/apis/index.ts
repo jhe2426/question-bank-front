@@ -5,6 +5,7 @@ import { GetUniversityListResponseDto, RefreshAccessTokenResponseDto, SignInResp
 import { useAuthStore } from 'src/stores';
 import { AUTH_ABSOLUTE_PATH } from 'src/constants';
 import { Cookies } from 'react-cookie';
+import GetPastExamRoundListResponseDto from './dto/response/pastExam/get-past-exam-round-list.response.dto';
 
 // variable: URL 상수 //
 const API_DOMAIN = process.env.REACT_APP_API_DOMAIN;
@@ -20,6 +21,10 @@ const APPROVAL_CODE_VERIFY_URL = `${AUTH_MODULE_URL}/approval-code/verify`;
 const SIGN_UP_URL = `${AUTH_MODULE_URL}/sign-up`;
 const REFRESH_ACCESS_TOKEN_URL = `${AUTH_MODULE_URL}/refresh`;
 const LOGOUT_URL = `${AUTH_MODULE_URL}/logout`;
+
+const PAST_EXAM_MODULE_URL = `${API_DOMAIN}/api/v1/past-exam`;
+
+const GET_PAST_EXAM_ROUND_LIST_URL = `${PAST_EXAM_MODULE_URL}`;
 
 // variable: refresh 토큰을 사용하여 access Token 발급 진행 여부 //
 let isRefreshing = false;
@@ -188,4 +193,12 @@ export const logoutRequest = async (accessToken: string) => {
         .then(responseSuccessHandler)
         .catch(responseErrorHandler);
     return responesBody;
+};
+
+// function: get past exam round list API 요청 함수 //
+export const getPastExamRoundListRequest = async (accessToken: string) => {
+    const responseBody = await api.get(GET_PAST_EXAM_ROUND_LIST_URL, bearerAuthorization(accessToken))
+        .then(responseSuccessHandler<GetPastExamRoundListResponseDto>)
+        .catch(responseErrorHandler);
+    return responseBody;
 };

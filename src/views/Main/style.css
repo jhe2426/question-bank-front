@@ -357,7 +357,22 @@
 
     width: 247px;
     height: 102px;
+
+    overflow-y: auto;
 }
+
+.past-section .past-selector .past-selector-box::-webkit-scrollbar {
+    width: 12px;
+    background: none;
+}
+
+.past-section .past-selector .past-selector-box::-webkit-scrollbar-thumb {
+    background-color: var(--PrimaryLight2);
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    min-height: 70px;
+} 
 
 .past-section .past-selector .past-selector-option {
     height: 34px;
