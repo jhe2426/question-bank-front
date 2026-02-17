@@ -58,6 +58,8 @@
     line-height: 44px;
 
     border-radius: 10px;
+
+    cursor: pointer;
 }
 
 #main-wrapper .level-button-container .level-button.high {
@@ -69,7 +71,7 @@
 } 
 
 #main-wrapper .level-button-container .level-button.low {
-    background-color: rgba(93, 167, 243, 1);
+    background-color: rgb(97, 172, 247, 1);
 } 
 
 #main-wrapper .level-button-container .level-button.high.disable {
@@ -81,7 +83,7 @@
 }
 
 #main-wrapper .level-button-container .level-button.low.disable {
-    background-color: rgba(93, 167, 243, 0.5);
+    background-color: rgba(97, 172, 247, 0.5);
 }
 
 #main-wrapper .solution-container {
@@ -271,8 +273,6 @@
     font-family: 'Cafe24Ssurround';
     font-size: 18px;
     font-weight: 400;
-    
-    cursor: pointer;
 }
 
 .mock-button.primary,

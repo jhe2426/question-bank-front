@@ -6,6 +6,7 @@ import { useAuthStore } from 'src/stores';
 import { AUTH_ABSOLUTE_PATH } from 'src/constants';
 import { Cookies } from 'react-cookie';
 import GetPastExamRoundListResponseDto from './dto/response/pastExam/get-past-exam-round-list.response.dto';
+import GetUnitAndChapterListResponseDto from './dto/response/mockExam/get-unit-and-chapter-list.response.dto';
 
 // variable: URL 상수 //
 const API_DOMAIN = process.env.REACT_APP_API_DOMAIN;
@@ -21,6 +22,10 @@ const APPROVAL_CODE_VERIFY_URL = `${AUTH_MODULE_URL}/approval-code/verify`;
 const SIGN_UP_URL = `${AUTH_MODULE_URL}/sign-up`;
 const REFRESH_ACCESS_TOKEN_URL = `${AUTH_MODULE_URL}/refresh`;
 const LOGOUT_URL = `${AUTH_MODULE_URL}/logout`;
+
+const MOCK_EXAM_MODULE_URL = `${API_DOMAIN}/api/v1/mock-exam`;
+
+const GET_UNIT_AND_CHAPTER_LIST_URL =`${MOCK_EXAM_MODULE_URL}/units-with-chapters`;
 
 const PAST_EXAM_MODULE_URL = `${API_DOMAIN}/api/v1/past-exam`;
 
@@ -193,6 +198,14 @@ export const logoutRequest = async (accessToken: string) => {
         .then(responseSuccessHandler)
         .catch(responseErrorHandler);
     return responesBody;
+};
+
+// function: get unit and chapter list API 요청 함수 //
+export const getUnitAndChapterListRequest = async (accessToken: string) => {
+    const responseBody = await api.get(GET_UNIT_AND_CHAPTER_LIST_URL, bearerAuthorization(accessToken))
+        .then(responseSuccessHandler<GetUnitAndChapterListResponseDto>)
+        .catch(responseErrorHandler);
+    return responseBody;
 };
 
 // function: get past exam round list API 요청 함수 //

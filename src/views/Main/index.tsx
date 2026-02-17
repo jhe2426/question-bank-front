@@ -3,13 +3,15 @@ import React, { useEffect, useState } from 'react';
 import './style.css';
 import UnitSelector from './UnitSelector';
 import IncorrectType from 'src/types/aliases/incorrect-type.alias';
-import { getPastExamRoundListRequest } from 'src/apis';
+import { getPastExamRoundListRequest, getUnitAndChapterListRequest } from 'src/apis';
 import { useAuthStore } from 'src/stores';
 import { useNavigate } from 'react-router';
-import { INCORRECT_QUESTIONS_TEST_ABSOLUTE_PATH, KILLER_EXAM_TEST_ABSOLUTE_PATH, PAST_EXAM_TEST_ABSOLUTE_PATH } from 'src/constants';
+import { INCORRECT_QUESTIONS_TEST_ABSOLUTE_PATH, KILLER_EXAM_TEST_ABSOLUTE_PATH, MOCK_EXAM_TEST_ABSOLUTE_PATH, PAST_EXAM_TEST_ABSOLUTE_PATH } from 'src/constants';
 import GetPastExamRoundListResponseDto from 'src/apis/dto/response/pastExam/get-past-exam-round-list.response.dto';
 import { ResponseDto } from 'src/apis/dto/response';
 import PastExamRound from 'src/types/interfaces/past-exam-round.interface';
+import { Chapter, MockExamPathParams, Unit, UnitSummary } from 'src/types/interfaces';
+import GetUnitAndChapterListResponseDto from 'src/apis/dto/response/mockExam/get-unit-and-chapter-list.response.dto';
 
 // component: 메인 화면 컴포넌트 //
 export default function Main() {
@@ -17,12 +19,24 @@ export default function Main() {
     // state: accessToken 정보 상태 //
     const { accessToken } = useAuthStore();
 
+    // state: 단원 리스트 상태 //
+    const [unitList, setUnitList] = useState<Unit[]>([]);
     // state: 선택한 단원 상태 //
-    const [selectedUnit, setSelectedUnit] = useState<string>('');
-    // state: 챕터 리스트 상태 //
-    const [chpaterList, setChapterList] = useState<string[]>([]);
+    const [selectedUnit, setSelectedUnit] = useState<UnitSummary | null>(null);
+    // state: 단원 옵션 리스트 상태 //
+    const [unitOptionList, setUnitOptionList] = useState<UnitSummary[]>([]);
+
+    // state: 챕터 옵션 리스트 상태 //
+    const [chapterOptionList, setChapterOptionList] = useState<Chapter[]>([]);
     // state: 선택한 챕터 상태 //
-    const [selectedChapter, setSelectedChapter] = useState<string>('');
+    const [selectedChapter, setSelectedChapter] = useState<Chapter | null>(null);
+
+    // state: 모의고사 난이도 상태 //
+    const [mockLevel, setMockLevel] = useState<string>('');
+    // state: 모의고사 난이도 선택 상태 //
+    const [isMockLevelSelected, setIsMockLevelSelected] = useState<boolean>(false);
+    // state: 선택한 해설 보기 옵션 상태 //
+    const [isSolutionVisible, setIsSolutionVisible] = useState<boolean | null>(null);
 
     // state: 기출문제 회차 리스트 상태 //
     const [pastExamRoundList, setPastExamRoundList] = useState<PastExamRound[]>([]);
@@ -40,31 +54,62 @@ export default function Main() {
     // state: 선택한 오답문제 타입 상태 //
     const [selectedIncorrectType, setSelectedIncorrectType] = useState<IncorrectType | ''>('');
 
-    // variable: 테스트 단원 배열 //
-    const units: string[] = ['데이터이해', '데이터 분석 기회', '데이터분석'];
-    // variable: 테스트 챕터 배열 //
-    const chapterMap: Record<string, string[]> = {
-        '데이터이해': ['데이터이해', '데이터의 가치와 미래', '가치 창조를 위한 데이터 사이언스와 전략 인사이트'],
-        '데이터 분석 기회': ['데이터 분석 기획의 이해', '분석 마스터 플랜'],
-        '데이터분석': ['R기초와 데이터 마트', '통계분석', '정형 데이터 마이닝']
-    };
+    // variable: 모의고사 난이도 클래스 //
+    const mockLevelHighClass = mockLevel === '상' || (isMockLevelSelected === false && mockLevel === '') ? 'level-button high' : 'level-button high disable';
+    const mockLevelMiddleClass = mockLevel === '중' || (isMockLevelSelected === false && mockLevel === '')  ? 'level-button middle' : 'level-button middle disable';
+    const mockLevelLowClass = mockLevel === '하' || (isMockLevelSelected === false && mockLevel === '')  ? 'level-button low' : 'level-button low disable';
+
+    // variable: 모의고사 버튼 활성화 클래스 //
+    const isMockExamButtonActive = selectedIncorrectType === '' && isMockLevelSelected && mockLevel !== '' && isSolutionVisible !== null && selectedUnit !== null && selectedChapter !== null;
+
+    // variable: 모의고사 버튼 클래스 //
+    const mockExamButtonClass = `mock-button ${isMockExamButtonActive ? 'primary' : 'disable'} fullwidth`;
+
+    // variable: 해설 보기 옵션 클래스 //
+    const solutionTrueOptionClass = isSolutionVisible === true ? 'option-item active' : 'option-item';
+    const solutionFlaseOptionClass = isSolutionVisible === false ? 'option-item active' : 'option-item';
 
     // variable: 선택된 기출문제 아이템 클래스 //
     const pastSelectedItemClass = selectedPastExamRound !== null ? 'past-selected-item' : 'past-selected-item inactive';
 
     // variable: 오답문제 타입 버튼 활성화 //
-    const isIncorrectTypeButtonActive = selectedIncorrectType !== '';
+    const isIncorrectTypeButtonActive = selectedIncorrectType !== '' && isMockExamButtonActive === false;
 
     // variable: 오답문제 타입 아이콘 클래스 //
-    const mockIncorrectTypeIconClass = selectedIncorrectType === '모의고사' ? `check-icon active` : `check-icon`;
-    const pastIncorrectTypeIconClass = selectedIncorrectType === '기출문제' ? `check-icon active` : `check-icon`;
-    const killerIncorrectTypeIconClass = selectedIncorrectType === '킬러문제' ? `check-icon active` : `check-icon`;
+    const mockIncorrectTypeIconClass = selectedIncorrectType === '모의고사' ? 'check-icon active' : 'check-icon';
+    const pastIncorrectTypeIconClass = selectedIncorrectType === '기출문제' ? 'check-icon active' : 'check-icon';
+    const killerIncorrectTypeIconClass = selectedIncorrectType === '킬러문제' ? 'check-icon active' : 'check-icon';
 
     // variable: 오답문제 타입 버튼 클래스 //
     const incorrectTypeButtonClass = `incorrect-button ${isIncorrectTypeButtonActive ? 'active' : 'disable'}`;
 
     // function: 네비게이터 함수 //
     const navigator = useNavigate();
+
+    // function: 오답문제 타입 초기화 함수 //
+    const clearIncorrectSelection = () => {
+        if (selectedIncorrectType !== '') {
+            setSelectedIncorrectType('');
+        }
+    };
+    
+    // function: get unit and chapter list response 처리 함수 //
+    const getUnitAndChapterListResponse = (responseBody: GetUnitAndChapterListResponseDto | ResponseDto | null) => {
+        const message =
+        !responseBody ? '서버에 문제가 있습니다' :
+        responseBody.code === 'DBE' ? '서버에 문제가 있습니다' :
+        responseBody.code === 'AF' ? '인증에 실패했습니다' : '';
+
+        const isSuccessed = responseBody !== null && responseBody.code === 'SU';
+        if (!isSuccessed) {
+            alert(message);
+            return;
+        }
+
+        const { units } = responseBody as GetUnitAndChapterListResponseDto;
+        setUnitList(units);
+        setUnitOptionList(units.map(unit => ({ unitId: unit.unitId, unitName: unit.unitName })));
+    };
 
     // function: get past exam round list response 처리 함수 //
     const getPastExamRoundListResponse = (responseBody: GetPastExamRoundListResponseDto | ResponseDto | null) => {
@@ -92,28 +137,59 @@ export default function Main() {
         setShowUnitSelector(!showUnitSelector);
     };
 
-    // event handler: 단원 선택 이벤트 처리 //
-    const onUnitOptionSelectHandler = (unit: string) => {
-        setSelectedUnit(unit);
-        setChapterList(chapterMap[unit]);
-        setSelectedChapter('');
-        setShowUnitSelector(false);
-    };
-
     // event handler: 챕터 셀렉터 오픈 이벤트 처리 //
     const onChapterSelectorClickHandler = () => {
         setShowChapterSelector(!showChapterSelector);
     };
 
-    // event handler: 챕터 선택 이벤트 처리 //
-    const onChapterOptionSelectHandler = (chpater: string) => {
-        setSelectedChapter(chpater);
-        setShowChapterSelector(false);
-    };
-
     // event handler: 기출문제 셀렉터 오픈 이벤트 처리 //
     const onPastSelectorClickHandler = () => {
         setShowPastSelector(!showPastSelector);
+    };
+
+    // event handler: 모의고사 난이도 선택 이벤트 처리 //
+    const onMockLevelSelectHandler = (selectedMockLevel: string) => {
+        clearIncorrectSelection();
+
+        if (selectedMockLevel === mockLevel) {
+            setMockLevel('');
+            setIsMockLevelSelected(false);
+            return;
+        }
+        setMockLevel(selectedMockLevel);
+        setIsMockLevelSelected(true);
+    };
+
+    // event handler: 해설 보기 옵션 선택 이벤트 처리 //
+    const onSolutionOptionSelectHandler = (isSolutionVisible: boolean) => {
+        clearIncorrectSelection();
+
+        setIsSolutionVisible(isSolutionVisible);
+    };
+
+    // event handler: 단원 선택 이벤트 처리 //
+    const onUnitOptionSelectHandler = (unit: UnitSummary) => {
+        clearIncorrectSelection();
+
+        setSelectedUnit(unit);
+        
+        const selectedUnitDetail = unitList.find(item => item.unitId === unit.unitId);
+        if (selectedUnitDetail) {
+            setChapterOptionList(selectedUnitDetail.chapters);
+        } else {
+            setChapterOptionList([]);
+        }
+
+        setSelectedChapter(null);
+        setShowUnitSelector(false);
+    };
+
+    // event handler: 챕터 선택 이벤트 처리 //
+    const onChapterOptionSelectHandler = (chpater: Chapter) => {
+        clearIncorrectSelection();
+
+        setSelectedChapter(chpater);
+        setShowChapterSelector(false);
     };
 
     // event handler: 기출문제 회차 선택 이벤트 처리 //
@@ -124,7 +200,24 @@ export default function Main() {
     
     // event handler: 오답문제 타입 변경 이벤트 처리 //
     const onIncorrectTypeChangeHandler = (incorrectType: IncorrectType) => {
+        if (showChapterSelector) {
+            setShowChapterSelector(false);
+        }
         setSelectedIncorrectType(incorrectType);
+    };
+
+    // event handler: 모의고사 버튼 클릭 이벤트 처리 //
+    const onMockExamClickHandler = () => {
+        if (!isMockExamButtonActive) return;
+
+        const mockExamParams: MockExamPathParams = {
+            unitId: selectedUnit.unitId,
+            chapterId: selectedChapter.chapterId,
+            difficulty: mockLevel,
+            hasExplanation: isMockLevelSelected
+        };
+
+        navigator(MOCK_EXAM_TEST_ABSOLUTE_PATH(mockExamParams));
     };
 
     // event handler: 킬러문제 버튼 클릭 이벤트 처리 //
@@ -144,6 +237,7 @@ export default function Main() {
         if (!accessToken) {
             return;
         }
+        getUnitAndChapterListRequest(accessToken).then(getUnitAndChapterListResponse);
         getPastExamRoundListRequest(accessToken).then(getPastExamRoundListResponse);
     }, [accessToken]);
 
@@ -156,6 +250,16 @@ export default function Main() {
         navigator(PAST_EXAM_TEST_ABSOLUTE_PATH(selectedPastExamRound.pastExamId, selectedPastExamRound.pastExamRound));
     }, [selectedPastExamRound]);
 
+    // effect: 오답문제 풀기 옵션 선택할 시 실행할 함수 //
+    useEffect(() => {
+        if (selectedIncorrectType) {   
+            setMockLevel('');
+            setIsSolutionVisible(null);
+            setSelectedUnit(null);
+            setSelectedChapter(null);
+        }
+    }, [selectedIncorrectType]);
+
     // render: 메인 화면 컴포넌트 렌더링 //
     return (
         <div id='main-wrapper'>
@@ -165,34 +269,34 @@ export default function Main() {
                     <div className='selector-container'>
                         <div className='selector-box'>
                             <div className='level-button-container'>
-                                <div className='level-button high'>상</div> 
-                                <div className='level-button middle'>중</div> 
-                                <div className='level-button low disable'>하</div> 
+                                <div className={mockLevelHighClass} onClick={() => onMockLevelSelectHandler('상')}>상</div> 
+                                <div className={mockLevelMiddleClass} onClick={() => onMockLevelSelectHandler('중')}>중</div> 
+                                <div className={mockLevelLowClass} onClick={() => onMockLevelSelectHandler('하')}>하</div> 
                             </div>
                             <div className='solution-container'>
                                 <div className='title'>해설 보기 옵션</div>
                                 <div className='option-group'>
-                                    <div className='option-item active'>
+                                    <div className={solutionTrueOptionClass} onClick={() => onSolutionOptionSelectHandler(true)}>
                                         <div className='radio-icon'></div>
                                         <div className='label'>해설을 보고 문제 풀기</div>
                                     </div>
 
-                                    <div className='option-item'>
+                                    <div className={solutionFlaseOptionClass} onClick={() => onSolutionOptionSelectHandler(false)}>
                                         <div className='radio-icon'></div>
                                         <div className='label'>해설을 보고 않고 문제 풀기</div>
                                     </div>
                                 </div>
                             </div>
                             <div className='unit-container'>
-                                <UnitSelector title={'단원별 문제'} options={units} showUnitSelector={showUnitSelector} selectedItem={selectedUnit} onSelectorClickHandler={onUnitSelectorClickHandler} onOptionClickHanlder={onUnitOptionSelectHandler} />
+                                <UnitSelector title={'단원별 문제'} options={unitOptionList} showUnitSelector={showUnitSelector} selectedItem={selectedUnit} onSelectorClickHandler={onUnitSelectorClickHandler} onOptionClickHanlder={onUnitOptionSelectHandler} getOptionName={(option) => option.unitName} />
                                 { selectedUnit &&
-                                <UnitSelector title={'챕터별 문제'} options={chpaterList} showUnitSelector={showChapterSelector} selectedItem={selectedChapter} onSelectorClickHandler={onChapterSelectorClickHandler} onOptionClickHanlder={onChapterOptionSelectHandler} />
+                                <UnitSelector title={'챕터별 문제'} options={chapterOptionList} showUnitSelector={showChapterSelector} selectedItem={selectedChapter} onSelectorClickHandler={onChapterSelectorClickHandler} onOptionClickHanlder={onChapterOptionSelectHandler} getOptionName={(option) => option.chapterName} />
                                 }
 
                             </div>
                         </div>
                         <div className='mock-button-container'>
-                            <div className='mock-button primary fullwidth'>모의고사 풀기</div>
+                            <div className={mockExamButtonClass} onClick={onMockExamClickHandler}>모의고사 풀기</div>
                         </div>
                     </div>
                 </div>
