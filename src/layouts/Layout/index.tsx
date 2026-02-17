@@ -57,7 +57,11 @@ export default function Layout() {
 
     // effect: 컴포넌트 로드 시 실행할 함수 //
     useEffect(() => {
-        if(!accessToken) {
+
+        if(accessToken) return;
+        
+
+        if(!accessToken && !csrfToken) {
             navigator(AUTH_ABSOLUTE_PATH);
             return;
         }

@@ -127,13 +127,13 @@ export default function Main() {
         setIncorrectType(incorrectType);
     };
 
-    // effect: 컴포넌트 로드 시 실행할 함수 //
+    // effect: accessToken이 변경될 시 실행할 함수 //
     useEffect(() => {
         if (!accessToken) {
             return;
         }
         getPastExamRoundListRequest(accessToken).then(getPastExamRoundListResponse);
-    }, []);
+    }, [accessToken]);
 
     // effect: 기출문제 회차를 선택할 시 실행할 함수 //
     useEffect(() => {
