@@ -1,0 +1,267 @@
+.test-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+
+    font-family: 'Cafe24Ssurround';
+}
+
+.test-top {
+    font-size: 20px;
+}
+
+.test-main {
+    display: flex;
+    gap: 18px;
+}
+
+.test-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 26px;
+
+    padding-bottom: 25px;
+}
+
+.question-list {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 37px;
+
+    width: 795px;
+    height: 663px;
+    border: 1px solid var(--Lightmode-Grey9);
+    padding-left: 35px;
+
+    font-size: 14px;
+}
+
+.question-item {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.question-header {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.question-number {
+    font-size: 17px;
+}
+
+.option-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    padding-left: 31px;
+
+    font-family: 'Cafe24SsurroundAir';
+}
+
+.option-item {
+    display: flex;
+    gap: 4px;
+}
+
+.option-text {
+    width: 700px;
+}
+
+.option-icon,
+.answer-option {
+    width: 18px;
+    height: 18px;
+
+    background-size: 100% 100%;
+    cursor: pointer;
+}
+
+.option-icon.number1,
+.answer-option.number1 {
+    background-image: url('src/assets/images/number-1.png');
+}
+
+.option-icon.number2,
+.answer-option.number2 {
+    background-image: url('src/assets/images/number-2.png');
+}
+
+.option-icon.number3,
+.answer-option.number3 {
+    background-image: url('src/assets/images/number-3.png');
+}
+
+.option-icon.number4,
+.answer-option.number4 {
+    background-image: url('src/assets/images/number-4.png');
+}
+
+
+.test-pagination {
+    display: flex;
+    gap: 6px;
+}
+
+.pagination-button {
+    width: 23px;
+    height: 23px;
+
+    background-size: 100% 100%;
+    cursor: pointer;
+}
+
+.pagination-button.left {
+    background-image: url('src/assets/images/page-left.png');
+}
+
+.pagination-button.right {
+    background-image: url('src/assets/images/page-right.png');
+}
+
+.page {
+    line-height: 25px;
+}
+
+.test-sidebar {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 720px;
+}
+
+.test-sidebar-top {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.timer-box {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+
+    width: 180px;
+    height: 64px;
+    box-sizing: border-box;
+    border: 1px solid var(--Lightmode-Grey9);
+    padding: 15px 0 15px 16px ;
+
+    font-family: 'Cafe24SsurroundAir';
+    font-size: 11px;
+}
+
+.timer-icon {
+    width: 35px;
+    height: 35px;
+
+    background-size: 100% 100%;
+
+    background-image: url('src/assets/images/timer.png');
+}
+
+.timer-content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.timer-time {
+    display: flex;
+    gap: 3px;
+}
+
+.time {
+    color: var(--Red);
+}
+
+.answer-sheet-wrapper {
+    position: relative;
+    width: 180px;
+}
+
+.answer-sheet {
+    width: 180px;
+    max-height: 428px;
+
+    box-sizing: border-box;
+    border: 1px solid var(--PrimaryDark2);
+
+    overflow-y: auto;
+}
+
+.answer-sheet::-webkit-scrollbar {
+    width: 13px;
+    background: none;
+}
+
+.answer-sheet::-webkit-scrollbar-thumb {
+    background-color: var(--PrimaryLight2);
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+} 
+
+.answer-header {
+    height: 34px;
+
+    background-color: var(--PrimaryDark2);
+
+    text-align: center;
+    font-size: 14px;
+    color: var(--White);
+    line-height: 34px;
+}
+
+.answer-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.answer-row {
+    display: flex;
+    height: 28px;
+}
+
+.answer-number {
+    width: 50px;
+    background-color: var( --PrimaryLight2);
+
+    text-align: center;
+    font-size: 14px;
+    color: var(--White);
+    line-height: 28px;
+}
+
+.answer-options {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 7px;
+
+    width: 130px;
+    height: 28px;
+    box-sizing: border-box;
+    border-bottom: 1px solid var(--Lightmode-Grey9);
+}
+
+.submit-button {
+    width: 180px;
+    height: 40px;
+
+    background-color: var(--Primary);
+    border-radius: 15px;
+
+    color: var(--White);
+    font-size: 17px;
+    text-align: center;
+    line-height: 40px;
+
+    cursor: pointer;
+}

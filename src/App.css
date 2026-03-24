@@ -23,6 +23,7 @@
     --Lightmode-Grey6: rgba(222, 225, 230, 1);
     --Lightmode-Grey7: rgba(236, 238, 240, 1);
     --Lightmode-Grey8: rgba(254, 254, 254, 1);
+    --Lightmode-Grey9: rgba(222, 225, 230, 1);
     --Primary: rgba(13, 84, 160, 1);
     --PrimaryLight: rgba(30, 144, 255, 1);
     --PrimaryLight2: rgba(102, 178, 255, 1);
@@ -30,6 +31,7 @@
     --PrimaryDark2: rgba(33, 106, 176, 1);
     --Second: rgba(216, 235, 255, 1);
     --Error: rgba(255, 84, 64, 1);
+    --Red: rgba(255, 0, 0, 1);
 }
 
 body {

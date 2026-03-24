@@ -6,6 +6,7 @@ import { AUTH_ABSOLUTE_PATH, AUTH_PATH, GRADING_VIEW_PATH, INCORRECT_QUESTIONS_T
 import Auth from './views/Auth';
 import { useAuthStore } from './stores';
 import Main from './views/Main';
+import Exam from './views/Test/Exam';
 
 function App() {
   return (
@@ -16,13 +17,13 @@ function App() {
       <Route element={<Layout />}>
         <Route path={MAIN_PATH} element={<Main />} />
 
-        <Route path={MOCK_EXAM_TEST_PATH} element={<>모의고사 시험 화면</>} />
+        <Route path={MOCK_EXAM_TEST_PATH} element={<Exam />} />
 
-        <Route path={KILLER_EXAM_TEST_PATH} element={<>킬러문제 시험 화면</>} />
+        <Route path={KILLER_EXAM_TEST_PATH} element={<Exam />} />
 
-        <Route path={PAST_EXAM_TEST_PATH} element={<>기출문제 시험 화면</>} />
+        <Route path={PAST_EXAM_TEST_PATH} element={<Exam />} />
 
-        <Route path={INCORRECT_QUESTIONS_TEST_PATH} element={<>오답문제 시험 화면</>} />
+        <Route path={INCORRECT_QUESTIONS_TEST_PATH} element={<Exam />} />
 
         <Route path={MY_PAGE_PATH}>
           <Route path={MY_PAGE_STUDY_HISTORY_PATH} element={<>학습 기록 페이지</>} />
