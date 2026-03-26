@@ -1,0 +1,28 @@
+#pagination {
+    display: flex;
+    gap: 6px;
+}
+
+#pagination .pagination-button {
+    width: 23px;
+    height: 23px;
+
+    background-size: 100% 100%;
+    cursor: pointer;
+}
+
+#pagination .pagination-button.disable {
+    cursor: default;
+}
+
+#pagination .pagination-button.left {
+    background-image: url('src/assets/images/page-left.png');
+}
+
+#pagination .pagination-button.right {
+    background-image: url('src/assets/images/page-right.png');
+}
+
+#pagination .page {
+    line-height: 25px;
+}

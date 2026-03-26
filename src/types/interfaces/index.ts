@@ -4,6 +4,7 @@ import MockExamPathParams from './mock-exam-path-params.interfaece';
 import Chapter from './chapter.interface';
 import Unit from './unit.interface';
 import UnitSummary from './unit-summary.interface';
+import Question from './question.interface';
 
 export type {
     University,
@@ -11,5 +12,6 @@ export type {
     MockExamPathParams,
     Chapter,
     Unit,
-    UnitSummary
+    UnitSummary,
+    Question
 }

@@ -2,9 +2,14 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 16px;
-
     font-family: 'Cafe24Ssurround';
+}
+
+.test-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
 }
 
 .test-top {
@@ -28,18 +33,30 @@
 .question-list {
     display: flex;
     flex-direction: column;
-    justify-content: center;
     gap: 37px;
 
     width: 795px;
-    height: 663px;
+    box-sizing: border-box;
     border: 1px solid var(--Lightmode-Grey9);
+    padding-top: 50px;
     padding-left: 35px;
+    padding-right: 107px;
+    padding-bottom: 46px;
 
     font-size: 14px;
 }
 
+.question-list.has-explanation {
+    gap: 55px;
+}
+
 .question-item {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.question-content {
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -53,6 +70,32 @@
 
 .question-number {
     font-size: 17px;
+}
+
+.explanation-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    width: 715px;
+    box-sizing: border-box;
+    padding: 16px 13px 20px 35px;
+
+    background-color: var(--Lightmode-Grey10);
+}
+
+.explanation-title {
+    font-size: 15px;
+    color: var(--Red);
+}
+
+.explanation-item {
+
+    font-family: 'Cafe24SsurroundAir';
+    font-size: 12px;
+    line-height: 200%;
+
+    white-space: pre-wrap;
 }
 
 .option-list {
@@ -103,37 +146,14 @@
     background-image: url('src/assets/images/number-4.png');
 }
 
-
-.test-pagination {
-    display: flex;
-    gap: 6px;
-}
-
-.pagination-button {
-    width: 23px;
-    height: 23px;
-
-    background-size: 100% 100%;
-    cursor: pointer;
-}
-
-.pagination-button.left {
-    background-image: url('src/assets/images/page-left.png');
-}
-
-.pagination-button.right {
-    background-image: url('src/assets/images/page-right.png');
-}
-
-.page {
-    line-height: 25px;
-}
-
 .test-sidebar {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     height: 720px;
+
+    position: sticky;
+    top: 20px;
 }
 
 .test-sidebar-top {
@@ -264,4 +284,15 @@
     line-height: 40px;
 
     cursor: pointer;
+}
+
+.test-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    
+    width: 998px;
+    box-sizing: border-box;
+    padding-left: 343px;
+    padding-bottom: 20px;
 }
