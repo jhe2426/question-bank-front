@@ -8,15 +8,20 @@ import Pagination from 'src/components/Pagination';
 // interface: 시험 문제 레코드 컴포넌트 속성 //
 interface QuestionTableItemProps {
     question: Question;
-}
+    selectedAnswer?: number;
+    onClick: (questionId: number, answer: number) => void;
+};
 
 // component: 시험 문제 레코드 컴포넌트 //
-function QuestionTableItem({ question }: QuestionTableItemProps) {
+function QuestionTableItem({ question, selectedAnswer, onClick }: QuestionTableItemProps) {
 
-    const { questionOrder, questionText, imageUrl, option1, option2, option3, option4, shortExplanation} = question;
+    const { questionId, questionOrder, questionText, imageUrl, option1, option2, option3, option4, shortExplanation} = question;
 
     // variable: 해설 //
     const explanation = '업무 이해(Business Understanding): 프로젝트의 목표, 요구사항, 현재 상황 등을 비즈니스 관점에서 이해하고 정의합니다.\n데이터 이해(Data Understanding): 데이터를 수집하고, 탐색하고, 품질을 검증합니다.\n데이터 준비(Data Preparation): 모델링에 적합하도록 데이터를 정제, 변환, 통합합니다.\n모델링(Modeling): 다양한 모델링 기법을 적용하고 파라미터를 조정하여 최적의 모델을 구축합니다.\n평가(Evaluation): 모델의 성능이 비즈니스 목표에 부합하는지 평가하고, 다음 단계 진행 여부를 결정합니다.\n배포(Deployment): 완성된 모델을 실제 운영 환경에 적용하고 모니터링합니다.';
+
+    // variable: option list //
+    const options = [option1, option2, option3, option4];
 
     return (
         <div className='question-item'>                    
@@ -27,25 +32,19 @@ function QuestionTableItem({ question }: QuestionTableItemProps) {
                 </div>
 
                 <div className='option-list'>
-                    <div className='option-item'>
-                        <div className='option-icon number1'></div>
-                        <div className='option-text'>{option1}</div>
-                    </div>
 
-                    <div className='option-item'>
-                        <div className='option-icon number2'></div>
-                        <div className='option-text'>{option2}</div>
-                    </div>
+                    { options.map((option, index) => {
+                        const number = index + 1;       
+                        const optionClass = selectedAnswer === number ? `option-icon number${number} active` : `option-icon number${number}`;
 
-                    <div className='option-item'>
-                        <div className='option-icon number3'></div>
-                        <div className='option-text'>{option3}</div>
-                    </div>
+                        return (
+                            <div key={number} className='option-item' onClick={() => onClick(questionId, number)}>
+                                    <div className={optionClass}></div>
+                                    <div className='option-text'>{option}</div>
+                            </div>
+                        );
+                    })}                           
 
-                    <div className='option-item'>
-                        <div className='option-icon number4'></div>
-                        <div className='option-text'>{option4}</div>
-                    </div>
                 </div>
             </div>
 
@@ -60,8 +59,15 @@ function QuestionTableItem({ question }: QuestionTableItemProps) {
 
 }
 
+// interface: 답안 표기란 레코드 컴포넌트 속성 //
+interface AnswerTableItemProps {
+    question: Question;
+    selectedAnswer?: number;
+    onClick: (questionId: number, questionOrder:number, answer: number) => void;
+};
+
 // component: 답안 표기란 레코드 컴포넌트 //
-function AnswerTableItem({ question }: QuestionTableItemProps) {
+function AnswerTableItem({ question, selectedAnswer, onClick }: AnswerTableItemProps) {
 
     const { questionId, questionOrder} = question;
 
@@ -70,10 +76,15 @@ function AnswerTableItem({ question }: QuestionTableItemProps) {
         <div className='answer-row'>
             <div className='answer-number'>{questionOrder}</div>
             <div className='answer-options'>
-                <div className='answer-option number1'></div>
-                <div className='answer-option number2'></div>
-                <div className='answer-option number3'></div>
-                <div className='answer-option number4'></div>
+                { [1, 2, 3, 4].map((number) => {
+                    
+                    const optionClass = selectedAnswer === number ? `answer-option number${number} active` : `answer-option number${number}`;
+                    
+                    return (
+                        <div className={optionClass} onClick={() => onClick(questionId, questionOrder, number)}></div>
+                    )
+        
+                })}
             </div>
         </div>
     </div>
@@ -83,22 +94,31 @@ function AnswerTableItem({ question }: QuestionTableItemProps) {
 // component: 시험 화면 컴포넌트 //
 export default function Exam() {
 
+    // variable: 페이지당 문제 수 //
+    const QUESTION_COUNT_PER_PAGE = 3;
+
     // state: 페이지네이션 상태 //
     const {
         currentPage, setCurrentPage, totalPage,
         setTotalList, viewList
-    } = usePagination<Question>(3);
+    } = usePagination<Question>(QUESTION_COUNT_PER_PAGE);
 
     // state: 간단한 해설 존재 여부 //
     const [hasExplanation, setHasExplanation] = useState<boolean>(true);
 
-    // variable: 이전 페이지 버튼 문자열 //
-    const preButtonClass = currentPage <= 1 ? 'pagination-button left disable' : 'pagination-button left';
-    // variable: 다음 페이지 버튼 문자열 //
-    const nextButtonClass = currentPage === totalPage ? 'pagination-button right disable' : 'pagination-button right';
+    // state: 선택된 문제 정답 번호 리스트 //
+    const [selectedAnswers, setSelectedAnswers] = useState<Record<number, number>>({});
 
-    // variable: 
+    // state: 타이머 상태 //
+    const [time, setTime] = useState(90 * 60);
+
+    // variable: 해설 존재 여부에 따른 문제 리스트 클래스 //
     const questionListClass = hasExplanation ? 'question-list has-explanation' : 'question-list';
+
+    // variable: 타이머 분 단위 //
+    const minutes = Math.floor(time / 60);
+    // variable: 타이머 초 단위 //
+    const seconds = time % 60;
 
     // variable: 테스트 문제 리스트 //
     const questionList: Question[] = [
@@ -143,8 +163,8 @@ export default function Exam() {
             option4: '데이터베이스 관리시스템에 장애가 발생하면 전체시스템의 업무처리가 중단되는 단점이 있다.'
         },
         {
-            questionId: 4,
-            questionOrder: 4,
+            questionId: 5,
+            questionOrder: 5,
             questionText: '데이터베이스 관리시스템에 대한 설명으로 옳지 않은 것은?',
             imageUrl: null,
             option1: '데이터베이스 관리로 모든 데이터 문제를 해결할 수 있다.',
@@ -153,8 +173,8 @@ export default function Exam() {
             option4: '데이터베이스 관리시스템에 장애가 발생하면 전체시스템의 업무처리가 중단되는 단점이 있다.'
         },
         {
-            questionId: 4,
-            questionOrder: 4,
+            questionId: 6,
+            questionOrder: 6,
             questionText: '데이터베이스 관리시스템에 대한 설명으로 옳지 않은 것은?',
             imageUrl: null,
             option1: '데이터베이스 관리로 모든 데이터 문제를 해결할 수 있다.',
@@ -163,8 +183,8 @@ export default function Exam() {
             option4: '데이터베이스 관리시스템에 장애가 발생하면 전체시스템의 업무처리가 중단되는 단점이 있다.'
         },
         {
-            questionId: 4,
-            questionOrder: 4,
+            questionId: 7,
+            questionOrder: 7,
             questionText: '데이터베이스 관리시스템에 대한 설명으로 옳지 않은 것은?',
             imageUrl: null,
             option1: '데이터베이스 관리로 모든 데이터 문제를 해결할 수 있다.',
@@ -173,8 +193,8 @@ export default function Exam() {
             option4: '데이터베이스 관리시스템에 장애가 발생하면 전체시스템의 업무처리가 중단되는 단점이 있다.'
         },
         {
-            questionId: 4,
-            questionOrder: 4,
+            questionId: 8,
+            questionOrder: 8,
             questionText: '데이터베이스 관리시스템에 대한 설명으로 옳지 않은 것은?',
             imageUrl: null,
             option1: '데이터베이스 관리로 모든 데이터 문제를 해결할 수 있다.',
@@ -184,20 +204,43 @@ export default function Exam() {
         }
     ];
 
-    // event handler: 이전 섹션 클릭 이벤트 처리 //
-    const onPreSectionClickHandler = () => {
-        if (currentPage <= 1) return;
-        setCurrentPage(currentPage - 1);
+    // event handler: 문제 영역 정답 변경 이벤트 처리 //
+    const onQuestionAnswerClickHandler = (questionId: number, answer: number) => {
+        setSelectedAnswers((prev) => ({
+            ...prev,
+            [questionId]: answer,
+        }));    
+
     };
 
-    // event handler: 다음 섹션 클릭 이벤트 처리 //
-    const onNextSectionClickHandler = () => {
-        if (currentPage === totalPage) return;
-        setCurrentPage(currentPage + 1);
+    // event handler: 답안 표기란 정답 변경 이벤트 처리 //
+    const onAnswerSheetClickHandler = (questionId: number, questionOrder: number, answer: number) => {
+        setSelectedAnswers((prev) => ({
+            ...prev,
+            [questionId]: answer,
+        }));    
+
+        const targetPage = Math.ceil(questionOrder / QUESTION_COUNT_PER_PAGE);
+        if (targetPage == currentPage) return;
+        setCurrentPage(targetPage);
+       
     };
 
+    // effect: 컴포넌트 로드 시 실행할 함수 //
     useEffect(() => {
         setTotalList(questionList);
+
+        const timer = setInterval(() => {
+            setTime((prev) => {
+                if (prev <= 0) {
+                    clearInterval(timer);
+                    return 0;
+                }
+            return prev - 1;
+            });
+        }, 1000);
+
+        return () => clearInterval(timer);
     }, []);
 
     // render: 시험 화면 컴포넌트 렌더링 //
@@ -213,7 +256,7 @@ export default function Exam() {
 
                     <div className='test-content'>
                         <div className={questionListClass}>
-                            {viewList.map((question, index) => <QuestionTableItem key={index} question={question} />)}
+                            {viewList.map((question, index) => <QuestionTableItem key={index} question={question} selectedAnswer={selectedAnswers[question.questionId]} onClick={onQuestionAnswerClickHandler}/>)}
                         </div>
 
                     </div>
@@ -228,14 +271,14 @@ export default function Exam() {
                                     <div className='timer-title'>제한 시간 90분</div>
                                     <div className='timer-time'>
                                         <div className='text'>남은 시간</div>
-                                        <div className='time'>89분 05초</div>
+                                        <div className='time'>{minutes}분 {seconds}초</div>
                                     </div>
                                 </div>
                             </div>
 
                             <div className='answer-sheet'>
                                 <div className='answer-header'>답안 표기란</div>
-                                {questionList.map((question, index) => <AnswerTableItem key={index} question={question} />)}
+                                {questionList.map((question, index) => <AnswerTableItem key={index} question={question} selectedAnswer={selectedAnswers[question.questionId]} onClick={onAnswerSheetClickHandler}/>)}
                             </div>
                             
                         </div>

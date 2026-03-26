@@ -146,6 +146,11 @@
     background-image: url('src/assets/images/number-4.png');
 }
 
+.option-icon.active,
+.answer-option.active {
+    background-image: url('src/assets/images/selected-number.png');
+}
+
 .test-sidebar {
     display: flex;
     flex-direction: column;

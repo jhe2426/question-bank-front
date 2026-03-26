@@ -1,4 +1,3 @@
-
 export default interface Question {
     questionId: number;
     questionOrder: number;
