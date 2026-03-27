@@ -72,6 +72,16 @@
     font-size: 17px;
 }
 
+.image-box {
+    padding-left: 25px;
+    margin-bottom: -5px;
+}
+
+.image-box img {
+    width: 100%;
+    max-width: 715px;
+}
+
 .explanation-container {
     display: flex;
     flex-direction: column;
