@@ -25,10 +25,22 @@ function QuestionTableItem({ question, selectedAnswer, onClick }: QuestionTableI
     // variable: option list //
     const options = [option1, option2, option3, option4];
 
-    // function: 수식 정제 전용 함수
-    const getCleanMath = (str: string) => {
-        if (!str) return "";
-        return str.replace(/^\$/, '').trim();
+    // function: 텍스트와 수식을 분리해서 렌더링하는 함수 //
+    const renderOptionContent = (text: string) => {
+        if (!text) return null;
+
+        const parts = text.split(/(\$.*?\$)/g).filter(Boolean);
+
+        return parts.map((part, index) => {
+            if (part.startsWith("$") && part.endsWith("$")) {
+                const mathValue = part.slice(1, -1).trim();
+                return <InlineMath key={index} math={mathValue} />
+            }
+            
+            return <span key={index}>{part}</span>;
+        });
+
+        
     };
 
     return (
@@ -54,11 +66,7 @@ function QuestionTableItem({ question, selectedAnswer, onClick }: QuestionTableI
                         return (
                             <div key={number} className='option-item' onClick={() => onClick(questionId, number)}>
                                     <div className={optionClass}></div>
-                                    {option.startsWith("$") ? 
-                                    <div className='option-text'><InlineMath math={getCleanMath(option)} /></div> :
-                                    <div className='option-text'>{option}</div>
-                                    }
-                                    
+                                    <div className='option-text'>{renderOptionContent(option)}</div>            
                             </div>
                         );
                     })}                           
@@ -99,7 +107,7 @@ function AnswerTableItem({ question, selectedAnswer, onClick }: AnswerTableItemP
                     const optionClass = selectedAnswer === number ? `answer-option number${number} active` : `answer-option number${number}`;
                     
                     return (
-                        <div className={optionClass} onClick={() => onClick(questionId, questionOrder, number)}></div>
+                        <div key={number} className={optionClass} onClick={() => onClick(questionId, questionOrder, number)}></div>
                     )
         
                 })}
@@ -145,17 +153,17 @@ export default function Exam() {
             questionOrder: 1,
             questionText: '다음 중 빅데이터 분석의 특성에 대한 설명으로 옳지 않은 것은?',
             imageUrl: 'https://localhost:4000/api/v1/file/모의고사/1d141986-dac8-42df-9963-34e495449a8a.png',
-            option1: '$d(x,y)=\\sqrt{x^2+y^2}',
-            option2: '빅데이터 분석에는 정형 데이터뿐만 아니라 비정형, 반정형 데이터를 포함한다.',
-            option3: '방대한 데이터에서 노이즈 및 오류 제거를 통해 활용 데이터에 대한 품질과 신뢰성 제고가 요구된다.',
-            option4: '데이터 크기가 커질수록 더 많은 분석을 수행하는 것이 경쟁우위 확보의 원천이다.'
+            option1: '$d(x,y) = \\sum_{j=1}^m | x_j - y_j |$은 블라블라이다.',
+            option2: '$d(x,y) = \\sqrt{\\sum_{i=1}^m (x_i - y_i)^2}$',
+            option3: '$d(x,y) = \\left[ \\sum_{i=1}^m | x_i - y_i |^m \\right]^{1/m}$',
+            option4: '$Can(x,y) = \\sum_{i=1}^d \\frac{| x_i - y_i |}{| x_i | + | y_i |}$'
         },
         {
             questionId: 2,
             questionOrder: 2,
             questionText: '다음 중 빅데이터 시대의 위기 요인과 사례가 잘못 연결된 것은?',
             imageUrl: 'https://localhost:4000/api/v1/file/기출문제/fe422e02-b727-42b3-b936-cb132f26b821.png',
-            option1: '$\\int_0^\\infty x^2 dx',
+            option1: '$\\int_0^\\infty x^2 dx$',
             option2: '책임 원칙 훼손 - 특정 집단에 속했다고 취업이 안됨',
             option3: '사생활 침해 - 여행 사실을 페이스북에 올린 사람의 집을 도둑이 노리는 사례 발생',
             option4: '책임 원칙 훼손 - 범죄 예측 프로그램 때문에 범행을 저지르기 전에 체포, 자신의 신용도와 무관하게 부당한 대출 거부'

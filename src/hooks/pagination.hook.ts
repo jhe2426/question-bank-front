@@ -20,7 +20,6 @@ const usePagination = <T>(itmesPerPage: number) => {
     // function: 뷰 리스트 변경 함수 //
     const initViewList = (totalList: T[]) => {
         const totalCount = totalList.length;
-        console.log(totalCount);
         const startIndex = (currentPage - 1) * itmesPerPage;
         const endIndex = currentPage * itmesPerPage > totalCount ? totalCount : currentPage * itmesPerPage;
         const viewList: T[] = totalList.slice(startIndex, endIndex);
