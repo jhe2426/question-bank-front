@@ -58,6 +58,8 @@ api.interceptors.response.use(
  
         if (!originalRequet || !authStoreAccessToken || error.response?.status !== 401) return Promise.reject(error);
 
+        if (originalRequet.url?.includes(SIGN_IN_URL)) return Promise.reject(error);
+
         // 리프레쉬 요청 자체에서 401에 대해서는 로그아웃 진행
         if (originalRequet.url?.includes(REFRESH_ACCESS_TOKEN_URL)) {
             clearAuth();
