@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { memo, useEffect } from 'react';
 
 import './style.css';
 
@@ -10,10 +10,10 @@ interface Props {
 }
 
 // component: 페이지네이션 컴포넌트 //
-export default function Pagination({
+const Pagination = memo(({
     currentPage, totalPage,
     setCurrentPage
-}: Props) {
+}: Props) => {
 
     // variable: 이전 페이지 버튼 문자열 //
     const preButtonClass = currentPage <= 1 ? 'pagination-button left disable' : 'pagination-button left';
@@ -42,4 +42,6 @@ export default function Pagination({
             <div className={nextButtonClass} onClick={onNextPageClickHandler}></div>
         </div>
     )
-}
+})
+
+export default Pagination;

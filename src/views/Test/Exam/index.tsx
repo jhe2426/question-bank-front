@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 
 import '../style.css';
 import 'katex/dist/katex.min.css';
@@ -15,7 +15,7 @@ interface QuestionTableItemProps {
 };
 
 // component: 시험 문제 레코드 컴포넌트 //
-function QuestionTableItem({ question, selectedAnswer, onClick }: QuestionTableItemProps) {
+const QuestionTableItem = memo(({ question, selectedAnswer, onClick }: QuestionTableItemProps) => {
 
     const { questionId, questionOrder, questionText, imageUrl, option1, option2, option3, option4, shortExplanation} = question;
 
@@ -25,7 +25,7 @@ function QuestionTableItem({ question, selectedAnswer, onClick }: QuestionTableI
     // variable: option list //
     const options = [option1, option2, option3, option4];
 
-    // function: 텍스트와 수식을 분리해서 렌더링하는 함수 //
+    // function: 텍스트와 수식을 분리해서 렌더링하는 함수
     const renderOptionContent = (text: string) => {
         if (!text) return null;
 
@@ -83,7 +83,7 @@ function QuestionTableItem({ question, selectedAnswer, onClick }: QuestionTableI
         </div>
     )
 
-}
+});
 
 // interface: 답안 표기란 레코드 컴포넌트 속성 //
 interface AnswerTableItemProps {
@@ -231,16 +231,16 @@ export default function Exam() {
     ];
 
     // event handler: 문제 영역 정답 변경 이벤트 처리 //
-    const onQuestionAnswerClickHandler = (questionId: number, answer: number) => {
+    const onQuestionAnswerClickHandler = useCallback((questionId: number, answer: number) => {
         setSelectedAnswers((prev) => ({
             ...prev,
             [questionId]: answer,
-        }));    
+        })); 
+    }, []);
 
-    };
 
     // event handler: 답안 표기란 정답 변경 이벤트 처리 //
-    const onAnswerSheetClickHandler = (questionId: number, questionOrder: number, answer: number) => {
+    const onAnswerSheetClickHandler = useCallback((questionId: number, questionOrder: number, answer: number) => {
         setSelectedAnswers((prev) => ({
             ...prev,
             [questionId]: answer,
@@ -249,8 +249,8 @@ export default function Exam() {
         const targetPage = Math.ceil(questionOrder / QUESTION_COUNT_PER_PAGE);
         if (targetPage == currentPage) return;
         setCurrentPage(targetPage);
-       
-    };
+
+    }, [currentPage]);
 
     // effect: 컴포넌트 로드 시 실행할 함수 //
     useEffect(() => {
@@ -284,8 +284,6 @@ export default function Exam() {
                         <div className={questionListClass}>
                             {viewList.map((question, index) => <QuestionTableItem key={index} question={question} selectedAnswer={selectedAnswers[question.questionId]} onClick={onQuestionAnswerClickHandler}/>)}
                         </div>
-
-                        <InlineMath math="\\sum_{i=1}^n i = \\frac{n(n+1)}{2}" />
                     </div>
 
                     <div className='test-sidebar'>
