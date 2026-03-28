@@ -19,14 +19,11 @@ const QuestionTableItem = memo(({ question, selectedAnswer, onClick }: QuestionT
 
     const { questionId, questionOrder, questionText, imageUrl, option1, option2, option3, option4, shortExplanation} = question;
 
-    // variable: 해설 //
-    const explanation = '업무 이해(Business Understanding): 프로젝트의 목표, 요구사항, 현재 상황 등을 비즈니스 관점에서 이해하고 정의합니다.\n데이터 이해(Data Understanding): 데이터를 수집하고, 탐색하고, 품질을 검증합니다.\n데이터 준비(Data Preparation): 모델링에 적합하도록 데이터를 정제, 변환, 통합합니다.\n모델링(Modeling): 다양한 모델링 기법을 적용하고 파라미터를 조정하여 최적의 모델을 구축합니다.\n평가(Evaluation): 모델의 성능이 비즈니스 목표에 부합하는지 평가하고, 다음 단계 진행 여부를 결정합니다.\n배포(Deployment): 완성된 모델을 실제 운영 환경에 적용하고 모니터링합니다.';
-
     // variable: option list //
     const options = [option1, option2, option3, option4];
 
-    // function: 텍스트와 수식을 분리해서 렌더링하는 함수
-    const renderOptionContent = (text: string) => {
+    // function: 텍스트와 수식을 분리해서 렌더링하는 함수 //
+    const renderContentWithMath = (text: string) => {
         if (!text) return null;
 
         const parts = text.split(/(\$.*?\$)/g).filter(Boolean);
@@ -66,7 +63,7 @@ const QuestionTableItem = memo(({ question, selectedAnswer, onClick }: QuestionT
                         return (
                             <div key={number} className='option-item' onClick={() => onClick(questionId, number)}>
                                     <div className={optionClass}></div>
-                                    <div className='option-text'>{renderOptionContent(option)}</div>            
+                                    <div className='option-text'>{renderContentWithMath(option)}</div>            
                             </div>
                         );
                     })}                           
@@ -74,12 +71,14 @@ const QuestionTableItem = memo(({ question, selectedAnswer, onClick }: QuestionT
                 </div>
             </div>
 
+            {shortExplanation &&
             <div className='explanation-container'>
                 <div className='explanation-title'>해설</div> 
                 <div className='explanation-item'>
-                {explanation}
+                {renderContentWithMath(shortExplanation)}
                 </div>
             </div>
+            }
         </div>
     )
 
@@ -156,7 +155,8 @@ export default function Exam() {
             option1: '$d(x,y) = \\sum_{j=1}^m | x_j - y_j |$은 블라블라이다.',
             option2: '$d(x,y) = \\sqrt{\\sum_{i=1}^m (x_i - y_i)^2}$',
             option3: '$d(x,y) = \\left[ \\sum_{i=1}^m | x_i - y_i |^m \\right]^{1/m}$',
-            option4: '$Can(x,y) = \\sum_{i=1}^d \\frac{| x_i - y_i |}{| x_i | + | y_i |}$'
+            option4: '$Can(x,y) = \\sum_{i=1}^d \\frac{| x_i - y_i |}{| x_i | + | y_i |}$',
+            shortExplanation: 'test'
         },
         {
             questionId: 2,
@@ -166,7 +166,8 @@ export default function Exam() {
             option1: '$\\int_0^\\infty x^2 dx$',
             option2: '책임 원칙 훼손 - 특정 집단에 속했다고 취업이 안됨',
             option3: '사생활 침해 - 여행 사실을 페이스북에 올린 사람의 집을 도둑이 노리는 사례 발생',
-            option4: '책임 원칙 훼손 - 범죄 예측 프로그램 때문에 범행을 저지르기 전에 체포, 자신의 신용도와 무관하게 부당한 대출 거부'
+            option4: '책임 원칙 훼손 - 범죄 예측 프로그램 때문에 범행을 저지르기 전에 체포, 자신의 신용도와 무관하게 부당한 대출 거부',
+            shortExplanation: '업무 이해(Business Understanding): 프로젝트의 목표, 요구사항, 현재 상황 등을 비즈니스 관점에서 이해하고 정의합니다.\n데이터 이해(Data Understanding): 데이터를 수집하고, 탐색하고, 품질을 검증합니다.\n데이터 준비(Data Preparation): 모델링에 적합하도록 데이터를 정제, 변환, 통합합니다.\n모델링(Modeling): 다양한 모델링 기법을 적용하고 파라미터를 조정하여 최적의 모델을 구축합니다.\n평가(Evaluation): 모델의 성능이 비즈니스 목표에 부합하는지 평가하고, 다음 단계 진행 여부를 결정합니다.\n배포(Deployment): 완성된 모델을 실제 운영 환경에 적용하고 모니터링합니다.'
         },
         {
             questionId: 3,
@@ -176,7 +177,8 @@ export default function Exam() {
             option1: '데이터베이스 관리로 모든 데이터 문제를 해결할 수 있다.',
             option2: '데이터베이스 관리시스템은 다수 사용자가 데이터베이스에 접근하여 데이터베이스의 정의, 조작, 제어 등 데이터베이스 관리를 지원하는 소프트웨어이다. ',
             option3: '데이터베이스 관리시스템은 데이터의 중복을 제어하고, 중앙 집중식 통제를 통해 데이터의 일관성을 유지한다.',
-            option4: '데이터베이스 관리시스템에 장애가 발생하면 전체시스템의 업무처리가 중단되는 단점이 있다.'
+            option4: '데이터베이스 관리시스템에 장애가 발생하면 전체시스템의 업무처리가 중단되는 단점이 있다.',
+            shortExplanation: '1. 맨하튼 거리: 각 축의 차이의 절대값을 모두 더한 거리 (시가지 주행 거리) $d(x,y) = \\sum$\n2. 유클리드 거리: 두 점 사이의 직선 거리 (피타고라스 정리 활용) $d(x,y) = \\sqrt{\\sum (x_i - y_i)^2}$'
         },
         {
             questionId: 4,
@@ -186,7 +188,8 @@ export default function Exam() {
             option1: '데이터베이스 관리로 모든 데이터 문제를 해결할 수 있다.',
             option2: '데이터베이스 관리시스템은 다수 사용자가 데이터베이스에 접근하여 데이터베이스의 정의, 조작, 제어 등 데이터베이스 관리를 지원하는 소프트웨어이다. ',
             option3: '데이터베이스 관리시스템은 데이터의 중복을 제어하고, 중앙 집중식 통제를 통해 데이터의 일관성을 유지한다.',
-            option4: '데이터베이스 관리시스템에 장애가 발생하면 전체시스템의 업무처리가 중단되는 단점이 있다.'
+            option4: '데이터베이스 관리시스템에 장애가 발생하면 전체시스템의 업무처리가 중단되는 단점이 있다.',
+            shortExplanation: 'test'
         },
         {
             questionId: 5,
@@ -196,7 +199,8 @@ export default function Exam() {
             option1: '데이터베이스 관리로 모든 데이터 문제를 해결할 수 있다.',
             option2: '데이터베이스 관리시스템은 다수 사용자가 데이터베이스에 접근하여 데이터베이스의 정의, 조작, 제어 등 데이터베이스 관리를 지원하는 소프트웨어이다. ',
             option3: '데이터베이스 관리시스템은 데이터의 중복을 제어하고, 중앙 집중식 통제를 통해 데이터의 일관성을 유지한다.',
-            option4: '데이터베이스 관리시스템에 장애가 발생하면 전체시스템의 업무처리가 중단되는 단점이 있다.'
+            option4: '데이터베이스 관리시스템에 장애가 발생하면 전체시스템의 업무처리가 중단되는 단점이 있다.',
+            shortExplanation: 'test'
         },
         {
             questionId: 6,
@@ -206,7 +210,8 @@ export default function Exam() {
             option1: '데이터베이스 관리로 모든 데이터 문제를 해결할 수 있다.',
             option2: '데이터베이스 관리시스템은 다수 사용자가 데이터베이스에 접근하여 데이터베이스의 정의, 조작, 제어 등 데이터베이스 관리를 지원하는 소프트웨어이다. ',
             option3: '데이터베이스 관리시스템은 데이터의 중복을 제어하고, 중앙 집중식 통제를 통해 데이터의 일관성을 유지한다.',
-            option4: '데이터베이스 관리시스템에 장애가 발생하면 전체시스템의 업무처리가 중단되는 단점이 있다.'
+            option4: '데이터베이스 관리시스템에 장애가 발생하면 전체시스템의 업무처리가 중단되는 단점이 있다.',
+            shortExplanation: 'test'
         },
         {
             questionId: 7,
@@ -216,7 +221,8 @@ export default function Exam() {
             option1: '데이터베이스 관리로 모든 데이터 문제를 해결할 수 있다.',
             option2: '데이터베이스 관리시스템은 다수 사용자가 데이터베이스에 접근하여 데이터베이스의 정의, 조작, 제어 등 데이터베이스 관리를 지원하는 소프트웨어이다. ',
             option3: '데이터베이스 관리시스템은 데이터의 중복을 제어하고, 중앙 집중식 통제를 통해 데이터의 일관성을 유지한다.',
-            option4: '데이터베이스 관리시스템에 장애가 발생하면 전체시스템의 업무처리가 중단되는 단점이 있다.'
+            option4: '데이터베이스 관리시스템에 장애가 발생하면 전체시스템의 업무처리가 중단되는 단점이 있다.',
+            shortExplanation: 'test'
         },
         {
             questionId: 8,
@@ -226,7 +232,8 @@ export default function Exam() {
             option1: '데이터베이스 관리로 모든 데이터 문제를 해결할 수 있다.',
             option2: '데이터베이스 관리시스템은 다수 사용자가 데이터베이스에 접근하여 데이터베이스의 정의, 조작, 제어 등 데이터베이스 관리를 지원하는 소프트웨어이다. ',
             option3: '데이터베이스 관리시스템은 데이터의 중복을 제어하고, 중앙 집중식 통제를 통해 데이터의 일관성을 유지한다.',
-            option4: '데이터베이스 관리시스템에 장애가 발생하면 전체시스템의 업무처리가 중단되는 단점이 있다.'
+            option4: '데이터베이스 관리시스템에 장애가 발생하면 전체시스템의 업무처리가 중단되는 단점이 있다.',
+            shortExplanation: 'test'
         }
     ];
 
