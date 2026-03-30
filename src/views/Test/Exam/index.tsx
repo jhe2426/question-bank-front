@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 
 import '../style.css';
 import 'katex/dist/katex.min.css';
@@ -6,6 +6,13 @@ import { InlineMath } from 'react-katex';
 import { usePagination } from 'src/hooks';
 import { Question } from 'src/types/interfaces';
 import Pagination from 'src/components/Pagination';
+import { useLocation, useParams } from 'react-router';
+import { GetPastExamQuestionListResponseDto } from 'src/apis/dto/response/pastExam';
+import { ResponseDto } from 'src/apis/dto/response';
+import { MESSAGE, RESPONSE_CODE } from 'src/constants';
+import { useAuthStore } from 'src/stores';
+import { ExamInfo } from 'src/types/aliases';
+import { getPastExamQuestionListRequest } from 'src/apis';
 
 // interface: 시험 문제 레코드 컴포넌트 속성 //
 interface QuestionTableItemProps {
@@ -36,10 +43,10 @@ const QuestionTableItem = memo(({ question, selectedAnswer, onClick }: QuestionT
             
             return <span key={index}>{part}</span>;
         });
-
         
     };
 
+    // render: 시험 문제 레코드 컴포넌트 렌더링 //
     return (
         <div className='question-item'>                    
             <div className='question-content'>
@@ -92,29 +99,30 @@ interface AnswerTableItemProps {
 };
 
 // component: 답안 표기란 레코드 컴포넌트 //
-function AnswerTableItem({ question, selectedAnswer, onClick }: AnswerTableItemProps) {
+const AnswerTableItem = memo(({ question, selectedAnswer, onClick }: AnswerTableItemProps) => {
 
     const { questionId, questionOrder} = question;
 
+    // render: 답안 표기란 레코드 컴포넌트 렌더링 //
     return (
         <div className='answer-list'>
-        <div className='answer-row'>
-            <div className='answer-number'>{questionOrder}</div>
-            <div className='answer-options'>
-                { [1, 2, 3, 4].map((number) => {
-                    
-                    const optionClass = selectedAnswer === number ? `answer-option number${number} active` : `answer-option number${number}`;
-                    
-                    return (
-                        <div key={number} className={optionClass} onClick={() => onClick(questionId, questionOrder, number)}></div>
-                    )
-        
-                })}
+            <div className='answer-row'>
+                <div className='answer-number'>{questionOrder}</div>
+                <div className='answer-options'>
+                    { [1, 2, 3, 4].map((number) => {
+                        
+                        const optionClass = selectedAnswer === number ? `answer-option number${number} active` : `answer-option number${number}`;
+                        
+                        return (
+                            <div key={number} className={optionClass} onClick={() => onClick(questionId, questionOrder, number)}></div>
+                        )
+            
+                    })}
+                </div>
             </div>
         </div>
-    </div>
     )
-}
+})
 
 // component: 시험 화면 컴포넌트 //
 export default function Exam() {
@@ -122,11 +130,26 @@ export default function Exam() {
     // variable: 페이지당 문제 수 //
     const QUESTION_COUNT_PER_PAGE = 3;
 
+    // state: accessToken 정보 상태 //
+    const { accessToken } = useAuthStore();
+
     // state: 페이지네이션 상태 //
     const {
         currentPage, setCurrentPage, totalPage,
         setTotalList, viewList
     } = usePagination<Question>(QUESTION_COUNT_PER_PAGE);
+
+    // state: 경로 상태 //
+    const { pathname } = useLocation();
+
+    // state: 경로 파라미터 조회 //
+    const params = useParams();
+
+    // state: 시험 문제 리스트 //
+    const [questionList, setQuestionList] = useState<Question[]>([]);
+
+    // state: 시험 제목 //
+    const [examTitle, setExamTitle] = useState<string>('');
 
     // state: 간단한 해설 존재 여부 //
     const [hasExplanation, setHasExplanation] = useState<boolean>(true);
@@ -137,6 +160,16 @@ export default function Exam() {
     // state: 타이머 상태 //
     const [time, setTime] = useState(90 * 60);
 
+
+    // variable: RESPONSE CODE 구조 분해 상수 //
+    const { DATABASE_ERROR, AUTHENTICATION_FAILED, PAST_EXAM_QUESTION_NOT_FOUND, SUCCESS} = RESPONSE_CODE;
+
+    // variable: 시험 유형 판별 //
+    const isMockExam = pathname.includes('mock-exam');
+    const isPastExam = pathname.includes('past-exam');
+    const isKillerExam = pathname.includes('killer-exam');
+    const isIncorrectExam = pathname.includes('incorrect-exam');
+
     // variable: 해설 존재 여부에 따른 문제 리스트 클래스 //
     const questionListClass = hasExplanation ? 'question-list has-explanation' : 'question-list';
 
@@ -145,97 +178,79 @@ export default function Exam() {
     // variable: 타이머 초 단위 //
     const seconds = time % 60;
 
-    // variable: 테스트 문제 리스트 //
-    const questionList: Question[] = [
-        {
-            questionId: 1,
-            questionOrder: 1,
-            questionText: '다음 중 빅데이터 분석의 특성에 대한 설명으로 옳지 않은 것은?',
-            imageUrl: 'https://localhost:4000/api/v1/file/모의고사/1d141986-dac8-42df-9963-34e495449a8a.png',
-            option1: '$d(x,y) = \\sum_{j=1}^m | x_j - y_j |$은 블라블라이다.',
-            option2: '$d(x,y) = \\sqrt{\\sum_{i=1}^m (x_i - y_i)^2}$',
-            option3: '$d(x,y) = \\left[ \\sum_{i=1}^m | x_i - y_i |^m \\right]^{1/m}$',
-            option4: '$Can(x,y) = \\sum_{i=1}^d \\frac{| x_i - y_i |}{| x_i | + | y_i |}$',
-            shortExplanation: 'test'
-        },
-        {
-            questionId: 2,
-            questionOrder: 2,
-            questionText: '다음 중 빅데이터 시대의 위기 요인과 사례가 잘못 연결된 것은?',
-            imageUrl: 'https://localhost:4000/api/v1/file/기출문제/fe422e02-b727-42b3-b936-cb132f26b821.png',
-            option1: '$\\int_0^\\infty x^2 dx$',
-            option2: '책임 원칙 훼손 - 특정 집단에 속했다고 취업이 안됨',
-            option3: '사생활 침해 - 여행 사실을 페이스북에 올린 사람의 집을 도둑이 노리는 사례 발생',
-            option4: '책임 원칙 훼손 - 범죄 예측 프로그램 때문에 범행을 저지르기 전에 체포, 자신의 신용도와 무관하게 부당한 대출 거부',
-            shortExplanation: '업무 이해(Business Understanding): 프로젝트의 목표, 요구사항, 현재 상황 등을 비즈니스 관점에서 이해하고 정의합니다.\n데이터 이해(Data Understanding): 데이터를 수집하고, 탐색하고, 품질을 검증합니다.\n데이터 준비(Data Preparation): 모델링에 적합하도록 데이터를 정제, 변환, 통합합니다.\n모델링(Modeling): 다양한 모델링 기법을 적용하고 파라미터를 조정하여 최적의 모델을 구축합니다.\n평가(Evaluation): 모델의 성능이 비즈니스 목표에 부합하는지 평가하고, 다음 단계 진행 여부를 결정합니다.\n배포(Deployment): 완성된 모델을 실제 운영 환경에 적용하고 모니터링합니다.'
-        },
-        {
-            questionId: 3,
-            questionOrder: 3,
-            questionText: '데이터베이스 관리시스템에 대한 설명으로 옳지 않은 것은?',
-            imageUrl: null,
-            option1: '데이터베이스 관리로 모든 데이터 문제를 해결할 수 있다.',
-            option2: '데이터베이스 관리시스템은 다수 사용자가 데이터베이스에 접근하여 데이터베이스의 정의, 조작, 제어 등 데이터베이스 관리를 지원하는 소프트웨어이다. ',
-            option3: '데이터베이스 관리시스템은 데이터의 중복을 제어하고, 중앙 집중식 통제를 통해 데이터의 일관성을 유지한다.',
-            option4: '데이터베이스 관리시스템에 장애가 발생하면 전체시스템의 업무처리가 중단되는 단점이 있다.',
-            shortExplanation: '1. 맨하튼 거리: 각 축의 차이의 절대값을 모두 더한 거리 (시가지 주행 거리) $d(x,y) = \\sum$\n2. 유클리드 거리: 두 점 사이의 직선 거리 (피타고라스 정리 활용) $d(x,y) = \\sqrt{\\sum (x_i - y_i)^2}$'
-        },
-        {
-            questionId: 4,
-            questionOrder: 4,
-            questionText: '데이터베이스 관리시스템에 대한 설명으로 옳지 않은 것은?',
-            imageUrl: null,
-            option1: '데이터베이스 관리로 모든 데이터 문제를 해결할 수 있다.',
-            option2: '데이터베이스 관리시스템은 다수 사용자가 데이터베이스에 접근하여 데이터베이스의 정의, 조작, 제어 등 데이터베이스 관리를 지원하는 소프트웨어이다. ',
-            option3: '데이터베이스 관리시스템은 데이터의 중복을 제어하고, 중앙 집중식 통제를 통해 데이터의 일관성을 유지한다.',
-            option4: '데이터베이스 관리시스템에 장애가 발생하면 전체시스템의 업무처리가 중단되는 단점이 있다.',
-            shortExplanation: 'test'
-        },
-        {
-            questionId: 5,
-            questionOrder: 5,
-            questionText: '데이터베이스 관리시스템에 대한 설명으로 옳지 않은 것은?',
-            imageUrl: null,
-            option1: '데이터베이스 관리로 모든 데이터 문제를 해결할 수 있다.',
-            option2: '데이터베이스 관리시스템은 다수 사용자가 데이터베이스에 접근하여 데이터베이스의 정의, 조작, 제어 등 데이터베이스 관리를 지원하는 소프트웨어이다. ',
-            option3: '데이터베이스 관리시스템은 데이터의 중복을 제어하고, 중앙 집중식 통제를 통해 데이터의 일관성을 유지한다.',
-            option4: '데이터베이스 관리시스템에 장애가 발생하면 전체시스템의 업무처리가 중단되는 단점이 있다.',
-            shortExplanation: 'test'
-        },
-        {
-            questionId: 6,
-            questionOrder: 6,
-            questionText: '데이터베이스 관리시스템에 대한 설명으로 옳지 않은 것은?',
-            imageUrl: null,
-            option1: '데이터베이스 관리로 모든 데이터 문제를 해결할 수 있다.',
-            option2: '데이터베이스 관리시스템은 다수 사용자가 데이터베이스에 접근하여 데이터베이스의 정의, 조작, 제어 등 데이터베이스 관리를 지원하는 소프트웨어이다. ',
-            option3: '데이터베이스 관리시스템은 데이터의 중복을 제어하고, 중앙 집중식 통제를 통해 데이터의 일관성을 유지한다.',
-            option4: '데이터베이스 관리시스템에 장애가 발생하면 전체시스템의 업무처리가 중단되는 단점이 있다.',
-            shortExplanation: 'test'
-        },
-        {
-            questionId: 7,
-            questionOrder: 7,
-            questionText: '데이터베이스 관리시스템에 대한 설명으로 옳지 않은 것은?',
-            imageUrl: null,
-            option1: '데이터베이스 관리로 모든 데이터 문제를 해결할 수 있다.',
-            option2: '데이터베이스 관리시스템은 다수 사용자가 데이터베이스에 접근하여 데이터베이스의 정의, 조작, 제어 등 데이터베이스 관리를 지원하는 소프트웨어이다. ',
-            option3: '데이터베이스 관리시스템은 데이터의 중복을 제어하고, 중앙 집중식 통제를 통해 데이터의 일관성을 유지한다.',
-            option4: '데이터베이스 관리시스템에 장애가 발생하면 전체시스템의 업무처리가 중단되는 단점이 있다.',
-            shortExplanation: 'test'
-        },
-        {
-            questionId: 8,
-            questionOrder: 8,
-            questionText: '데이터베이스 관리시스템에 대한 설명으로 옳지 않은 것은?',
-            imageUrl: null,
-            option1: '데이터베이스 관리로 모든 데이터 문제를 해결할 수 있다.',
-            option2: '데이터베이스 관리시스템은 다수 사용자가 데이터베이스에 접근하여 데이터베이스의 정의, 조작, 제어 등 데이터베이스 관리를 지원하는 소프트웨어이다. ',
-            option3: '데이터베이스 관리시스템은 데이터의 중복을 제어하고, 중앙 집중식 통제를 통해 데이터의 일관성을 유지한다.',
-            option4: '데이터베이스 관리시스템에 장애가 발생하면 전체시스템의 업무처리가 중단되는 단점이 있다.',
-            shortExplanation: 'test'
+    // function: 전달된 파라미터를 기반으로 제목 생성하는 함수 //
+    const initExamInfo = (): ExamInfo | null => {
+
+        if (isMockExam && params?.unitId && params?.chapterId && params?.difficulty) {
+            const { unitId, chapterId, difficulty  } = params;
+
+            return {
+                type: 'mock',
+                title: `모의고사 ${unitId}단원 - ${difficulty}`,
+                unitId,
+                chapterId,
+                difficulty
+            };
+        } 
+        
+        if (isPastExam && params?.pastExamId && params?.pastExamRound) {
+            const { pastExamId, pastExamRound } = params;
+
+            return {
+                type: 'past',
+                title: `${pastExamRound}회 기출문제`,
+                pastExamId,
+                pastExamRound
+            };
+        } 
+        
+        if (isKillerExam) {
+            return {
+                type: 'killer',
+                title: '킬러문제'
+            };
+        } 
+        
+        if (isIncorrectExam && params?.questionType) {
+            const { questionType } = params;
+
+            return {
+                type: 'incorrect',
+                title: `${questionType} 오답`,
+                questionType
+            };
+        }    
+
+        return null;
+    };
+
+    // variable: URL 파라미터 기반으로 게싼된 시험 정보 //
+    const examInfo = useMemo(() => initExamInfo(), [
+        isMockExam,
+        isPastExam,
+        isKillerExam,
+        isIncorrectExam,
+        params
+    ]);
+
+    // function: get past exam question list response 처리 함수 //
+    const getPastExamQuestionListResponse = (responseBody: GetPastExamQuestionListResponseDto | ResponseDto | null) => {
+        const message =
+            !responseBody ? MESSAGE.SERVER_ERROR :
+            responseBody.code === DATABASE_ERROR ?  MESSAGE.SERVER_ERROR :
+            responseBody.code === AUTHENTICATION_FAILED ? MESSAGE.AUTHENTICATION_FAILED : 
+            responseBody.code === PAST_EXAM_QUESTION_NOT_FOUND ? '기출문제를 찾을 수 없습니다' : '';
+
+        const isSuccess = responseBody !== null && responseBody.code === SUCCESS;
+        if (!isSuccess) {
+            alert(message);
+            return;
         }
-    ];
+
+        const { questions } = responseBody as GetPastExamQuestionListResponseDto;
+        setQuestionList(questions);
+        setTotalList(questions);
+    };
 
     // event handler: 문제 영역 정답 변경 이벤트 처리 //
     const onQuestionAnswerClickHandler = useCallback((questionId: number, answer: number) => {
@@ -261,7 +276,16 @@ export default function Exam() {
 
     // effect: 컴포넌트 로드 시 실행할 함수 //
     useEffect(() => {
-        setTotalList(questionList);
+
+        if (!accessToken || examInfo == null) return;
+
+        setExamTitle(examInfo.title);
+
+        if (!isPastExam) return;
+
+        if (examInfo.type == 'past') {
+            getPastExamQuestionListRequest(accessToken, examInfo.pastExamId).then(getPastExamQuestionListResponse);
+        }
 
         const timer = setInterval(() => {
             setTime((prev) => {
@@ -274,7 +298,7 @@ export default function Exam() {
         }, 1000);
 
         return () => clearInterval(timer);
-    }, []);
+    }, [accessToken, examInfo]);
 
     // render: 시험 화면 컴포넌트 렌더링 //
     return (
@@ -282,7 +306,7 @@ export default function Exam() {
 
             <div className='test-body'>
                 <div className='test-top'>
-                    <div className='test-title'>43회 기출문제</div>
+                    <div className='test-title'>{examTitle}</div>
                 </div>
 
                 <div className='test-main'>
@@ -293,10 +317,13 @@ export default function Exam() {
                         </div>
                     </div>
 
+                    <div>{questionList.length}</div>
+
                     <div className='test-sidebar'>
 
                         <div className='test-sidebar-top'>
 
+                            {isPastExam &&
                             <div className='timer-box'>
                                 <div className='timer-icon'></div>
                                 <div className='timer-content'>
@@ -306,7 +333,8 @@ export default function Exam() {
                                         <div className='time'>{minutes}분 {seconds}초</div>
                                     </div>
                                 </div>
-                            </div>
+                            </div>  
+                            }
 
                             <div className='answer-sheet'>
                                 <div className='answer-header'>답안 표기란</div>
@@ -321,7 +349,6 @@ export default function Exam() {
 
             <div className='test-bottom'>
                 <Pagination currentPage={currentPage} totalPage={totalPage} setCurrentPage={setCurrentPage} />
-
                 <div className='submit-button'>답안 제출</div>
             </div>
         </div>

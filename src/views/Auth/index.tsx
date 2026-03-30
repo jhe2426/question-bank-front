@@ -1,9 +1,9 @@
-import React, { ChangeEvent, useState } from 'react';
+import React, { useState } from 'react';
 
 import './style.css';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
-import AuthPage from 'src/types/aliases/auth-page.alias';
+import { AuthPage } from 'src/types/aliases';
 
 // component: 로그인 회원가입 화면 컴포넌트 //
 export default function Auth() {

@@ -3,13 +3,13 @@ import { Address, useDaumPostcodePopup } from 'react-daum-postcode';
 
 import './style.css';
 import InputBox from 'src/components/InputBox';
-import Gender from 'src/types/aliases/gender.alias';
 import { approvalCodeVerifyRequest, getUniversityListRequest, idCheckRequest, phoneNumberAuthRequest, phoneNumberAuthVerifyRequest, signUpRequest } from 'src/apis';
 import { GetUniversityListResponseDto } from 'src/apis/dto/response/auth';
 import { ResponseDto } from 'src/apis/dto/response';
 import { University } from 'src/types/interfaces';
 import { ApprovalCodeVerifyRequestDto, IdCheckRequestDto, PhoneNumberAuthRequestDto, PhoneNumberAuthVerifyRequestDto, SignUpRequestDto } from 'src/apis/dto/request/auth';
-import AuthPage from 'src/types/aliases/auth-page.alias';
+import { MESSAGE, RESPONSE_CODE } from 'src/constants';
+import { AuthPage, Gender } from 'src/types/aliases';
 
 // interface: 회원가입 컴포넌트 속성 //
 interface Props {
@@ -78,6 +78,12 @@ export default function SignUp(props: Props) {
 
     // state: 대학교 선택 셀렉터 오픈 여부 상태 //
     const [showUniversitySelector, setShowUniversityShowSelector] = useState<boolean>(false);
+
+    // variable: RESPONSE CODE 구조 분해 상수 //
+    const { 
+        DATABASE_ERROR, REDIS_SERVER_ERROR, ALREADY_REQUESTED, SMS_SEND_FAILED, PHONE_AUTHENTICATION_FAILED,
+        APPROVAL_CODE_MISMATCH, APPROVAL_CODE_ALREADY_USED, DUPLICATE_PHONE_NUMBER, SUCCESS, EXISTING_USER_ID, VALIDATION_FAILED
+    } = RESPONSE_CODE;
 
     // variable: 중복 확인 버튼 활성화 //
     const isUserIdCheckButtonActive = userId !== '' && isUserIdPatternMatched && !isUserApprovalCodeChecked;
@@ -175,12 +181,12 @@ export default function SignUp(props: Props) {
     // function: id check response 처리 함수 //
     const idCheckResponse = (responseBody: ResponseDto | null) => {
         const message = 
-            !responseBody ? '서버에 문제가 있습니다' :
-            responseBody.code === 'DBE' ? '서버에 문제가 있습니다' :
-            responseBody.code === 'EUI' ? '이미 사용중인 아이디입니다' :
-            responseBody.code == 'VF' ? '아이디를 영문, 숫자를 혼용하여 3 ~ 15자 입력해주세요' : '사용 가능한 아이디입니다';
+            !responseBody ? MESSAGE.SERVER_ERROR :
+            responseBody.code === DATABASE_ERROR ? MESSAGE.SERVER_ERROR :
+            responseBody.code === EXISTING_USER_ID ? '이미 사용중인 아이디입니다' :
+            responseBody.code == VALIDATION_FAILED ? '아이디를 영문, 숫자를 혼용하여 3 ~ 15자 입력해주세요' : '사용 가능한 아이디입니다';
 
-        const isSuccess = responseBody !== null && responseBody.code === 'SU';
+        const isSuccess = responseBody !== null && responseBody.code === SUCCESS;
         setUserIdMessage(message);
         setIsUserIdMessageError(!isSuccess);
         setIsUserIdChecked(isSuccess);
@@ -189,19 +195,19 @@ export default function SignUp(props: Props) {
     // function: 전화번호 인증 response 처리 함수 //
     const phoneNumberAuthResponse = (responseBody: ResponseDto | null) => {
         const message = 
-            !responseBody ? '서버에 문제가 있습니다' : 
-            responseBody.code === 'RE' ? '서버에 문제가 있습니다' :
-            responseBody.code === 'EUP' ? '이미 사용중인 전화번호입니다' :
-            responseBody.code === 'AR' ? '이미 인증번호가 발송되었습니다' :
-            responseBody.code === 'SSF' ? '서버에 문제가 있습니다' : '인증번호가 전송되었습니다';
+            !responseBody ? MESSAGE.SERVER_ERROR : 
+            responseBody.code === REDIS_SERVER_ERROR ? MESSAGE.SERVER_ERROR :
+            responseBody.code === DUPLICATE_PHONE_NUMBER ? '이미 사용중인 전화번호입니다' :
+            responseBody.code === ALREADY_REQUESTED ? '이미 인증번호가 발송되었습니다' :
+            responseBody.code === SMS_SEND_FAILED ? MESSAGE.SERVER_ERROR : '인증번호가 전송되었습니다';
         
-        const isSuccess = responseBody !== null && responseBody.code === 'SU';
-        const isAlreadySent = responseBody?.code === 'AR';
+        const isSuccess = responseBody !== null && responseBody.code === SUCCESS;
+        const isAlreadySent = responseBody?.code === ALREADY_REQUESTED;
 
         setUserPhoneNumberMessage(message);
         setIsUserPhoneNumberMessageError(!isSuccess);
         setIsUserPhoneNumberSend(isSuccess || isAlreadySent);
-        if (responseBody?.code === 'AR') {
+        if (responseBody?.code === ALREADY_REQUESTED) {
             setIsPhoneNumberRetryError(true);
         }
     }; 
@@ -209,11 +215,11 @@ export default function SignUp(props: Props) {
     // function: 전화번호 인증 확인 response body 처리 함수 //
     const phoneNumberAuthVerifyResponse = (responseBody: ResponseDto | null) => {
         const message =
-            !responseBody ? '서버에 문제가 있습니다' : 
-            responseBody.code === 'RE' ? '서버에 문제가 있습니다' :
-            responseBody.code === 'PAF' ? '인증번호가 일치하지 않습니다' : '인증번호가 확인되었습니다';
+            !responseBody ? MESSAGE.SERVER_ERROR : 
+            responseBody.code === REDIS_SERVER_ERROR ? MESSAGE.SERVER_ERROR :
+            responseBody.code === PHONE_AUTHENTICATION_FAILED ? '인증번호가 일치하지 않습니다' : '인증번호가 확인되었습니다';
 
-        const isSuccess = responseBody !== null && responseBody.code === 'SU';
+        const isSuccess = responseBody !== null && responseBody.code === SUCCESS;
         setUserAuthCodeMessage(message);
         setIsUserAuthCodeMessageError(!isSuccess);
         setIsUserAuthCodeChecked(isSuccess);
@@ -228,13 +234,13 @@ export default function SignUp(props: Props) {
     // function: 승인번호 확인 response body 처리 함수 //
     const approvalCodeVerifyResponse = (responseBody: ResponseDto | null) => {
         const message =
-            !responseBody ? '서버에 문제가 있습니다' : 
-            responseBody.code === 'DBE' ? '서버에 문제가 있습니다' :
-            responseBody.code === 'EUI' ? '이미 사용중인 아이디입니다. 아이디를 변경 후 다시 시도해주세요' :
-            responseBody.code === 'AAF' ? '승인번호가 일치하지 않습니다' : 
-            responseBody.code === 'AU' ? '이미 사용된 승인번호입니다' : '승인번호가 확인되었습니다';
+            !responseBody ? MESSAGE.SERVER_ERROR : 
+            responseBody.code === DATABASE_ERROR ? MESSAGE.SERVER_ERROR :
+            responseBody.code === EXISTING_USER_ID ? '이미 사용중인 아이디입니다. 아이디를 변경 후 다시 시도해주세요' :
+            responseBody.code === APPROVAL_CODE_MISMATCH ? '승인번호가 일치하지 않습니다' : 
+            responseBody.code === APPROVAL_CODE_ALREADY_USED ? '이미 사용된 승인번호입니다' : '승인번호가 확인되었습니다';
         
-        const isSuccess = responseBody !== null && responseBody.code === 'SU';
+        const isSuccess = responseBody !== null && responseBody.code === SUCCESS;
         setUserApprovalCodeMessage(message);
         setIsUserApprovalCodeMessageError(!isSuccess);
         setIsUserApprovalCodeChecked(isSuccess);
@@ -243,10 +249,10 @@ export default function SignUp(props: Props) {
     // function: get university list response 처리 함수 //
     const getUniversityListResponse = (responseBody: GetUniversityListResponseDto | ResponseDto | null) => {
         const message =
-            !responseBody ? '서버에 문제가 있습니다' :
-            responseBody.code === 'DBE' ? '서버에 문제가 있습니다' : '';
+            !responseBody ? MESSAGE.SERVER_ERROR :
+            responseBody.code === DATABASE_ERROR ? MESSAGE.SERVER_ERROR : '';
         
-        const isSuccessed = responseBody !== null && responseBody.code === 'SU';
+        const isSuccessed = responseBody !== null && responseBody.code === SUCCESS;
         if (!isSuccessed) {
             alert(message);
             return;
@@ -259,32 +265,32 @@ export default function SignUp(props: Props) {
     // function: sign up response 처리 함수 //
     const signUpResponse = (responseBody: ResponseDto | null) => {
         const message =
-            !responseBody ? '서버에 문제가 있습니다' :
-            responseBody.code === 'DBE' ? '서버에 문제가 있습니다' :
-            responseBody.code === 'RE' ? '서버에 문제가 있습니다' :
-            responseBody.code === 'EUI' ? '이미 사용중인 아이디입니다' :
-            responseBody.code === 'EUP' ? '이미 사용중인 전화번호입니다' :
-            responseBody.code === 'PAF' ? '전화번호 인증에 실패했습니다' :
-            responseBody.code === 'AAF' ? '승인번호 인증에 실패했습니다' : '';
+            !responseBody ? MESSAGE.SERVER_ERROR :
+            responseBody.code === DATABASE_ERROR ? MESSAGE.SERVER_ERROR :
+            responseBody.code === REDIS_SERVER_ERROR ? MESSAGE.SERVER_ERROR :
+            responseBody.code === EXISTING_USER_ID ? '이미 사용중인 아이디입니다' :
+            responseBody.code === DUPLICATE_PHONE_NUMBER ? '이미 사용중인 전화번호입니다' :
+            responseBody.code === PHONE_AUTHENTICATION_FAILED ? '전화번호 인증에 실패했습니다' :
+            responseBody.code === APPROVAL_CODE_MISMATCH ? '승인번호 인증에 실패했습니다' : '';
 
-        const isSuccess = responseBody !== null && responseBody.code === 'SU';
+        const isSuccess = responseBody !== null && responseBody.code === SUCCESS;
         if (!isSuccess) {
-            if (responseBody && responseBody.code === 'EUI') {
+            if (responseBody && responseBody.code === EXISTING_USER_ID) {
                 setUserIdMessage(message);
                 setIsUserIdMessageError(true);
                 return;
             }
-            if (responseBody && responseBody.code === 'EUP') {
+            if (responseBody && responseBody.code === DUPLICATE_PHONE_NUMBER) {
                 setUserPhoneNumberMessage(message);
                 setIsUserPhoneNumberMessageError(true);
                 return;
             }
-            if (responseBody && responseBody.code === 'PAF') {
+            if (responseBody && responseBody.code === PHONE_AUTHENTICATION_FAILED) {
                 setUserAuthCodeMessage(message);
                 setIsUserAuthCodeMessageError(true);
                 return;
             }
-            if (responseBody && responseBody.code === 'AAF') {
+            if (responseBody && responseBody.code === APPROVAL_CODE_MISMATCH) {
                 setUserApprovalCodeMessage(message);
                 setIsUserApprovalCodeMessageError(true);
                 return;

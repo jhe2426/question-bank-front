@@ -5,8 +5,8 @@ import { GetUniversityListResponseDto, RefreshAccessTokenResponseDto, SignInResp
 import { useAuthStore } from 'src/stores';
 import { AUTH_ABSOLUTE_PATH } from 'src/constants';
 import { Cookies } from 'react-cookie';
-import GetPastExamRoundListResponseDto from './dto/response/pastExam/get-past-exam-round-list.response.dto';
-import GetUnitAndChapterListResponseDto from './dto/response/mockExam/get-unit-and-chapter-list.response.dto';
+import { GetPastExamRoundListResponseDto } from './dto/response/pastExam';
+import { GetUnitAndChapterListResponseDto } from './dto/response/mockExam';
 
 // variable: URL 상수 //
 const API_DOMAIN = process.env.REACT_APP_API_DOMAIN;
@@ -30,6 +30,7 @@ const GET_UNIT_AND_CHAPTER_LIST_URL =`${MOCK_EXAM_MODULE_URL}/units-with-chapter
 const PAST_EXAM_MODULE_URL = `${API_DOMAIN}/api/v1/past-exam`;
 
 const GET_PAST_EXAM_ROUND_LIST_URL = `${PAST_EXAM_MODULE_URL}`;
+const GET_PAST_EXAM_QUESTION_LIST_URL = (pastExamId: number | string) => `${PAST_EXAM_MODULE_URL}/${pastExamId}`;
 
 // variable: refresh 토큰을 사용하여 access Token 발급 진행 여부 //
 let isRefreshing = false;
@@ -213,6 +214,14 @@ export const getUnitAndChapterListRequest = async (accessToken: string) => {
 // function: get past exam round list API 요청 함수 //
 export const getPastExamRoundListRequest = async (accessToken: string) => {
     const responseBody = await api.get(GET_PAST_EXAM_ROUND_LIST_URL, bearerAuthorization(accessToken))
+        .then(responseSuccessHandler<GetPastExamRoundListResponseDto>)
+        .catch(responseErrorHandler);
+    return responseBody;
+};
+
+// function: get past exam question list API 요청 함수 //
+export const getPastExamQuestionListRequest = async (accessToken: string, pastExamId: number | string) => {
+    const responseBody = await api.get(GET_PAST_EXAM_QUESTION_LIST_URL(pastExamId), bearerAuthorization(accessToken))
         .then(responseSuccessHandler<GetPastExamRoundListResponseDto>)
         .catch(responseErrorHandler);
     return responseBody;

@@ -2,16 +2,15 @@ import React, { useEffect, useState } from 'react';
 
 import './style.css';
 import UnitSelector from './UnitSelector';
-import IncorrectType from 'src/types/aliases/incorrect-type.alias';
 import { getPastExamRoundListRequest, getUnitAndChapterListRequest } from 'src/apis';
 import { useAuthStore } from 'src/stores';
 import { useNavigate } from 'react-router';
-import { INCORRECT_QUESTIONS_TEST_ABSOLUTE_PATH, KILLER_EXAM_TEST_ABSOLUTE_PATH, MOCK_EXAM_TEST_ABSOLUTE_PATH, PAST_EXAM_TEST_ABSOLUTE_PATH } from 'src/constants';
-import GetPastExamRoundListResponseDto from 'src/apis/dto/response/pastExam/get-past-exam-round-list.response.dto';
+import { INCORRECT_QUESTIONS_TEST_ABSOLUTE_PATH, KILLER_EXAM_TEST_ABSOLUTE_PATH, MESSAGE, MOCK_EXAM_TEST_ABSOLUTE_PATH, PAST_EXAM_TEST_ABSOLUTE_PATH, RESPONSE_CODE } from 'src/constants';
 import { ResponseDto } from 'src/apis/dto/response';
-import PastExamRound from 'src/types/interfaces/past-exam-round.interface';
-import { Chapter, MockExamPathParams, Unit, UnitSummary } from 'src/types/interfaces';
-import GetUnitAndChapterListResponseDto from 'src/apis/dto/response/mockExam/get-unit-and-chapter-list.response.dto';
+import { Chapter, MockExamPathParams, PastExamRound, Unit, UnitSummary } from 'src/types/interfaces';
+import { GetUnitAndChapterListResponseDto } from 'src/apis/dto/response/mockExam';
+import { GetPastExamRoundListResponseDto } from 'src/apis/dto/response/pastExam';
+import { IncorrectType } from 'src/types/aliases';
 
 // component: 메인 화면 컴포넌트 //
 export default function Main() {
@@ -53,6 +52,9 @@ export default function Main() {
 
     // state: 선택한 오답문제 타입 상태 //
     const [selectedIncorrectType, setSelectedIncorrectType] = useState<IncorrectType | ''>('');
+
+    // variable: RESPONSE CODE 구조 분해 상수 //
+    const { DATABASE_ERROR, AUTHENTICATION_FAILED, SUCCESS} = RESPONSE_CODE;
 
     // variable: 모의고사 난이도 클래스 //
     const mockLevelHighClass = mockLevel === '상' || (isMockLevelSelected === false && mockLevel === '') ? 'level-button high' : 'level-button high disable';
@@ -96,11 +98,11 @@ export default function Main() {
     // function: get unit and chapter list response 처리 함수 //
     const getUnitAndChapterListResponse = (responseBody: GetUnitAndChapterListResponseDto | ResponseDto | null) => {
         const message =
-        !responseBody ? '서버에 문제가 있습니다' :
-        responseBody.code === 'DBE' ? '서버에 문제가 있습니다' :
-        responseBody.code === 'AF' ? '인증에 실패했습니다' : '';
+        !responseBody ? MESSAGE.SERVER_ERROR :
+        responseBody.code === DATABASE_ERROR ? MESSAGE.SERVER_ERROR :
+        responseBody.code === AUTHENTICATION_FAILED ? MESSAGE.AUTHENTICATION_FAILED : '';
 
-        const isSuccessed = responseBody !== null && responseBody.code === 'SU';
+        const isSuccessed = responseBody !== null && responseBody.code === SUCCESS;
         if (!isSuccessed) {
             alert(message);
             return;
@@ -114,11 +116,11 @@ export default function Main() {
     // function: get past exam round list response 처리 함수 //
     const getPastExamRoundListResponse = (responseBody: GetPastExamRoundListResponseDto | ResponseDto | null) => {
         const message =
-            !responseBody ? '서버에 문제가 있습니다' :
-            responseBody.code === 'DBE' ? '서버에 문제가 있습니다' :
-            responseBody.code === 'AF' ? '인증에 실패했습니다' : '';
+            !responseBody ? MESSAGE.SERVER_ERROR :
+            responseBody.code === DATABASE_ERROR ? MESSAGE.SERVER_ERROR :
+            responseBody.code === AUTHENTICATION_FAILED ? MESSAGE.AUTHENTICATION_FAILED : '';
 
-        const isSuccessed = responseBody !== null && responseBody.code === 'SU';
+        const isSuccessed = responseBody !== null && responseBody.code === SUCCESS;
         if (!isSuccessed) {
             alert(message);
             return;

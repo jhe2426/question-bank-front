@@ -7,9 +7,9 @@ import { SignInRequestDto } from 'src/apis/dto/request/auth';
 import { ResponseDto } from 'src/apis/dto/response';
 import { SignInResponseDto } from 'src/apis/dto/response/auth';
 import { useAuthStore } from 'src/stores';
-import { MAIN_ABSOLUTE_PATH } from 'src/constants';
+import { MAIN_ABSOLUTE_PATH, MESSAGE, RESPONSE_CODE } from 'src/constants';
 import { signInRequest } from 'src/apis';
-import AuthPage from 'src/types/aliases/auth-page.alias';
+import { AuthPage } from 'src/types/aliases';
 
 // interface: 로그인 컴포넌트 속성 //
 interface Props {
@@ -33,6 +33,9 @@ export default function SignIn(props: Props) {
     // state: accessToken 정보 상태 //
     const { setAccessToken } = useAuthStore();
 
+    // variable: RESPONSE CODE 구조 분해 상수 //
+    const { DATABASE_ERROR, REDIS_SERVER_ERROR, APPROVAL_CODE_EXPIRED, SIGN_IN_FAILED, SUCCESS} = RESPONSE_CODE;
+
     // reference: 유저 비밀번호 InputBox 요소 참조 //
     const userPasswordInputBoxRef = useRef<HTMLInputElement | null>(null);
 
@@ -42,13 +45,13 @@ export default function SignIn(props: Props) {
     // function: sign in response 처리 함수 //
     const signInResponse = (responseBody: SignInResponseDto | ResponseDto | null) => {
         const message =
-            !responseBody ? '서버에 문제가 있습니다' :
-            responseBody.code === 'DBE' ? '서버에 문제가 있습니다' :
-            responseBody.code === 'ROF' ? '서버에 문제가 있습니다' :
-            responseBody.code === 'AE' ? '승인번호 사용기간이 지났습니다' :
-            responseBody.code === 'SF' ? '로그인 정보가 일치하지 않습니다' : '';
+            !responseBody ? MESSAGE.SERVER_ERROR :
+            responseBody.code ===  DATABASE_ERROR ? MESSAGE.SERVER_ERROR :
+            responseBody.code === REDIS_SERVER_ERROR ? MESSAGE.SERVER_ERROR :
+            responseBody.code === APPROVAL_CODE_EXPIRED ? '승인번호 사용기간이 지났습니다' :
+            responseBody.code === SIGN_IN_FAILED ? '로그인 정보가 일치하지 않습니다' : '';
 
-        const isSuccess = responseBody !== null && responseBody.code === 'SU';
+        const isSuccess = responseBody !== null && responseBody.code === SUCCESS;
         if (!isSuccess) {
             setUserPasswordMessage(message);
             return;
