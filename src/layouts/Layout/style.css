@@ -47,6 +47,12 @@
 
     border-radius: 25px 25px 0 0;
     background-color: var(--PrimaryDark2);
+    
+    cursor: pointer;
+}
+
+#main .header-box.disable {
+    cursor: default;
 }
 
 #main .header-box .header {
@@ -57,3 +63,4 @@
     font-weight: 700;
     line-height: 70px;
 }
+

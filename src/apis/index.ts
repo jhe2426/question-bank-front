@@ -7,6 +7,7 @@ import { AUTH_ABSOLUTE_PATH } from 'src/constants';
 import { Cookies } from 'react-cookie';
 import { GetPastExamRoundListResponseDto } from './dto/response/pastExam';
 import { GetUnitAndChapterListResponseDto } from './dto/response/mockExam';
+import { GetKillerExamQuestionListResponseDto } from './dto/response/killerExam';
 
 // variable: URL 상수 //
 const API_DOMAIN = process.env.REACT_APP_API_DOMAIN;
@@ -25,10 +26,12 @@ const LOGOUT_URL = `${AUTH_MODULE_URL}/logout`;
 
 const MOCK_EXAM_MODULE_URL = `${API_DOMAIN}/api/v1/mock-exam`;
 
+const KILLER_EXAM_MODULE_URL = `${API_DOMAIN}/api/v1/killer-exam`;
+const GET_KILLER_EXAM_QUESTION_LIST_URL = `${KILLER_EXAM_MODULE_URL}`;
+
 const GET_UNIT_AND_CHAPTER_LIST_URL =`${MOCK_EXAM_MODULE_URL}/units-with-chapters`;
 
 const PAST_EXAM_MODULE_URL = `${API_DOMAIN}/api/v1/past-exam`;
-
 const GET_PAST_EXAM_ROUND_LIST_URL = `${PAST_EXAM_MODULE_URL}`;
 const GET_PAST_EXAM_QUESTION_LIST_URL = (pastExamId: number | string) => `${PAST_EXAM_MODULE_URL}/${pastExamId}`;
 
@@ -223,6 +226,14 @@ export const getPastExamRoundListRequest = async (accessToken: string) => {
 export const getPastExamQuestionListRequest = async (accessToken: string, pastExamId: number | string) => {
     const responseBody = await api.get(GET_PAST_EXAM_QUESTION_LIST_URL(pastExamId), bearerAuthorization(accessToken))
         .then(responseSuccessHandler<GetPastExamRoundListResponseDto>)
+        .catch(responseErrorHandler);
+    return responseBody;
+};
+
+// function: get killer exam question list API 요청 함수 //
+export const getKillerExamQuestionListRequest = async (accessToken: string) => {
+    const responseBody = await api.get(GET_KILLER_EXAM_QUESTION_LIST_URL, bearerAuthorization(accessToken))
+        .then(responseSuccessHandler<GetKillerExamQuestionListResponseDto>)
         .catch(responseErrorHandler);
     return responseBody;
 };

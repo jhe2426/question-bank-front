@@ -12,7 +12,8 @@ import { ResponseDto } from 'src/apis/dto/response';
 import { MESSAGE, RESPONSE_CODE } from 'src/constants';
 import { useAuthStore } from 'src/stores';
 import { ExamInfo } from 'src/types/aliases';
-import { getPastExamQuestionListRequest } from 'src/apis';
+import { getKillerExamQuestionListRequest, getPastExamQuestionListRequest } from 'src/apis';
+import { GetKillerExamQuestionListResponseDto } from 'src/apis/dto/response/killerExam';
 
 // interface: 시험 문제 레코드 컴포넌트 속성 //
 interface QuestionTableItemProps {
@@ -151,6 +152,9 @@ export default function Exam() {
     // state: 시험 제목 //
     const [examTitle, setExamTitle] = useState<string>('');
 
+    // state: 현재 풀이 회차를 식별하는 값 (모의고사/킬러문제 완료 여부 판단 기준) //
+    const [sessionId, setSessionId] = useState<number>();
+
     // state: 간단한 해설 존재 여부 //
     const [hasExplanation, setHasExplanation] = useState<boolean>(true);
 
@@ -252,6 +256,25 @@ export default function Exam() {
         setTotalList(questions);
     };
 
+    // function: get killer exam question list response 처리 함수 //
+    const getKillerExamQuestionListResponse = (responseBody: GetKillerExamQuestionListResponseDto | ResponseDto | null) => {
+        const message =
+            !responseBody ? MESSAGE.SERVER_ERROR :
+            responseBody.code === DATABASE_ERROR ?  MESSAGE.SERVER_ERROR :
+            responseBody.code === AUTHENTICATION_FAILED ? MESSAGE.AUTHENTICATION_FAILED : '';
+
+        const isSuccess = responseBody !== null && responseBody.code === SUCCESS;
+        if (!isSuccess) {
+            alert(message);
+            return;
+        }
+
+        const { sessionId, questions } = responseBody as GetKillerExamQuestionListResponseDto;
+        setQuestionList(questions);
+        setTotalList(questions);
+        setSessionId(sessionId);
+    };
+
     // event handler: 문제 영역 정답 변경 이벤트 처리 //
     const onQuestionAnswerClickHandler = useCallback((questionId: number, answer: number) => {
         setSelectedAnswers((prev) => ({
@@ -281,6 +304,8 @@ export default function Exam() {
 
         setExamTitle(examInfo.title);
 
+        if (isKillerExam && examInfo.type == 'killer') getKillerExamQuestionListRequest(accessToken).then(getKillerExamQuestionListResponse);
+ 
         if (!isPastExam) return;
 
         if (examInfo.type == 'past') {
@@ -316,8 +341,6 @@ export default function Exam() {
                             {viewList.map((question, index) => <QuestionTableItem key={index} question={question} selectedAnswer={selectedAnswers[question.questionId]} onClick={onQuestionAnswerClickHandler}/>)}
                         </div>
                     </div>
-
-                    <div>{questionList.length}</div>
 
                     <div className='test-sidebar'>
 

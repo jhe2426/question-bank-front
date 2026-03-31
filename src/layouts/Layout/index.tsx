@@ -27,6 +27,9 @@ export default function Layout() {
     // variable: 메인 클래스 //
     const mainClass = pathname.startsWith(MAIN_ABSOLUTE_PATH) ? '' : 'small-margin';
 
+    // variable: 헤더 클래스 //
+    const headerClass = pathname.startsWith(MAIN_ABSOLUTE_PATH) ? 'header-box disable' : 'header-box';
+
     // function: 네비게이터 함수 //
     const navigator = useNavigate();
 
@@ -49,6 +52,11 @@ export default function Layout() {
             clearAuth();
             navigator(AUTH_ABSOLUTE_PATH);
         }
+    };
+
+    // event handler: 메인 로고 클릭 이벤트 처리 //
+    const onMainLogoClickHandler = () => {
+        navigator(MAIN_ABSOLUTE_PATH);
     };
 
     // event handler: 로그아웃 클릭 이벤트 처리 //
@@ -88,7 +96,7 @@ export default function Layout() {
             </div>
             
             <div id='main' className={mainClass}>
-                <div className='header-box'>
+                <div className={headerClass} onClick={onMainLogoClickHandler}>
                     <div className='header'>ADSP 문제은행 시스템</div>
                 </div>
                 <Outlet />
