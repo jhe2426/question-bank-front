@@ -6,14 +6,15 @@ import { InlineMath } from 'react-katex';
 import { usePagination } from 'src/hooks';
 import { Question } from 'src/types/interfaces';
 import Pagination from 'src/components/Pagination';
-import { useLocation, useParams } from 'react-router';
+import { useLocation, useNavigate, useParams } from 'react-router';
 import { GetPastExamQuestionListResponseDto } from 'src/apis/dto/response/pastExam';
 import { ResponseDto } from 'src/apis/dto/response';
-import { MESSAGE, RESPONSE_CODE } from 'src/constants';
+import { MAIN_ABSOLUTE_PATH, MESSAGE, RESPONSE_CODE } from 'src/constants';
 import { useAuthStore } from 'src/stores';
 import { ExamInfo } from 'src/types/aliases';
-import { getKillerExamQuestionListRequest, getPastExamQuestionListRequest } from 'src/apis';
+import { getKillerExamQuestionListRequest, getMockExamQuestionListRequest, getPastExamQuestionListRequest } from 'src/apis';
 import { GetKillerExamQuestionListResponseDto } from 'src/apis/dto/response/killerExam';
+import { GetMockExamQuestionListResponseDto } from 'src/apis/dto/response/mockExam';
 
 // interface: 시험 문제 레코드 컴포넌트 속성 //
 interface QuestionTableItemProps {
@@ -182,18 +183,31 @@ export default function Exam() {
     // variable: 타이머 초 단위 //
     const seconds = time % 60;
 
+    // function: 네비게이터 함수 //
+    const navigator = useNavigate();
+
     // function: 전달된 파라미터를 기반으로 제목 생성하는 함수 //
     const initExamInfo = (): ExamInfo | null => {
 
         if (isMockExam && params?.unitId && params?.chapterId && params?.difficulty) {
-            const { unitId, chapterId, difficulty  } = params;
+            const { unitId, chapterId, difficulty, hasExplanation } = params;
+
+            const explanation = hasExplanation === 'true';
+            let mappedDifficulty = '';
+
+            if (difficulty === '상') mappedDifficulty = 'HIGH';
+            else if (difficulty === '중') mappedDifficulty = 'MEDIUM';
+            else if (difficulty === '하') mappedDifficulty = 'LOW';
+
+            setHasExplanation(explanation);
 
             return {
                 type: 'mock',
                 title: `모의고사 ${unitId}단원 - ${difficulty}`,
-                unitId,
-                chapterId,
-                difficulty
+                unitId: Number(unitId),
+                chapterId: Number(chapterId),
+                difficulty: mappedDifficulty,
+                hasExplanation: explanation
             };
         } 
         
@@ -203,8 +217,8 @@ export default function Exam() {
             return {
                 type: 'past',
                 title: `${pastExamRound}회 기출문제`,
-                pastExamId,
-                pastExamRound
+                pastExamId: Number(pastExamId),
+                pastExamRound: Number(pastExamRound)
             };
         } 
         
@@ -228,7 +242,7 @@ export default function Exam() {
         return null;
     };
 
-    // variable: URL 파라미터 기반으로 게싼된 시험 정보 //
+    // variable: URL 파라미터 기반으로 계산된 시험 정보 //
     const examInfo = useMemo(() => initExamInfo(), [
         isMockExam,
         isPastExam,
@@ -275,6 +289,33 @@ export default function Exam() {
         setSessionId(sessionId);
     };
 
+    // function: get mock exam question list response 처리 함수 //
+    const getMockExamQuestionListResponse = (responseBody: GetMockExamQuestionListResponseDto | ResponseDto | null) => {
+        const message =
+            !responseBody ? MESSAGE.SERVER_ERROR :
+            responseBody.code === DATABASE_ERROR ?  MESSAGE.SERVER_ERROR :
+            responseBody.code === AUTHENTICATION_FAILED ? MESSAGE.AUTHENTICATION_FAILED : '';
+
+        const isSuccess = responseBody !== null && responseBody.code === SUCCESS;
+        if (!isSuccess) {
+            alert(message);
+            return;
+        }
+
+        const { sessionId, questions } = responseBody as GetKillerExamQuestionListResponseDto;
+        if (questions.length === 0) {
+            navigator(MAIN_ABSOLUTE_PATH);
+            setTimeout(() => {
+                alert('해당 조건의 모의고사 문제는 모두 풀었습니다.');
+            }, 50);
+            return;
+        }
+
+        setQuestionList(questions);
+        setTotalList(questions);
+        setSessionId(sessionId);
+    };
+
     // event handler: 문제 영역 정답 변경 이벤트 처리 //
     const onQuestionAnswerClickHandler = useCallback((questionId: number, answer: number) => {
         setSelectedAnswers((prev) => ({
@@ -304,7 +345,15 @@ export default function Exam() {
 
         setExamTitle(examInfo.title);
 
-        if (isKillerExam && examInfo.type == 'killer') getKillerExamQuestionListRequest(accessToken).then(getKillerExamQuestionListResponse);
+        if (isKillerExam && examInfo.type == 'killer') {
+            getKillerExamQuestionListRequest(accessToken).then(getKillerExamQuestionListResponse);
+            return;
+        } 
+
+        if (isMockExam && examInfo.type == 'mock') {
+            getMockExamQuestionListRequest(accessToken, examInfo.chapterId, examInfo.difficulty, examInfo.hasExplanation).then(getMockExamQuestionListResponse);
+            return;
+        }
  
         if (!isPastExam) return;
 

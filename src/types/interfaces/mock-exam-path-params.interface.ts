@@ -1,6 +1,6 @@
 export default interface MockExamPathParams {
-    unitId: number | string;
-    chapterId: number | string;
+    unitId: number;
+    chapterId: number;
     difficulty: string;
     hasExplanation: boolean;
 }

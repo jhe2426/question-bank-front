@@ -216,7 +216,7 @@ export default function Main() {
             unitId: selectedUnit.unitId,
             chapterId: selectedChapter.chapterId,
             difficulty: mockLevel,
-            hasExplanation: isMockLevelSelected
+            hasExplanation: isSolutionVisible
         };
 
         navigator(MOCK_EXAM_TEST_ABSOLUTE_PATH(mockExamParams));
