@@ -12,11 +12,12 @@ import { PostExamResponseDto, ResponseDto } from 'src/apis/dto/response';
 import { MAIN_ABSOLUTE_PATH, MESSAGE, RESPONSE_CODE } from 'src/constants';
 import { useAuthStore } from 'src/stores';
 import { ExamInfo } from 'src/types/aliases';
-import { getIncorrectQuestionListRequest, getKillerExamQuestionListRequest, getMockExamQuestionListRequest, getPastExamQuestionListRequest, postKillerExamGradingRequest } from 'src/apis';
+import { getIncorrectQuestionListRequest, getKillerExamQuestionListRequest, getMockExamQuestionListRequest, getPastExamQuestionListRequest, postKillerExamGradingRequest, postPastExamGradingRequest } from 'src/apis';
 import { GetKillerExamQuestionListResponseDto } from 'src/apis/dto/response/killerExam';
 import { GetMockExamQuestionListResponseDto } from 'src/apis/dto/response/mockExam';
 import { GetIncorrectQuestionListResponseDto } from 'src/apis/dto/response/incorrectQuestions';
 import { PostKillerExamGradingRequestDto } from 'src/apis/dto/request/killerExam';
+import { PostPastExamGradingRequestDto } from 'src/apis/dto/request/pastExam';
 
 // interface: 시험 문제 레코드 컴포넌트 속성 //
 interface QuestionTableItemProps {
@@ -156,9 +157,6 @@ export default function Exam() {
 
     // state: 시험 문제 리스트 //
     const [questionList, setQuestionList] = useState<Question[]>([]);
-
-    // state: 시험 제목 //
-    const [examTitle, setExamTitle] = useState<string>('');
 
     // state: 현재 풀이 회차를 식별하는 값 (모의고사/킬러문제 완료 여부 판단 기준) //
     const [sessionId, setSessionId] = useState<number>();
@@ -413,8 +411,8 @@ export default function Exam() {
         saveExamToStorage(questions, initialAnswer, null, examInfo);
     };
 
-    // function: post killer exam grading response 처리 함수 //
-    const postKillerExamGradingResponse = (responseBody: PostExamResponseDto | ResponseDto | null) => {
+    // function: post exam grading response 처리 함수 //
+    const postExamGradingResponse = (responseBody: PostExamResponseDto | ResponseDto | null) => {
         const message =
             !responseBody ? MESSAGE.SERVER_ERROR :
             responseBody.code === DATABASE_ERROR ?  MESSAGE.SERVER_ERROR :
@@ -455,6 +453,29 @@ export default function Exam() {
 
     }, [currentPage]);
 
+    // event handler: 기출문제 자동 제출 처리 //
+    const submitPastExam= () => {
+        if (!accessToken || !examInfo || examInfo.type !== 'past') return;
+
+        const userAnswers: UserAnswer[] = Object.entries(selectedAnswers).map(
+            ([questionId, value]) => ({
+                questionId: Number(questionId),
+                questionOrder: value.questionOrder,
+                answer: value.answer
+            })
+        );
+
+
+        const requestBody: PostPastExamGradingRequestDto = {
+            detailedType: examInfo.title,
+            pastExamId: Number(examInfo?.pastExamId),
+            userAnswers
+        };
+
+
+        postPastExamGradingRequest(requestBody, accessToken).then(postExamGradingResponse);
+    };
+
     // event handler: 채점하기 버튼 클릭 이벤트 처리 //
     const onClickGradingButtonHandler = () => {
 
@@ -484,18 +505,26 @@ export default function Exam() {
                 userAnswers
             };
 
-            postKillerExamGradingRequest(requestBody, accessToken).then(postKillerExamGradingResponse);
+            postKillerExamGradingRequest(requestBody, accessToken).then(postExamGradingResponse);
             return;
         }
         
+        if (sourceType === 'past' && examInfo?.title) {
+            const requestBody: PostPastExamGradingRequestDto = {
+                detailedType: examInfo.title,
+                pastExamId: Number(examInfo?.pastExamId),
+                userAnswers
+            };
+
+            postPastExamGradingRequest(requestBody, accessToken).then(postExamGradingResponse);
+            return;
+        }
     };
 
     // effect: accessToken와 examInfo가 변경될 시 실행할 함수 //
     useEffect(() => {
 
         if (!accessToken || examInfo == null) return;
-
-        setExamTitle(examInfo.title);
 
         if (!isPastExam) {
             const savedData = loadExamFromStorage();
@@ -532,8 +561,10 @@ export default function Exam() {
 
         const timer = setInterval(() => {
             setTime((prev) => {
-                if (prev <= 0) {
+                if (prev <= 1) {
                     clearInterval(timer);
+                    alert('시험 시간이 종료되었습니다. 자동으로 제출됩니다.');
+                    submitPastExam();
                     return 0;
                 }
             return prev - 1;
@@ -549,7 +580,7 @@ export default function Exam() {
 
             <div className='test-body'>
                 <div className='test-top'>
-                    <div className='test-title'>{examTitle}</div>
+                    <div className='test-title'>{examInfo?.title}</div>
                 </div>
 
                 <div className='test-main'>

@@ -10,6 +10,7 @@ import { GetMockExamQuestionListResponseDto, GetUnitAndChapterListResponseDto } 
 import { GetKillerExamQuestionListResponseDto } from './dto/response/killerExam';
 import { GetIncorrectQuestionListResponseDto } from './dto/response/incorrectQuestions';
 import { PostKillerExamGradingRequestDto } from './dto/request/killerExam';
+import { PostPastExamGradingRequestDto } from './dto/request/pastExam';
 
 // variable: URL 상수 //
 const API_DOMAIN = process.env.REACT_APP_API_DOMAIN;
@@ -38,6 +39,7 @@ const POST_KILLER_EXAM_GRADING_URL = `${KILLER_EXAM_MODULE_URL}/grading`;
 const PAST_EXAM_MODULE_URL = `${API_DOMAIN}/api/v1/past-exam`;
 const GET_PAST_EXAM_ROUND_LIST_URL = `${PAST_EXAM_MODULE_URL}`;
 const GET_PAST_EXAM_QUESTION_LIST_URL = (pastExamId: number | string) => `${PAST_EXAM_MODULE_URL}/${pastExamId}`;
+const POST_PAST_EXAM_GRADING_URL = `${PAST_EXAM_MODULE_URL}/grading`;
 
 const INCORRECT_QUESTIONS_MODULE_URL =`${API_DOMAIN}/api/v1/incorrect-questions`;
 const GET_INCORRECT_QUESTION_LIST_URL = (sourceType: string) => `${INCORRECT_QUESTIONS_MODULE_URL}/${sourceType}`;
@@ -264,6 +266,14 @@ export const getIncorrectQuestionListRequest = async (accessToken: string, sourc
 // function: post killer exam grading API 요청 함수 //
 export const postKillerExamGradingRequest = async (requestBody: PostKillerExamGradingRequestDto, accessToken: string) => {
     const responseBody = await axios.post(POST_KILLER_EXAM_GRADING_URL, requestBody, bearerAuthorization(accessToken))
+        .then(responseSuccessHandler<PostExamResponseDto>)
+        .catch(responseErrorHandler);
+    return responseBody;
+};
+
+// function: post past exam grading API 요청 함수 //
+export const postPastExamGradingRequest = async (requestBody: PostPastExamGradingRequestDto, accessToken: string) => {
+    const responseBody = await axios.post(POST_PAST_EXAM_GRADING_URL, requestBody, bearerAuthorization(accessToken))
         .then(responseSuccessHandler<PostExamResponseDto>)
         .catch(responseErrorHandler);
     return responseBody;
