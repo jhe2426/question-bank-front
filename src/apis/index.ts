@@ -8,6 +8,7 @@ import { Cookies } from 'react-cookie';
 import { GetPastExamRoundListResponseDto } from './dto/response/pastExam';
 import { GetMockExamQuestionListResponseDto, GetUnitAndChapterListResponseDto } from './dto/response/mockExam';
 import { GetKillerExamQuestionListResponseDto } from './dto/response/killerExam';
+import { GetIncorrectQuestionListResponseDto } from './dto/response/incorrectQuestions';
 
 // variable: URL 상수 //
 const API_DOMAIN = process.env.REACT_APP_API_DOMAIN;
@@ -25,17 +26,19 @@ const REFRESH_ACCESS_TOKEN_URL = `${AUTH_MODULE_URL}/refresh`;
 const LOGOUT_URL = `${AUTH_MODULE_URL}/logout`;
 
 const MOCK_EXAM_MODULE_URL = `${API_DOMAIN}/api/v1/mock-exam`;
+const GET_UNIT_AND_CHAPTER_LIST_URL =`${MOCK_EXAM_MODULE_URL}/units-with-chapters`;
 const GET_MOCK_EXAM_QUESTION_LIST_URL = (chapterId: number | string, difficulty: string, hasExplanation: boolean) => 
     `${MOCK_EXAM_MODULE_URL}/${chapterId}/${difficulty}/${hasExplanation}`;
 
 const KILLER_EXAM_MODULE_URL = `${API_DOMAIN}/api/v1/killer-exam`;
 const GET_KILLER_EXAM_QUESTION_LIST_URL = `${KILLER_EXAM_MODULE_URL}`;
 
-const GET_UNIT_AND_CHAPTER_LIST_URL =`${MOCK_EXAM_MODULE_URL}/units-with-chapters`;
-
 const PAST_EXAM_MODULE_URL = `${API_DOMAIN}/api/v1/past-exam`;
 const GET_PAST_EXAM_ROUND_LIST_URL = `${PAST_EXAM_MODULE_URL}`;
 const GET_PAST_EXAM_QUESTION_LIST_URL = (pastExamId: number | string) => `${PAST_EXAM_MODULE_URL}/${pastExamId}`;
+
+const INCORRECT_QUESTIONS_MODULE_URL =`${API_DOMAIN}/api/v1/incorrect-questions`;
+const GET_INCORRECT_QUESTION_LIST_URL = (sourceType: string) => `${INCORRECT_QUESTIONS_MODULE_URL}/${sourceType}`;
 
 // variable: refresh 토큰을 사용하여 access Token 발급 진행 여부 //
 let isRefreshing = false;
@@ -244,6 +247,14 @@ export const getKillerExamQuestionListRequest = async (accessToken: string) => {
 export const getMockExamQuestionListRequest = async (accessToken: string, chapterId: number, difficulty: string, hasExplanation: boolean) => {
     const responseBody = await api.get(GET_MOCK_EXAM_QUESTION_LIST_URL(chapterId, difficulty, hasExplanation), bearerAuthorization(accessToken))
         .then(responseSuccessHandler<GetMockExamQuestionListResponseDto>)
+        .catch(responseErrorHandler);
+    return responseBody;
+};
+
+// function: get incorrect question list API 요청 함수 //
+export const getIncorrectQuestionListRequest = async (accessToken: string, sourceType: string) => {
+    const responseBody = await api.get(GET_INCORRECT_QUESTION_LIST_URL(sourceType), bearerAuthorization(accessToken))
+        .then(responseSuccessHandler<GetIncorrectQuestionListResponseDto>)
         .catch(responseErrorHandler);
     return responseBody;
 };

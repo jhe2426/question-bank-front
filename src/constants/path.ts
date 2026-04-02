@@ -9,8 +9,8 @@ export const MOCK_EXAM_TEST_PATH = `${MOCK_EXAM_PATH}/unit/:unitId/chapter/:chap
 export const KILLER_EXAM_TEST_PATH = 'killer-exam';
 export const PAST_EXAM_PATH = 'past-exam';
 export const PAST_EXAM_TEST_PATH = `${PAST_EXAM_PATH}/:pastExamId/:pastExamRound`;
-export const INCORRECT_QUESTIONS_PATH = 'incorrect-exam';
-export const INCORRECT_QUESTIONS_TEST_PATH = `${INCORRECT_QUESTIONS_PATH}/:questionType`;
+export const INCORRECT_QUESTIONS_PATH = 'incorrect-questions';
+export const INCORRECT_QUESTIONS_TEST_PATH = `${INCORRECT_QUESTIONS_PATH}/:sourceType`;
 export const MY_PAGE_PATH = 'my-page';
 export const MY_PAGE_STUDY_HISTORY_PATH = 'study-history';
 export const MY_PAGE_CHANGE_PASSWORD_PATH = 'change-password';
@@ -27,8 +27,8 @@ export const MOCK_EXAM_TEST_ABSOLUTE_PATH = ({ unitId, chapterId, difficulty, ha
 export const KILLER_EXAM_TEST_ABSOLUTE_PATH = `${ROOT_PATH}${KILLER_EXAM_TEST_PATH}`;
 export const PAST_EXAM_TEST_ABSOLUTE_PATH = (pastExamId: number | string, pastExamRound: number | string) => 
     `${ROOT_PATH}${PAST_EXAM_PATH}/${pastExamId}/${pastExamRound}`;
-export const INCORRECT_QUESTIONS_TEST_ABSOLUTE_PATH = (questionType: string) => 
-    `${ROOT_PATH}${INCORRECT_QUESTIONS_PATH}/${questionType}`;
+export const INCORRECT_QUESTIONS_TEST_ABSOLUTE_PATH = (sourceType: string) => 
+    `${ROOT_PATH}${INCORRECT_QUESTIONS_PATH}/${sourceType}`;
 export const MY_PAGE_STUDY_HISTORY_ABSOLUTE_PATH = `${ROOT_PATH}${MY_PAGE_PATH}/${MY_PAGE_STUDY_HISTORY_PATH}`;
 export const MY_PAGE_CHANGE_PASSWORD_ABSOLUTE_PATH = `${ROOT_PATH}${MY_PAGE_PATH}/${MY_PAGE_CHANGE_PASSWORD_PATH}`;
 export const GRADING_VIEW_ABSOLUTE_PATH = (groupId: number | string, filter: string) => 

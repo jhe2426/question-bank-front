@@ -12,9 +12,10 @@ import { ResponseDto } from 'src/apis/dto/response';
 import { MAIN_ABSOLUTE_PATH, MESSAGE, RESPONSE_CODE } from 'src/constants';
 import { useAuthStore } from 'src/stores';
 import { ExamInfo } from 'src/types/aliases';
-import { getKillerExamQuestionListRequest, getMockExamQuestionListRequest, getPastExamQuestionListRequest } from 'src/apis';
+import { getIncorrectQuestionListRequest, getKillerExamQuestionListRequest, getMockExamQuestionListRequest, getPastExamQuestionListRequest } from 'src/apis';
 import { GetKillerExamQuestionListResponseDto } from 'src/apis/dto/response/killerExam';
 import { GetMockExamQuestionListResponseDto } from 'src/apis/dto/response/mockExam';
+import { GetIncorrectQuestionListResponseDto } from 'src/apis/dto/response/incorrectQuestions';
 
 // interface: 시험 문제 레코드 컴포넌트 속성 //
 interface QuestionTableItemProps {
@@ -173,7 +174,7 @@ export default function Exam() {
     const isMockExam = pathname.includes('mock-exam');
     const isPastExam = pathname.includes('past-exam');
     const isKillerExam = pathname.includes('killer-exam');
-    const isIncorrectExam = pathname.includes('incorrect-exam');
+    const isIncorrectExam = pathname.includes('incorrect-questions');
 
     // variable: 해설 존재 여부에 따른 문제 리스트 클래스 //
     const questionListClass = hasExplanation ? 'question-list has-explanation' : 'question-list';
@@ -229,13 +230,13 @@ export default function Exam() {
             };
         } 
         
-        if (isIncorrectExam && params?.questionType) {
-            const { questionType } = params;
+        if (isIncorrectExam && params?.sourceType) {
+            const { sourceType } = params;
 
             return {
                 type: 'incorrect',
-                title: `${questionType} 오답`,
-                questionType
+                title: `${sourceType} 오답`,
+                sourceType 
             };
         }    
 
@@ -316,6 +317,33 @@ export default function Exam() {
         setSessionId(sessionId);
     };
 
+    // function: get incorrect question list response 처리 함수 //
+    const getIncorrectQuestionListResponse = (responseBody: GetIncorrectQuestionListResponseDto | ResponseDto | null) => {
+        const message =
+            !responseBody ? MESSAGE.SERVER_ERROR :
+            responseBody.code === DATABASE_ERROR ?  MESSAGE.SERVER_ERROR :
+            responseBody.code === AUTHENTICATION_FAILED ? MESSAGE.AUTHENTICATION_FAILED : '';
+
+        const isSuccess = responseBody !== null && responseBody.code === SUCCESS;
+        if (!isSuccess) {
+            alert(message);
+            return;
+        }
+
+        const { questions } = responseBody as GetIncorrectQuestionListResponseDto;
+
+        if (questions.length === 0 ) {
+            navigator(MAIN_ABSOLUTE_PATH);
+            setTimeout(() => {
+                alert('오답문제가 존재하지 않습니다.');
+            }, 50);
+            return;
+        }
+
+        setQuestionList(questions);
+        setTotalList(questions);
+    };
+
     // event handler: 문제 영역 정답 변경 이벤트 처리 //
     const onQuestionAnswerClickHandler = useCallback((questionId: number, answer: number) => {
         setSelectedAnswers((prev) => ({
@@ -352,6 +380,11 @@ export default function Exam() {
 
         if (isMockExam && examInfo.type == 'mock') {
             getMockExamQuestionListRequest(accessToken, examInfo.chapterId, examInfo.difficulty, examInfo.hasExplanation).then(getMockExamQuestionListResponse);
+            return;
+        }
+
+        if (isIncorrectExam && examInfo.type == 'incorrect') {
+            getIncorrectQuestionListRequest(accessToken, examInfo.sourceType).then(getIncorrectQuestionListResponse);
             return;
         }
  

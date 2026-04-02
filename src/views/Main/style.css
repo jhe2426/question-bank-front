@@ -120,6 +120,8 @@
 
     border-radius: 10px;
     border: 1px solid var(--Lightmode-Grey);
+
+    cursor: pointer;
 }
 
 #main-wrapper .option-item .radio-icon {
@@ -139,7 +141,8 @@
 
 #main-wrapper .option-item.active {
     border: 1px solid var(--PrimaryLight);
-    box-shadow: 0 4px 3px rgba(0, 0, 0, 0.25)
+    box-shadow: 0 4px 3px rgba(0, 0, 0, 0.25);
+    cursor: default;
 }
 
 #main-wrapper .option-item.active .radio-icon {
