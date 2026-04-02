@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
-import { ResponseDto } from './dto/response';
+import { PostExamResponseDto, ResponseDto } from './dto/response';
 import { ApprovalCodeVerifyRequestDto, IdCheckRequestDto, PhoneNumberAuthRequestDto, PhoneNumberAuthVerifyRequestDto, SignInRequestDto, SignUpRequestDto } from './dto/request/auth';
 import { GetUniversityListResponseDto, RefreshAccessTokenResponseDto, SignInResponseDto } from './dto/response/auth';
 import { useAuthStore } from 'src/stores';
@@ -9,6 +9,7 @@ import { GetPastExamRoundListResponseDto } from './dto/response/pastExam';
 import { GetMockExamQuestionListResponseDto, GetUnitAndChapterListResponseDto } from './dto/response/mockExam';
 import { GetKillerExamQuestionListResponseDto } from './dto/response/killerExam';
 import { GetIncorrectQuestionListResponseDto } from './dto/response/incorrectQuestions';
+import { PostKillerExamGradingRequestDto } from './dto/request/killerExam';
 
 // variable: URL 상수 //
 const API_DOMAIN = process.env.REACT_APP_API_DOMAIN;
@@ -32,6 +33,7 @@ const GET_MOCK_EXAM_QUESTION_LIST_URL = (chapterId: number | string, difficulty:
 
 const KILLER_EXAM_MODULE_URL = `${API_DOMAIN}/api/v1/killer-exam`;
 const GET_KILLER_EXAM_QUESTION_LIST_URL = `${KILLER_EXAM_MODULE_URL}`;
+const POST_KILLER_EXAM_GRADING_URL = `${KILLER_EXAM_MODULE_URL}/grading`;
 
 const PAST_EXAM_MODULE_URL = `${API_DOMAIN}/api/v1/past-exam`;
 const GET_PAST_EXAM_ROUND_LIST_URL = `${PAST_EXAM_MODULE_URL}`;
@@ -69,14 +71,14 @@ api.interceptors.response.use(
 
         if (originalRequet.url?.includes(SIGN_IN_URL)) return Promise.reject(error);
 
-        // 리프레쉬 요청 자체에서 401에 대해서는 로그아웃 진행
+        // description: 리프레쉬 요청 자체에서 401에 대해서는 로그아웃 진행 //
         if (originalRequet.url?.includes(REFRESH_ACCESS_TOKEN_URL)) {
             clearAuth();
             window.location.href = AUTH_ABSOLUTE_PATH;
             return Promise.reject(error);
         }
 
-        // 이미 리프레쉬 요청 중이면 다른 요청에 대해서 새로 발급한 액세스 토큰을 담아서 요청
+        // description: 이미 리프레쉬 요청 중이면 다른 요청에 대해서 새로 발급한 액세스 토큰을 담아서 요청 //
         if (isRefreshing) {
             return new Promise((resolve) => {
                 refreshQueue.push((newToken: string) => {
@@ -255,6 +257,14 @@ export const getMockExamQuestionListRequest = async (accessToken: string, chapte
 export const getIncorrectQuestionListRequest = async (accessToken: string, sourceType: string) => {
     const responseBody = await api.get(GET_INCORRECT_QUESTION_LIST_URL(sourceType), bearerAuthorization(accessToken))
         .then(responseSuccessHandler<GetIncorrectQuestionListResponseDto>)
+        .catch(responseErrorHandler);
+    return responseBody;
+};
+
+// function: post killer exam grading API 요청 함수 //
+export const postKillerExamGradingRequest = async (requestBody: PostKillerExamGradingRequestDto, accessToken: string) => {
+    const responseBody = await axios.post(POST_KILLER_EXAM_GRADING_URL, requestBody, bearerAuthorization(accessToken))
+        .then(responseSuccessHandler<PostExamResponseDto>)
         .catch(responseErrorHandler);
     return responseBody;
 };

@@ -5,6 +5,7 @@ import Chapter from './chapter.interface';
 import Unit from './unit.interface';
 import UnitSummary from './unit-summary.interface';
 import Question from './question.interface';
+import UserAnswer from './user-answer.interface';
 
 export type {
     University,
@@ -13,5 +14,6 @@ export type {
     Chapter,
     Unit,
     UnitSummary,
-    Question
+    Question,
+    UserAnswer
 }

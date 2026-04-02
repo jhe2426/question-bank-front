@@ -4,24 +4,25 @@ import '../style.css';
 import 'katex/dist/katex.min.css';
 import { InlineMath } from 'react-katex';
 import { usePagination } from 'src/hooks';
-import { Question } from 'src/types/interfaces';
+import { Question, UserAnswer } from 'src/types/interfaces';
 import Pagination from 'src/components/Pagination';
 import { useLocation, useNavigate, useParams } from 'react-router';
 import { GetPastExamQuestionListResponseDto } from 'src/apis/dto/response/pastExam';
-import { ResponseDto } from 'src/apis/dto/response';
+import { PostExamResponseDto, ResponseDto } from 'src/apis/dto/response';
 import { MAIN_ABSOLUTE_PATH, MESSAGE, RESPONSE_CODE } from 'src/constants';
 import { useAuthStore } from 'src/stores';
 import { ExamInfo } from 'src/types/aliases';
-import { getIncorrectQuestionListRequest, getKillerExamQuestionListRequest, getMockExamQuestionListRequest, getPastExamQuestionListRequest } from 'src/apis';
+import { getIncorrectQuestionListRequest, getKillerExamQuestionListRequest, getMockExamQuestionListRequest, getPastExamQuestionListRequest, postKillerExamGradingRequest } from 'src/apis';
 import { GetKillerExamQuestionListResponseDto } from 'src/apis/dto/response/killerExam';
 import { GetMockExamQuestionListResponseDto } from 'src/apis/dto/response/mockExam';
 import { GetIncorrectQuestionListResponseDto } from 'src/apis/dto/response/incorrectQuestions';
+import { PostKillerExamGradingRequestDto } from 'src/apis/dto/request/killerExam';
 
 // interface: 시험 문제 레코드 컴포넌트 속성 //
 interface QuestionTableItemProps {
     question: Question;
-    selectedAnswer?: number;
-    onClick: (questionId: number, answer: number) => void;
+    selectedAnswer?: {answer: number, questionOrder: number};
+    onClick: (questionId: number, answer: number, questionOrder: number) => void;
 };
 
 // component: 시험 문제 레코드 컴포넌트 //
@@ -68,10 +69,10 @@ const QuestionTableItem = memo(({ question, selectedAnswer, onClick }: QuestionT
 
                     { options.map((option, index) => {
                         const number = index + 1;       
-                        const optionClass = selectedAnswer === number ? `option-icon number${number} active` : `option-icon number${number}`;
+                        const optionClass = selectedAnswer?.answer === number ? `option-icon number${number} active` : `option-icon number${number}`;
 
                         return (
-                            <div key={number} className='option-item' onClick={() => onClick(questionId, number)}>
+                            <div key={number} className='option-item' onClick={() => onClick(questionId, number, questionOrder)}>
                                     <div className={optionClass}></div>
                                     <div className='option-text'>{renderContentWithMath(option)}</div>            
                             </div>
@@ -97,7 +98,7 @@ const QuestionTableItem = memo(({ question, selectedAnswer, onClick }: QuestionT
 // interface: 답안 표기란 레코드 컴포넌트 속성 //
 interface AnswerTableItemProps {
     question: Question;
-    selectedAnswer?: number;
+    selectedAnswer?: {answer: number, questionOrder: number};
     onClick: (questionId: number, questionOrder:number, answer: number) => void;
 };
 
@@ -114,7 +115,7 @@ const AnswerTableItem = memo(({ question, selectedAnswer, onClick }: AnswerTable
                 <div className='answer-options'>
                     { [1, 2, 3, 4].map((number) => {
                         
-                        const optionClass = selectedAnswer === number ? `answer-option number${number} active` : `answer-option number${number}`;
+                        const optionClass = selectedAnswer?.answer === number ? `answer-option number${number} active` : `answer-option number${number}`;
                         
                         return (
                             <div key={number} className={optionClass} onClick={() => onClick(questionId, questionOrder, number)}></div>
@@ -129,6 +130,11 @@ const AnswerTableItem = memo(({ question, selectedAnswer, onClick }: AnswerTable
 
 // component: 시험 화면 컴포넌트 //
 export default function Exam() {
+
+    // variable: localStorage에 저장할 시험 데이터 키 //
+    const EXAM_STORAGE_KEY = 'examData';
+    // variable: localStorage 유효 시간(1시간) //
+    const EXAM_STORAGE_EXPIRE_TIME = 1000 * 60 * 60;
 
     // variable: 페이지당 문제 수 //
     const QUESTION_COUNT_PER_PAGE = 3;
@@ -161,14 +167,17 @@ export default function Exam() {
     const [hasExplanation, setHasExplanation] = useState<boolean>(true);
 
     // state: 선택된 문제 정답 번호 리스트 //
-    const [selectedAnswers, setSelectedAnswers] = useState<Record<number, number>>({});
+    const [selectedAnswers, setSelectedAnswers] = useState<Record<number, {answer: number, questionOrder: number}>>({});
 
     // state: 타이머 상태 //
     const [time, setTime] = useState(90 * 60);
+    
+    // state: 채점 그룹 아이디 //
+    const [groupId, setGroupId] = useState<number>();
 
 
     // variable: RESPONSE CODE 구조 분해 상수 //
-    const { DATABASE_ERROR, AUTHENTICATION_FAILED, PAST_EXAM_QUESTION_NOT_FOUND, SUCCESS} = RESPONSE_CODE;
+    const { DATABASE_ERROR, AUTHENTICATION_FAILED, PAST_EXAM_QUESTION_NOT_FOUND, NOT_EXIST_QUESTION_ID, SUCCESS} = RESPONSE_CODE;
 
     // variable: 시험 유형 판별 //
     const isMockExam = pathname.includes('mock-exam');
@@ -193,7 +202,7 @@ export default function Exam() {
         if (isMockExam && params?.unitId && params?.chapterId && params?.difficulty) {
             const { unitId, chapterId, difficulty, hasExplanation } = params;
 
-            const explanation = hasExplanation === 'true';
+            const explanation = hasExplanation == 'true';
             let mappedDifficulty = '';
 
             if (difficulty === '상') mappedDifficulty = 'HIGH';
@@ -252,6 +261,56 @@ export default function Exam() {
         params
     ]);
 
+    // function: 시험 상태 저장 //
+    const saveExamToStorage = (
+        questionList: Question[],
+        selectedAnswers: Record<number, { answer: number; questionOrder: number }>,
+        sessionId: number | null,
+        examInfo?: ExamInfo | null
+    ) => {
+        const data = {
+            saveAt: Date.now(),
+            questionList,
+            selectedAnswers,
+            sessionId,
+            examInfo
+        };
+        
+        localStorage.setItem(EXAM_STORAGE_KEY, JSON.stringify(data));
+    };
+
+    // function: 시험 상태 불러오기 //
+    const loadExamFromStorage = () => {
+        const rawData = localStorage.getItem(EXAM_STORAGE_KEY);
+        if (!rawData) return null;
+
+        const data = JSON.parse(rawData);
+
+        const isExpired = Date.now () - data.saveAt > EXAM_STORAGE_EXPIRE_TIME;
+        if (isExpired) {
+            clearExamStorage();
+            return null;
+        }
+
+        return data;
+    };
+
+    // function: 시험 상태 삭제 //
+    const clearExamStorage = () => {
+        localStorage.removeItem(EXAM_STORAGE_KEY);
+    };
+
+    // function: 문제 리스트 기반 초기 답안 상태 생성 //
+    const createInitialAnswers = (questions: Question[]): Record<number, {answer: number; questionOrder: number}> => {
+        return questions.reduce((acc, q) => {
+            acc[q.questionId] = {
+                answer: 0,
+                questionOrder: q.questionOrder
+            }; 
+        return acc;
+        }, {} as Record<number, { answer: number; questionOrder: number }>);
+    };
+
     // function: get past exam question list response 처리 함수 //
     const getPastExamQuestionListResponse = (responseBody: GetPastExamQuestionListResponseDto | ResponseDto | null) => {
         const message =
@@ -269,6 +328,7 @@ export default function Exam() {
         const { questions } = responseBody as GetPastExamQuestionListResponseDto;
         setQuestionList(questions);
         setTotalList(questions);
+        setSelectedAnswers(createInitialAnswers(questions));
     };
 
     // function: get killer exam question list response 처리 함수 //
@@ -288,6 +348,9 @@ export default function Exam() {
         setQuestionList(questions);
         setTotalList(questions);
         setSessionId(sessionId);
+        const initialAnswer = createInitialAnswers(questions);
+        setSelectedAnswers(initialAnswer);
+        saveExamToStorage(questions, initialAnswer, sessionId, examInfo);
     };
 
     // function: get mock exam question list response 처리 함수 //
@@ -315,6 +378,9 @@ export default function Exam() {
         setQuestionList(questions);
         setTotalList(questions);
         setSessionId(sessionId);
+        const initialAnswer = createInitialAnswers(questions);
+        setSelectedAnswers(initialAnswer);
+        saveExamToStorage(questions, initialAnswer, sessionId, examInfo);
     };
 
     // function: get incorrect question list response 처리 함수 //
@@ -342,13 +408,36 @@ export default function Exam() {
 
         setQuestionList(questions);
         setTotalList(questions);
+        const initialAnswer = createInitialAnswers(questions);
+        setSelectedAnswers(initialAnswer);
+        saveExamToStorage(questions, initialAnswer, null, examInfo);
     };
 
+    // function: post killer exam grading response 처리 함수 //
+    const postKillerExamGradingResponse = (responseBody: PostExamResponseDto | ResponseDto | null) => {
+        const message =
+            !responseBody ? MESSAGE.SERVER_ERROR :
+            responseBody.code === DATABASE_ERROR ?  MESSAGE.SERVER_ERROR :
+            responseBody.code === NOT_EXIST_QUESTION_ID ? MESSAGE.SERVER_ERROR :
+            responseBody.code === AUTHENTICATION_FAILED ? MESSAGE.AUTHENTICATION_FAILED : '';
+
+        const isSuccess = responseBody !== null && responseBody.code === SUCCESS;
+        if (!isSuccess) {
+            alert(message);
+            return;
+        }
+
+        const { groupId } = responseBody as PostExamResponseDto;
+        setGroupId(groupId);
+        clearExamStorage();
+    };
+
+
     // event handler: 문제 영역 정답 변경 이벤트 처리 //
-    const onQuestionAnswerClickHandler = useCallback((questionId: number, answer: number) => {
+    const onQuestionAnswerClickHandler = useCallback((questionId: number, answer: number, questionOrder: number) => {
         setSelectedAnswers((prev) => ({
             ...prev,
-            [questionId]: answer,
+            [questionId]: {answer, questionOrder},
         })); 
     }, []);
 
@@ -357,7 +446,7 @@ export default function Exam() {
     const onAnswerSheetClickHandler = useCallback((questionId: number, questionOrder: number, answer: number) => {
         setSelectedAnswers((prev) => ({
             ...prev,
-            [questionId]: answer,
+            [questionId]: {answer, questionOrder},
         }));    
 
         const targetPage = Math.ceil(questionOrder / QUESTION_COUNT_PER_PAGE);
@@ -366,12 +455,59 @@ export default function Exam() {
 
     }, [currentPage]);
 
-    // effect: 컴포넌트 로드 시 실행할 함수 //
+    // event handler: 채점하기 버튼 클릭 이벤트 처리 //
+    const onClickGradingButtonHandler = () => {
+
+        if (!accessToken) return;
+
+        const unansweredCount = questionList.filter((q) => selectedAnswers[q.questionId].answer == 0).length;
+
+        if (unansweredCount > 0) {
+            const isConfirm = window.confirm(`아직 풀지 않은 문제가 ${unansweredCount}개 있습니다. 그래도 채점하시겠습니까?`);
+
+            if (!isConfirm) return;
+        };
+
+        const sourceType = examInfo?.type;  
+        const userAnswers: UserAnswer[] = Object.entries(selectedAnswers).map(
+            ([questionId, value]) => ({
+                questionId: Number(questionId),
+                questionOrder: value.questionOrder,
+                answer: value.answer
+            })
+
+        );
+
+        if (sourceType === 'killer' && sessionId) {
+            const requestBody: PostKillerExamGradingRequestDto = {
+                sessionId,
+                userAnswers
+            };
+
+            postKillerExamGradingRequest(requestBody, accessToken).then(postKillerExamGradingResponse);
+            return;
+        }
+        
+    };
+
+    // effect: accessToken와 examInfo가 변경될 시 실행할 함수 //
     useEffect(() => {
 
         if (!accessToken || examInfo == null) return;
 
         setExamTitle(examInfo.title);
+
+        if (!isPastExam) {
+            const savedData = loadExamFromStorage();
+
+            if (savedData) {
+                setQuestionList(savedData.questionList);
+                setTotalList(savedData.questionList);
+                setSelectedAnswers(savedData.selectedAnswers);
+                setSessionId(savedData.sessionId);
+                return;
+            }
+        }
 
         if (isKillerExam && examInfo.type == 'killer') {
             getKillerExamQuestionListRequest(accessToken).then(getKillerExamQuestionListResponse);
@@ -454,7 +590,7 @@ export default function Exam() {
 
             <div className='test-bottom'>
                 <Pagination currentPage={currentPage} totalPage={totalPage} setCurrentPage={setCurrentPage} />
-                <div className='submit-button'>답안 제출</div>
+                <div className='submit-button' onClick={onClickGradingButtonHandler}>답안 제출</div>
             </div>
         </div>
     )
