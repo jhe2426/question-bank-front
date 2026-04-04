@@ -11,6 +11,7 @@ import { GetKillerExamQuestionListResponseDto } from './dto/response/killerExam'
 import { GetIncorrectQuestionListResponseDto } from './dto/response/incorrectQuestions';
 import { PostKillerExamGradingRequestDto } from './dto/request/killerExam';
 import { PostPastExamGradingRequestDto } from './dto/request/pastExam';
+import { PostMockExamGradingRequestDto } from './dto/request/mockExam';
 
 // variable: URL 상수 //
 const API_DOMAIN = process.env.REACT_APP_API_DOMAIN;
@@ -31,6 +32,7 @@ const MOCK_EXAM_MODULE_URL = `${API_DOMAIN}/api/v1/mock-exam`;
 const GET_UNIT_AND_CHAPTER_LIST_URL =`${MOCK_EXAM_MODULE_URL}/units-with-chapters`;
 const GET_MOCK_EXAM_QUESTION_LIST_URL = (chapterId: number | string, difficulty: string, hasExplanation: boolean) => 
     `${MOCK_EXAM_MODULE_URL}/${chapterId}/${difficulty}/${hasExplanation}`;
+const POST_MOCK_EXAM_GRADING_URL = `${MOCK_EXAM_MODULE_URL}/grading`;
 
 const KILLER_EXAM_MODULE_URL = `${API_DOMAIN}/api/v1/killer-exam`;
 const GET_KILLER_EXAM_QUESTION_LIST_URL = `${KILLER_EXAM_MODULE_URL}`;
@@ -265,7 +267,7 @@ export const getIncorrectQuestionListRequest = async (accessToken: string, sourc
 
 // function: post killer exam grading API 요청 함수 //
 export const postKillerExamGradingRequest = async (requestBody: PostKillerExamGradingRequestDto, accessToken: string) => {
-    const responseBody = await axios.post(POST_KILLER_EXAM_GRADING_URL, requestBody, bearerAuthorization(accessToken))
+    const responseBody = await api.post(POST_KILLER_EXAM_GRADING_URL, requestBody, bearerAuthorization(accessToken))
         .then(responseSuccessHandler<PostExamResponseDto>)
         .catch(responseErrorHandler);
     return responseBody;
@@ -273,7 +275,15 @@ export const postKillerExamGradingRequest = async (requestBody: PostKillerExamGr
 
 // function: post past exam grading API 요청 함수 //
 export const postPastExamGradingRequest = async (requestBody: PostPastExamGradingRequestDto, accessToken: string) => {
-    const responseBody = await axios.post(POST_PAST_EXAM_GRADING_URL, requestBody, bearerAuthorization(accessToken))
+    const responseBody = await api.post(POST_PAST_EXAM_GRADING_URL, requestBody, bearerAuthorization(accessToken))
+        .then(responseSuccessHandler<PostExamResponseDto>)
+        .catch(responseErrorHandler);
+    return responseBody;
+};
+
+// function: post mock exam grading API 요청 함수 //
+export const postMockExamGradingRequest = async (requestBody: PostMockExamGradingRequestDto, accessToken: string) => {
+    const responseBody = await api.post(POST_MOCK_EXAM_GRADING_URL, requestBody, bearerAuthorization(accessToken))
         .then(responseSuccessHandler<PostExamResponseDto>)
         .catch(responseErrorHandler);
     return responseBody;

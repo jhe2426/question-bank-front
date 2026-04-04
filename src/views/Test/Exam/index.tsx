@@ -12,12 +12,13 @@ import { PostExamResponseDto, ResponseDto } from 'src/apis/dto/response';
 import { MAIN_ABSOLUTE_PATH, MESSAGE, RESPONSE_CODE } from 'src/constants';
 import { useAuthStore } from 'src/stores';
 import { ExamInfo } from 'src/types/aliases';
-import { getIncorrectQuestionListRequest, getKillerExamQuestionListRequest, getMockExamQuestionListRequest, getPastExamQuestionListRequest, postKillerExamGradingRequest, postPastExamGradingRequest } from 'src/apis';
+import { getIncorrectQuestionListRequest, getKillerExamQuestionListRequest, getMockExamQuestionListRequest, getPastExamQuestionListRequest, postKillerExamGradingRequest, postMockExamGradingRequest, postPastExamGradingRequest } from 'src/apis';
 import { GetKillerExamQuestionListResponseDto } from 'src/apis/dto/response/killerExam';
 import { GetMockExamQuestionListResponseDto } from 'src/apis/dto/response/mockExam';
 import { GetIncorrectQuestionListResponseDto } from 'src/apis/dto/response/incorrectQuestions';
 import { PostKillerExamGradingRequestDto } from 'src/apis/dto/request/killerExam';
 import { PostPastExamGradingRequestDto } from 'src/apis/dto/request/pastExam';
+import { PostMockExamGradingRequestDto } from 'src/apis/dto/request/mockExam';
 
 // interface: 시험 문제 레코드 컴포넌트 속성 //
 interface QuestionTableItemProps {
@@ -428,9 +429,8 @@ export default function Exam() {
 
         const { groupId } = responseBody as PostExamResponseDto;
         setGroupId(groupId);
-        clearExamStorage();
+        if (!isPastExam) clearExamStorage();
     };
-
 
     // event handler: 문제 영역 정답 변경 이벤트 처리 //
     const onQuestionAnswerClickHandler = useCallback((questionId: number, answer: number, questionOrder: number) => {
@@ -518,6 +518,17 @@ export default function Exam() {
             };
 
             postPastExamGradingRequest(requestBody, accessToken).then(postExamGradingResponse);
+            return;
+        }
+
+        if (sourceType === 'mock' && examInfo?.title && sessionId) {
+            const requestBody: PostMockExamGradingRequestDto = {
+                detailedType: examInfo.title,
+                sessionId,
+                userAnswers
+            };
+
+            postMockExamGradingRequest(requestBody, accessToken).then(postExamGradingResponse);
             return;
         }
     };
