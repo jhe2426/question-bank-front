@@ -267,6 +267,7 @@ export default function Exam() {
         examInfo?: ExamInfo | null
     ) => {
         const data = {
+            type: examInfo?.type,
             saveAt: Date.now(),
             questionList,
             selectedAnswers,
@@ -454,7 +455,7 @@ export default function Exam() {
     }, [currentPage]);
 
     // event handler: 기출문제 자동 제출 처리 //
-    const submitPastExam= () => {
+    const submitPastExam = () => {
         if (!accessToken || !examInfo || examInfo.type !== 'past') return;
 
         const userAnswers: UserAnswer[] = Object.entries(selectedAnswers).map(
@@ -520,6 +521,26 @@ export default function Exam() {
             return;
         }
     };
+
+    // effect: pathname가 변경될 시 실행할 함수 //
+    useEffect(() => {
+        if (examInfo == null) return;
+
+        const savedData = loadExamFromStorage();
+        if (!savedData) return;
+        
+
+        if (examInfo.type === 'incorrect' && savedData.examInfo.type === 'incorrect') {
+            if (examInfo.sourceType !== savedData.examInfo.sourceType) {
+                clearExamStorage();
+                return;
+            }
+        }
+
+        if (savedData.type !== examInfo.type) {
+            clearExamStorage();
+        }
+    }, [pathname]);
 
     // effect: accessToken와 examInfo가 변경될 시 실행할 함수 //
     useEffect(() => {
