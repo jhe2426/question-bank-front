@@ -12,13 +12,14 @@ import { PostExamResponseDto, ResponseDto } from 'src/apis/dto/response';
 import { MAIN_ABSOLUTE_PATH, MESSAGE, RESPONSE_CODE } from 'src/constants';
 import { useAuthStore } from 'src/stores';
 import { ExamInfo } from 'src/types/aliases';
-import { getIncorrectQuestionListRequest, getKillerExamQuestionListRequest, getMockExamQuestionListRequest, getPastExamQuestionListRequest, postKillerExamGradingRequest, postMockExamGradingRequest, postPastExamGradingRequest } from 'src/apis';
+import { getIncorrectQuestionListRequest, getKillerExamQuestionListRequest, getMockExamQuestionListRequest, getPastExamQuestionListRequest, postIncorrectQuestionGradingReuqest, postKillerExamGradingRequest, postMockExamGradingRequest, postPastExamGradingRequest } from 'src/apis';
 import { GetKillerExamQuestionListResponseDto } from 'src/apis/dto/response/killerExam';
 import { GetMockExamQuestionListResponseDto } from 'src/apis/dto/response/mockExam';
 import { GetIncorrectQuestionListResponseDto } from 'src/apis/dto/response/incorrectQuestions';
 import { PostKillerExamGradingRequestDto } from 'src/apis/dto/request/killerExam';
 import { PostPastExamGradingRequestDto } from 'src/apis/dto/request/pastExam';
 import { PostMockExamGradingRequestDto } from 'src/apis/dto/request/mockExam';
+import { PostIncorrectQuestionGradingRequestDto } from 'src/apis/dto/request/incorrectQuestions';
 
 // interface: 시험 문제 레코드 컴포넌트 속성 //
 interface QuestionTableItemProps {
@@ -490,7 +491,8 @@ export default function Exam() {
             if (!isConfirm) return;
         };
 
-        const sourceType = examInfo?.type;  
+        if (!examInfo) return;
+        const sourceType = examInfo.type;  
         const userAnswers: UserAnswer[] = Object.entries(selectedAnswers).map(
             ([questionId, value]) => ({
                 questionId: Number(questionId),
@@ -510,7 +512,7 @@ export default function Exam() {
             return;
         }
         
-        if (sourceType === 'past' && examInfo?.title) {
+        if (sourceType === 'past' && examInfo.title) {
             const requestBody: PostPastExamGradingRequestDto = {
                 detailedType: examInfo.title,
                 pastExamId: Number(examInfo?.pastExamId),
@@ -521,7 +523,7 @@ export default function Exam() {
             return;
         }
 
-        if (sourceType === 'mock' && examInfo?.title && sessionId) {
+        if (sourceType === 'mock' && examInfo.title && sessionId) {
             const requestBody: PostMockExamGradingRequestDto = {
                 detailedType: examInfo.title,
                 sessionId,
@@ -529,6 +531,17 @@ export default function Exam() {
             };
 
             postMockExamGradingRequest(requestBody, accessToken).then(postExamGradingResponse);
+            return;
+        }
+
+        if (sourceType === 'incorrect' && examInfo.title && examInfo.sourceType) {
+            const requestBody: PostIncorrectQuestionGradingRequestDto = {
+                sourceType: examInfo.sourceType,
+                detailedType: examInfo.title,
+                userAnswers
+            };
+
+            postIncorrectQuestionGradingReuqest(requestBody, accessToken).then(postExamGradingResponse);
             return;
         }
     };
