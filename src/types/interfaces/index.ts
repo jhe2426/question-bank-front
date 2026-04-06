@@ -6,6 +6,7 @@ import Unit from './unit.interface';
 import UnitSummary from './unit-summary.interface';
 import Question from './question.interface';
 import UserAnswer from './user-answer.interface';
+import ExamResult from './exam-result.interface';
 
 export type {
     University,
@@ -15,5 +16,6 @@ export type {
     Unit,
     UnitSummary,
     Question,
-    UserAnswer
+    UserAnswer,
+    ExamResult
 }

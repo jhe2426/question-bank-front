@@ -7,6 +7,7 @@ import Auth from './views/Auth';
 import { useAuthStore } from './stores';
 import Main from './views/Main';
 import Exam from './views/Test/Exam';
+import Grade from './views/Test/Grade';
 
 function App() {
   return (
@@ -30,7 +31,7 @@ function App() {
           <Route path={MY_PAGE_CHANGE_PASSWORD_PATH} element={<>비밀번호 변경 페이지</>} />
         </Route>
 
-        <Route path={GRADING_VIEW_PATH} element={<>채점 완료 페이지</>} />
+        <Route path={GRADING_VIEW_PATH} element={<Grade />} />
 
         <Route path={OTHERS_PATH} element={<>404 페이지</>} />
       </Route>

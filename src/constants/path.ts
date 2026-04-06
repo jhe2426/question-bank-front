@@ -15,7 +15,7 @@ export const MY_PAGE_PATH = 'my-page';
 export const MY_PAGE_STUDY_HISTORY_PATH = 'study-history';
 export const MY_PAGE_CHANGE_PASSWORD_PATH = 'change-password';
 export const GRADING_PATH = 'grading';
-export const GRADING_VIEW_PATH = `${GRADING_PATH}:groupId/:filter`;
+export const GRADING_VIEW_PATH = `${GRADING_PATH}/:groupId/:filter`;
 export const OTHERS_PATH = '*';
 
 // variable: 절대 path 상수 //

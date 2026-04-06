@@ -9,7 +9,7 @@ import Pagination from 'src/components/Pagination';
 import { useLocation, useNavigate, useParams } from 'react-router';
 import { GetPastExamQuestionListResponseDto } from 'src/apis/dto/response/pastExam';
 import { PostExamResponseDto, ResponseDto } from 'src/apis/dto/response';
-import { MAIN_ABSOLUTE_PATH, MESSAGE, RESPONSE_CODE } from 'src/constants';
+import { GRADING_VIEW_ABSOLUTE_PATH, MAIN_ABSOLUTE_PATH, MESSAGE, RESPONSE_CODE } from 'src/constants';
 import { useAuthStore } from 'src/stores';
 import { ExamInfo } from 'src/types/aliases';
 import { getIncorrectQuestionListRequest, getKillerExamQuestionListRequest, getMockExamQuestionListRequest, getPastExamQuestionListRequest, postIncorrectQuestionGradingReuqest, postKillerExamGradingRequest, postMockExamGradingRequest, postPastExamGradingRequest } from 'src/apis';
@@ -36,6 +36,9 @@ const QuestionTableItem = memo(({ question, selectedAnswer, onClick }: QuestionT
     // variable: option list //
     const options = [option1, option2, option3, option4];
 
+    // variable: 문제 번호 텍스트 //
+    const questionNubmerText = questionOrder > 10 ? `${questionOrder}.` : `0${questionOrder}.`;
+
     // function: 텍스트와 수식을 분리해서 렌더링하는 함수 //
     const renderContentWithMath = (text: string) => {
         if (!text) return null;
@@ -58,7 +61,7 @@ const QuestionTableItem = memo(({ question, selectedAnswer, onClick }: QuestionT
         <div className='question-item'>                    
             <div className='question-content'>
                 <div className='question-header'>
-                    <div className='question-number'>0{questionOrder}.</div>
+                    <div className='question-number'>{questionNubmerText}</div>
                     <div className='question-text'>{questionText}</div>
                 </div>
 
@@ -103,18 +106,29 @@ interface AnswerTableItemProps {
     question: Question;
     selectedAnswer?: {answer: number, questionOrder: number};
     onClick: (questionId: number, questionOrder:number, answer: number) => void;
+    currentPage: number;
+    setCurrentPage: (page: number) => void;
+    QUESTION_COUNT_PER_PAGE: number;
 };
 
 // component: 답안 표기란 레코드 컴포넌트 //
-const AnswerTableItem = memo(({ question, selectedAnswer, onClick }: AnswerTableItemProps) => {
+const AnswerTableItem = memo(({ question, selectedAnswer, onClick, currentPage, setCurrentPage, QUESTION_COUNT_PER_PAGE }: AnswerTableItemProps) => {
 
     const { questionId, questionOrder} = question;
+
+
+    // event handler: 답안 번호 선택 이벤트 처리 //
+    const onAnswerSheetNumberClickHandler = (questionOrder: number) => {
+        const targetPage = Math.ceil(questionOrder / QUESTION_COUNT_PER_PAGE);
+        if (targetPage == currentPage) return;
+        setCurrentPage(targetPage);
+    };
 
     // render: 답안 표기란 레코드 컴포넌트 렌더링 //
     return (
         <div className='answer-list'>
             <div className='answer-row'>
-                <div className='answer-number'>{questionOrder}</div>
+                <div className='answer-number' onClick={() => onAnswerSheetNumberClickHandler(questionOrder)}>{questionOrder}</div>
                 <div className='answer-options'>
                     { [1, 2, 3, 4].map((number) => {
                         
@@ -431,6 +445,8 @@ export default function Exam() {
         const { groupId } = responseBody as PostExamResponseDto;
         setGroupId(groupId);
         if (!isPastExam) clearExamStorage();
+
+        navigator(GRADING_VIEW_ABSOLUTE_PATH(groupId, 'all'));
     };
 
     // event handler: 문제 영역 정답 변경 이벤트 처리 //
@@ -440,7 +456,6 @@ export default function Exam() {
             [questionId]: {answer, questionOrder},
         })); 
     }, []);
-
 
     // event handler: 답안 표기란 정답 변경 이벤트 처리 //
     const onAnswerSheetClickHandler = useCallback((questionId: number, questionOrder: number, answer: number) => {
@@ -655,7 +670,7 @@ export default function Exam() {
 
                             <div className='answer-sheet'>
                                 <div className='answer-header'>답안 표기란</div>
-                                {questionList.map((question, index) => <AnswerTableItem key={index} question={question} selectedAnswer={selectedAnswers[question.questionId]} onClick={onAnswerSheetClickHandler}/>)}
+                                {questionList.map((question, index) => <AnswerTableItem key={index} question={question} selectedAnswer={selectedAnswers[question.questionId]} onClick={onAnswerSheetClickHandler} currentPage={currentPage} setCurrentPage={setCurrentPage} QUESTION_COUNT_PER_PAGE={QUESTION_COUNT_PER_PAGE} />)}
                             </div>
                             
                         </div>

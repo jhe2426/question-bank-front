@@ -13,6 +13,7 @@ import { PostKillerExamGradingRequestDto } from './dto/request/killerExam';
 import { PostPastExamGradingRequestDto } from './dto/request/pastExam';
 import { PostMockExamGradingRequestDto } from './dto/request/mockExam';
 import { PostIncorrectQuestionGradingRequestDto } from './dto/request/incorrectQuestions';
+import { GetExamResultListResponseDto } from './dto/response/examResult';
 
 // variable: URL 상수 //
 const API_DOMAIN = process.env.REACT_APP_API_DOMAIN;
@@ -47,6 +48,9 @@ const POST_PAST_EXAM_GRADING_URL = `${PAST_EXAM_MODULE_URL}/grading`;
 const INCORRECT_QUESTIONS_MODULE_URL =`${API_DOMAIN}/api/v1/incorrect-questions`;
 const GET_INCORRECT_QUESTION_LIST_URL = (sourceType: string) => `${INCORRECT_QUESTIONS_MODULE_URL}/${sourceType}`;
 const POST_INCORRECT_QUESTION_GRADING_URL = `${INCORRECT_QUESTIONS_MODULE_URL}/grading`;
+
+const EXAM_RESULT_MODULE_URL = `${API_DOMAIN}/api/v1/exam-result`;
+const GET_EXAM_RESULT_LIST_URL = (groupId: number, filter: string) => `${EXAM_RESULT_MODULE_URL}/${groupId}/${filter}`;
 
 // variable: refresh 토큰을 사용하여 access Token 발급 진행 여부 //
 let isRefreshing = false;
@@ -295,6 +299,14 @@ export const postMockExamGradingRequest = async (requestBody: PostMockExamGradin
 export const postIncorrectQuestionGradingReuqest = async (requestBody: PostIncorrectQuestionGradingRequestDto, accessToken: string) => {
     const responseBody = await api.post(POST_INCORRECT_QUESTION_GRADING_URL, requestBody, bearerAuthorization(accessToken))
         .then(responseSuccessHandler<PostExamResponseDto>)
+        .catch(responseErrorHandler);
+    return responseBody;
+};
+
+// function: get exam result list API 요청 함수 //
+export const getExamResultListRequest = async (accessToken: string, groupId: number, filter: string) => {
+    const responseBody = await api.get(GET_EXAM_RESULT_LIST_URL(groupId, filter), bearerAuthorization(accessToken))
+        .then(responseSuccessHandler<GetExamResultListResponseDto>)
         .catch(responseErrorHandler);
     return responseBody;
 };
