@@ -47,7 +47,7 @@ export default function SignUp(props: Props) {
     const [userAddressMessage, setUserAddressMessage] = useState<string>('');
     const [userApprovalCodeMessage, setUserApprovalCodeMessage] = useState<string>('');
 
-    // state: 사용자 정보 메세지 에러 상태 //
+    // state: 사용자 정보 메시지 에러 상태 //
     const [isUserIdMessageError, setIsUserIdMessageError] = useState<boolean>(false);
     const [isUserPhoneNumberMessageError, setIsUserPhoneNumberMessageError] = useState<boolean>(false);
     const [isUserAuthCodeMessageError, setIsUserAuthCodeMessageError] = useState<boolean>(false);
@@ -341,7 +341,7 @@ export default function SignUp(props: Props) {
 
         if (clearErrorMessageIfEmpty(value, setUserPasswordMessage)) return;
 
-        const regexp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*-_?])[a-zA-Z0-9!@#$%^&*-_?]{8,20}$/;
+        const regexp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*\-_?])[a-zA-Z0-9!@#$%^&*\-_?]{8,20}$/;
         const isMatch = regexp.test(value);
         const message = isMatch ? '' : '영대소문자 + 숫자 + 특수문자(!@#$%^&*-_?)를 혼용하여 8 ~ 20자 입력해주세요';
         setUserPasswordMessage(message);

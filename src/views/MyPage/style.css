@@ -39,6 +39,11 @@
     color: var(--Black);
 }
 
+#mypage-wrapper .mypage-sidebar .navigation-list .navigation.active {
+    color: var(--Black);
+    cursor: default;
+}
+
 #mypage-wrapper .mypage-content {
     flex: 1;
 }

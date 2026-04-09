@@ -98,9 +98,9 @@ export default function Main() {
     // function: get unit and chapter list response 처리 함수 //
     const getUnitAndChapterListResponse = (responseBody: GetUnitAndChapterListResponseDto | ResponseDto | null) => {
         const message =
-        !responseBody ? MESSAGE.SERVER_ERROR :
-        responseBody.code === DATABASE_ERROR ? MESSAGE.SERVER_ERROR :
-        responseBody.code === AUTHENTICATION_FAILED ? MESSAGE.AUTHENTICATION_FAILED : '';
+            !responseBody ? MESSAGE.SERVER_ERROR :
+            responseBody.code === DATABASE_ERROR ? MESSAGE.SERVER_ERROR :
+            responseBody.code === AUTHENTICATION_FAILED ? MESSAGE.AUTHENTICATION_FAILED : '';
 
         const isSuccessed = responseBody !== null && responseBody.code === SUCCESS;
         if (!isSuccessed) {
