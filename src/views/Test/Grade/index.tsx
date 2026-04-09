@@ -256,7 +256,7 @@ export default function Grade() {
 
                     <div className='test-sidebar'>
 
-                        <div className='test-sidebar-top'>
+                        <div className='test-sidebar-box'>
 
                             <div className='answer-sheet'>
                                 <div className='answer-header'>답안 표기란</div>

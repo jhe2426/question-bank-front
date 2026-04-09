@@ -19,6 +19,7 @@
 .test-main {
     display: flex;
     gap: 18px;
+    align-items: flex-start;
 }
 
 .test-content {
@@ -200,7 +201,7 @@
     top: 20px;
 }
 
-.test-sidebar-top {
+.test-sidebar-box {
     display: flex;
     flex-direction: column;
     gap: 14px;

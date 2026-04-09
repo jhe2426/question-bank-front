@@ -7,7 +7,7 @@ import { useAuthStore } from 'src/stores';
 import { useCookies } from 'react-cookie';
 import { RefreshAccessTokenResponseDto } from 'src/apis/dto/response/auth';
 import { ResponseDto } from 'src/apis/dto/response';
-import { AUTH_ABSOLUTE_PATH, MAIN_ABSOLUTE_PATH } from 'src/constants';
+import { AUTH_ABSOLUTE_PATH, MAIN_ABSOLUTE_PATH, MY_PAGE_ABSOLUTE_PATH } from 'src/constants';
 
 // component: 공통 레이아웃 컴포넌트 //
 export default function Layout() {
@@ -25,7 +25,7 @@ export default function Layout() {
     const csrfToken = cookies['csrfToken'];
 
     // variable: 메인 클래스 //
-    const mainClass = pathname.startsWith(MAIN_ABSOLUTE_PATH) ? '' : 'small-margin';
+    const mainClass = pathname.startsWith(MAIN_ABSOLUTE_PATH) || pathname.startsWith(MY_PAGE_ABSOLUTE_PATH) ? '' : 'small-margin';
 
     // variable: 헤더 클래스 //
     const headerClass = pathname.startsWith(MAIN_ABSOLUTE_PATH) ? 'header-box disable' : 'header-box';
@@ -57,6 +57,11 @@ export default function Layout() {
     // event handler: 메인 로고 클릭 이벤트 처리 //
     const onMainLogoClickHandler = () => {
         navigator(MAIN_ABSOLUTE_PATH);
+    };
+    
+    // event handler: 마이페이지 클릭 이벤트 처리 //
+    const onMyPageClickHandler = () => {
+        navigator(MY_PAGE_ABSOLUTE_PATH);
     };
 
     // event handler: 로그아웃 클릭 이벤트 처리 //
@@ -90,7 +95,7 @@ export default function Layout() {
         <div id='layout-wrapper'>
             <div id='top-bar'>
                 <div className='navigation-list'>
-                    <div>마이페이지</div>
+                    <div onClick={onMyPageClickHandler}>마이페이지</div>
                     <div onClick={onLogoutClickHandler}>로그아웃</div>
                 </div>
             </div>

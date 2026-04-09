@@ -15,6 +15,7 @@
 
 :root {
     --White: rgba(255, 255, 255, 1);
+    --Black: rgba(0, 0, 0, 1);
     --Lightmode-Grey: rgba(226, 226, 226, 1);
     --Lightmode-Grey2: rgba(128, 128, 128, 1);
     --Lightmode-Grey3: rgba(241, 243, 244, 1);
@@ -28,6 +29,7 @@
     --Primary: rgba(13, 84, 160, 1);
     --PrimaryLight: rgba(30, 144, 255, 1);
     --PrimaryLight2: rgba(102, 178, 255, 1);
+    --PrimaryLight3: rgba(46, 137, 223, 1);
     --PrimaryDark: rgba(10, 68, 130, 1);
     --PrimaryDark2: rgba(33, 106, 176, 1);
     --Second: rgba(216, 235, 255, 1);

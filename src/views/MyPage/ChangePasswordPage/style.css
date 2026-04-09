@@ -1,0 +1,26 @@
+#change-password-page-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 26px;
+
+    height: 660px;
+}
+
+#change-password-page-container .input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+
+    width: 450px;
+}
+
+#change-password-page-container .button-container {
+    width: 450px;
+}
+
+#change-password-page-container .button-container .button {
+    height: 35px;
+    font-size: 20px;
+}

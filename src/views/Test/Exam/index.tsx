@@ -653,7 +653,7 @@ export default function Exam() {
 
                     <div className='test-sidebar'>
 
-                        <div className='test-sidebar-top'>
+                        <div className='test-sidebar-box'>
 
                             {isPastExam &&
                             <div className='timer-box'>
