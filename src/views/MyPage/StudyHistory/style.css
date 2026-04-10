@@ -1,0 +1,233 @@
+#study-history-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 54px;
+    
+    margin-top: 70px;
+}
+
+.study-history-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.study-history-table>.tr,
+.study-history-table>.study-history-row .tr {
+    display: flex;
+
+    box-sizing: border-box;
+    border-bottom: 1px solid var(--Lightmode-Grey11);
+    height: 50px;
+}
+
+.study-history-table>.study-history-row:last-child .tr {
+    border: none;
+}
+
+.study-history-table>.tr .th,
+.study-history-table>.study-history-row .tr .td {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 115px;
+
+    font-size: 15px;
+}
+.study-history-table>.study-history-row .tr .td {
+    font-family: 'Cafe24SsurroundAir';
+    font-size: 13px;
+}
+
+.study-history-table>.study-history-row .tr .study-history-incorrect .past-exam-incorrect-icon {
+    width: 25px;
+    height: 25px;
+
+    background-size: 100% 100%;
+    background-image: url('/src/assets/images/past-exam-incorrect-question.png');
+
+    cursor: pointer;
+    
+}
+
+.study-history-table>.study-history-row .study-history-incorrect .incorrect-icon {
+    width: 30px;
+    height: 30px;
+
+    background-size: 100% 100%;
+    background-image: url('/src/assets/images/incorrect-question.png');
+
+    cursor: pointer;
+}
+
+.study-history-table>.study-history-row .tr .study-history-total .total-question-icon {
+    width: 35px;
+    height: 35px;
+
+    background-size: 100% 100%;
+    background-image: url('/src/assets/images/total-question.png');
+
+    cursor: pointer;
+}
+
+.study-history-table>.study-history-row .tr .study-history-exam-result.pass{
+    color: var(--Red);
+}
+
+.study-history-table>.study-history-row .tr .study-history-exam-result.fail{
+    color: var(--PrimaryLight4);
+}
+
+.past-exam-result-detail {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 17px;
+
+    width: 100%;
+    background-color: var(--Second2);
+    box-sizing: border-box;
+    border-bottom: 1px solid var(--Lightmode-Grey11);
+
+    font-family: 'Cafe24SsurroundAir';
+}
+
+.unit-score-card {
+    display: flex;
+    flex-direction: column;
+
+    width: 237px;
+    height: 164px;
+
+    background-color: var(--White);
+    border-radius: 15px;
+    box-sizing: border-box;
+    border: 1px solid var(--Lightmode-Grey);
+
+    margin-top: 14px;
+}
+
+.unit-score-card .unit-score-card-header {
+    padding-left: 19px;
+    box-sizing: border-box;
+    border-bottom: 1px solid var(--Lightmode-Grey);
+    height: 40px;
+}
+
+.unit-score-card-header .title {
+    font-size: 15px;
+    line-height: 40px;
+}
+
+.unit-score-card .unit-score-item {
+    padding-left: 19px;
+    padding-right: 17px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 40px;
+    border-bottom: 1px solid var(--Lightmode-Grey);
+}
+
+.unit-score-item .unit-name {
+    font-size: 12px;
+    line-height: 40px;
+}
+
+.unit-score-item .unit-score-badge {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 39px;
+    height: 16px;
+    border-radius: 3px;
+
+    font-family: 'Cafe24Ssurround';
+    font-size: 8px;
+    color: var(--White);
+}
+
+.unit-score-item .unit-score-badge.fail {
+    background-color: var(--Red2);
+}
+
+.unit-score-item .unit-score-badge.pass {
+    background-color: var(--Pass);
+}
+
+.past-exam-result-detail .incorrect-question-button {
+    width: 237px;
+    height: 30px;
+
+    border-radius: 8px;
+    background-color: var(--Primary);
+
+    color: var(--White);
+    font-family: 'Cafe24Ssurround';
+    font-size: 14px;
+    line-height: 30px;
+    text-align: center;
+
+    margin-bottom: 16px;
+}   
+
+#study-history-container .pagination-container {
+    display: flex;
+    justify-content: center;
+
+    margin-bottom: 50px;
+}
+
+#study-history-container .pagination-box {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+}
+
+#study-history-container .pagination-box .pagination-button {
+    width: 40px;
+    height: 40px;
+
+    background-size: 100% 100%;
+
+    cursor: pointer;
+}
+
+#study-history-container .pagination-button.disable {
+    cursor: default;
+}
+
+#study-history-container .pagination-box .pagination-button.left {
+    background-image: url('/src/assets/images/my-page-left.png');
+}
+
+#study-history-container .pagination-box .pagination-button.right {
+    background-image: url('/src/assets/images/my-page-right.png');
+}
+
+#study-history-container .pagination-box .pagination {
+    display: flex;
+    gap: 16px;    
+}
+
+#study-history-container .pagination-box .pagination .page {
+    font-family: 'Pretendard';
+    font-size: 14px;
+    color: var(--Lightmode-Grey12);
+ }
+
+ #study-history-container .pagination-box .pagination .page:hover {
+    color: var(--Lightmode-Grey13);
+    font-weight: 700;
+    cursor: pointer;
+ }
+
+ #study-history-container .pagination-box .pagination .page:hover {
+    color: var(--Lightmode-Grey13);
+    font-weight: 700;
+    cursor: default;
+ }

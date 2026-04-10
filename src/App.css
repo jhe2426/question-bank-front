@@ -26,15 +26,22 @@
     --Lightmode-Grey8: rgba(254, 254, 254, 1);
     --Lightmode-Grey9: rgba(222, 225, 230, 1);
     --Lightmode-Grey10: rgba(248, 250, 251, 1);
+    --Lightmode-Grey11: rgba(197, 197, 197, 1);
+    --Lightmode-Grey12: rgba(138, 146, 166, 1);
+    --Lightmode-Grey13: rgba(64, 64, 64, 1);
     --Primary: rgba(13, 84, 160, 1);
     --PrimaryLight: rgba(30, 144, 255, 1);
     --PrimaryLight2: rgba(102, 178, 255, 1);
     --PrimaryLight3: rgba(46, 137, 223, 1);
+    --PrimaryLight4: rgba(0, 38, 255, 1);
     --PrimaryDark: rgba(10, 68, 130, 1);
     --PrimaryDark2: rgba(33, 106, 176, 1);
     --Second: rgba(216, 235, 255, 1);
+    --Second2: rgba(248, 253, 255, 1);
     --Error: rgba(255, 84, 64, 1);
     --Red: rgba(255, 0, 0, 1);
+    --Red2: rgba(240, 11, 11, 1);
+    --Pass: rgba(62, 175, 63, 1);
 }
 
 body {

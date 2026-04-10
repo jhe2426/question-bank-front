@@ -1,11 +1,12 @@
 #mypage-wrapper {
     display: flex;
     width:992px;
+    padding-bottom: 40px;
 }
 
 #mypage-wrapper .mypage-sidebar {
     width: 170px;
-    height: 660px;
+    min-height: 660px;
 
     border-radius: 15px 0 0 15px;
     background-color: var(--PrimaryLight3);
@@ -46,4 +47,7 @@
 
 #mypage-wrapper .mypage-content {
     flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

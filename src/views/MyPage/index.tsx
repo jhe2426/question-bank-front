@@ -3,12 +3,13 @@ import React, { useState } from 'react';
 import './style.css';
 import MyPagePath from 'src/types/aliases/my-page.alias';
 import ChangePasswordPage from './ChangePasswordPage';
+import StudyHistory from './StudyHistory';
 
 // component: 학습기록, 비밀번호 변경 화면 컴포넌트 //
 export default function MyPage() {
     
     // state: 페이지 상태 //
-    const [page, setPage] = useState<MyPagePath> ('change-password');
+    const [page, setPage] = useState<MyPagePath> ('study-history');
 
     // variable: 네비게이션 클래스 //
     const studyHistoyNavigationClass = page === 'study-history' ? 'navigation active' : 'navigation';
@@ -35,7 +36,7 @@ export default function MyPage() {
 
             <div className='mypage-content'>
                 {page === 'study-history' ?
-                <div></div> :
+                <StudyHistory onPageChange={onPageChangeHandler} /> :
                 <ChangePasswordPage onPageChange={onPageChangeHandler} />
                 }
             </div>
