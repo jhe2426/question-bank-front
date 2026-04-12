@@ -49,8 +49,22 @@
     background-size: 100% 100%;
     background-image: url('/src/assets/images/past-exam-incorrect-question.png');
 
+    margin-right: 4px;
+
     cursor: pointer;
     
+}
+
+.study-history-table>.study-history-row .tr .study-history-incorrect .past-exam-incorrect-up-arrow-icon {
+    width: 25px;
+    height: 25px;
+
+    background-size: 100% 100%;
+    background-image: url('/src/assets/images/past-exam-incorrect-up-arrow.png');
+
+    margin-right: 4px;
+
+    cursor: pointer;
 }
 
 .study-history-table>.study-history-row .study-history-incorrect .incorrect-icon {
@@ -79,6 +93,21 @@
 
 .study-history-table>.study-history-row .tr .study-history-exam-result.fail{
     color: var(--PrimaryLight4);
+}
+
+.past-exam-result-detail-wrapper {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    
+    transition: max-height 0.5s ease
+}
+
+.past-exam-result-detail-wrapper.open {
+    min-width: 100%;
+    max-height: 500px;
+    opacity: 1;
+    transition: max-height 1s ease
 }
 
 .past-exam-result-detail {
