@@ -7,6 +7,8 @@ import UnitSummary from './unit-summary.interface';
 import Question from './question.interface';
 import UserAnswer from './user-answer.interface';
 import ExamResult from './exam-result.interface';
+import LearningRecord from './learning-record.interface';
+import UnitGradingResult from './unit-grading-result.interface';
 
 export type {
     University,
@@ -17,5 +19,7 @@ export type {
     UnitSummary,
     Question,
     UserAnswer,
-    ExamResult
+    ExamResult,
+    LearningRecord,
+    UnitGradingResult
 }

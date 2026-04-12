@@ -118,11 +118,6 @@
     margin-bottom: -5px;
 }
 
-.image-box img {
-    width: 100%;
-    max-width: 715px;
-}
-
 .explanation-container {
     display: flex;
     flex-direction: column;
@@ -141,7 +136,7 @@
 }
 
 .explanation-item {
-
+    padding-right: 20px;
     font-family: 'Cafe24SsurroundAir';
     font-size: 12px;
     line-height: 200%;

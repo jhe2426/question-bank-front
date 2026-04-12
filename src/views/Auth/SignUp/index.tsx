@@ -578,7 +578,7 @@ export default function SignUp(props: Props) {
 
     // effect: 대학교 셀렉터 컨테이너 상태가 변경될 시 실행할 함수 //
     useEffect(() => {
-        const onOutsidClickHanlder= (event: MouseEvent) => {
+        const onOutsidClickHandler = (event: MouseEvent) => {
             if (selectorRef.current && !selectorRef.current.contains(event.target as Node)) {
                 setShowUniversityShowSelector(false);
             }
@@ -586,7 +586,7 @@ export default function SignUp(props: Props) {
 
         if  (!showUniversitySelector) return;
 
-        document.addEventListener('mousedown', onOutsidClickHanlder);
+        document.addEventListener('mousedown', onOutsidClickHandler);
         
     }, [showUniversitySelector]);
 

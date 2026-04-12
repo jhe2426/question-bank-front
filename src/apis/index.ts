@@ -16,6 +16,7 @@ import { PostIncorrectQuestionGradingRequestDto } from './dto/request/incorrectQ
 import { GetExamResultListResponseDto } from './dto/response/examResult';
 import { PatchUserPasswordRequestDto } from './dto/request/myPage';
 import { GetLearningRecordListResponseDto } from './dto/response/myPage';
+import GetUnitGradingResultListResponseDto from './dto/response/myPage/get-unit-grading-result-list.response.dto';
 
 // variable: URL 상수 //
 const API_DOMAIN = process.env.REACT_APP_API_DOMAIN;
@@ -57,6 +58,7 @@ const GET_EXAM_RESULT_LIST_URL = (groupId: number, filter: string) => `${EXAM_RE
 const MY_PAGE_MODULE_URL = `${API_DOMAIN}/api/v1/my-page`;
 const PATCH_USER_PASSWORD_URL = `${MY_PAGE_MODULE_URL}/change-password`;
 const GET_LEARNING_RECORD_LIST_URL = `${MY_PAGE_MODULE_URL}/learning-records`;
+const GET_UNIT_GRADING_RESULT_LIST_URL = (groupId: number) => `${MY_PAGE_MODULE_URL}/${groupId}/unit-grading-results`;
 
 // variable: refresh 토큰을 사용하여 access Token 발급 진행 여부 //
 let isRefreshing = false;
@@ -332,3 +334,11 @@ export const getLearningRecordListRequest = async (accessToken: string) => {
         .catch(responseErrorHandler);
     return responseBody;
 }
+
+// function: get unit grading result list API 요청 함수 //
+export const getUnitGradingResultListRequest = async (accessToken: string, groupId: number) => {
+    const responseBody = await api.get(GET_UNIT_GRADING_RESULT_LIST_URL(groupId), bearerAuthorization(accessToken))
+        .then(responseSuccessHandler<GetUnitGradingResultListResponseDto>)
+        .catch(responseErrorHandler);
+    return responseBody;
+};
