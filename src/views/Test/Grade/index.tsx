@@ -170,6 +170,9 @@ export default function Grade() {
 
     // state: 제목 //
     const [title, setTitle] = useState<string>('');
+
+    // state: 시험 점수 //
+    const [totalScore, setTotalScore] = useState<number>();
     
     // state: 문제 유형 //
     const [sourceType, setSourceType] = useState<string>('');
@@ -188,9 +191,6 @@ export default function Grade() {
 
     // variable: 제목 텍스트 //
     const titleText = isKillerExam ? sourceType : title;
-
-    // function: 네비게이터 함수 //
-    const navigator = useNavigate();
 
     // function: 채점 결과 기반으로 선택 답안 상태 초기화 //
     const initSelectedAnswers = (questionList: ExamResult[]) => {
@@ -221,9 +221,10 @@ export default function Grade() {
             return;
         }
         
-        const { sourceType, detailedType, examResults } = responseBody as GetExamResultListResponseDto;
+        const { sourceType, detailedType, totalScore, examResults } = responseBody as GetExamResultListResponseDto;
         setSourceType(sourceType);
         setTitle(detailedType);
+        setTotalScore(totalScore);
         setQuestionList(examResults);
         setTotalList(examResults);
         initSelectedAnswers(examResults);
@@ -244,6 +245,9 @@ export default function Grade() {
             <div className='test-body'>
                 <div className='test-top'>
                     <div className='test-title'>{titleText}</div>
+                    {filter === 'all' ?
+                    <div className='test-score'>{totalScore}점</div> : <></>
+                    }   
                 </div>
 
                 <div className='test-main'>

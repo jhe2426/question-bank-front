@@ -95,6 +95,17 @@
     color: var(--PrimaryLight4);
 }
 
+.study-history-table .empty-message {
+    display: flex;
+    justify-self: center;
+
+    font-family: 'Cafe24SsurroundAir';
+    font-size: 17px;
+
+    padding-top: 20px;
+    margin-bottom: 500px;
+}
+
 .past-exam-result-detail-wrapper {
     max-height: 0;
     opacity: 0;
@@ -255,7 +266,7 @@
     cursor: pointer;
  }
 
- #study-history-container .pagination-box .pagination .page:hover {
+ #study-history-container .pagination-box .pagination .page.active {
     color: var(--Lightmode-Grey13);
     font-weight: 700;
     cursor: default;

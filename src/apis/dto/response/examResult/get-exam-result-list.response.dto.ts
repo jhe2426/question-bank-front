@@ -5,5 +5,6 @@ import { ResponseDto } from 'src/apis/dto/response';
 export default interface GetExamResultListResponseDto extends ResponseDto {
     sourceType: string;
     detailedType: string;
+    totalScore: number;
     examResults: ExamResult[];
 }

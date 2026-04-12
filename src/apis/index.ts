@@ -15,6 +15,7 @@ import { PostMockExamGradingRequestDto } from './dto/request/mockExam';
 import { PostIncorrectQuestionGradingRequestDto } from './dto/request/incorrectQuestions';
 import { GetExamResultListResponseDto } from './dto/response/examResult';
 import { PatchUserPasswordRequestDto } from './dto/request/myPage';
+import { GetLearningRecordListResponseDto } from './dto/response/myPage';
 
 // variable: URL 상수 //
 const API_DOMAIN = process.env.REACT_APP_API_DOMAIN;
@@ -55,6 +56,7 @@ const GET_EXAM_RESULT_LIST_URL = (groupId: number, filter: string) => `${EXAM_RE
 
 const MY_PAGE_MODULE_URL = `${API_DOMAIN}/api/v1/my-page`;
 const PATCH_USER_PASSWORD_URL = `${MY_PAGE_MODULE_URL}/change-password`;
+const GET_LEARNING_RECORD_LIST_URL = `${MY_PAGE_MODULE_URL}/learning-records`;
 
 // variable: refresh 토큰을 사용하여 access Token 발급 진행 여부 //
 let isRefreshing = false;
@@ -316,9 +318,17 @@ export const getExamResultListRequest = async (accessToken: string, groupId: num
 };
 
 // function: patch user password API 요청 함수 //
-export const patchUserPasswordRequest = async(requestBody: PatchUserPasswordRequestDto, accessToken: string) => {
+export const patchUserPasswordRequest = async (requestBody: PatchUserPasswordRequestDto, accessToken: string) => {
     const responseBody = await api.patch(PATCH_USER_PASSWORD_URL, requestBody, bearerAuthorization(accessToken))
         .then(responseSuccessHandler)
         .catch(responseErrorHandler);
     return responseBody;
 };
+
+// function: get learning record list API 요청 함수 //
+export const getLearningRecordListRequest = async (accessToken: string) => {
+    const responseBody = await api.get(GET_LEARNING_RECORD_LIST_URL, bearerAuthorization(accessToken))
+        .then(responseSuccessHandler<GetLearningRecordListResponseDto>)
+        .catch(responseErrorHandler);
+    return responseBody;
+}

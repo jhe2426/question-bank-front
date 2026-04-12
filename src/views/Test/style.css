@@ -13,7 +13,22 @@
 }
 
 .test-top {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-self: center;
     font-size: 20px;
+    width: 100%;
+}
+
+.test-title {
+    grid-column: 2;
+    justify-self: center;
+}
+
+.test-score {
+    grid-column: 3;
+    justify-self: end;
+    padding-right: 70px;
 }
 
 .test-main {
