@@ -15,8 +15,7 @@ import { PostMockExamGradingRequestDto } from './dto/request/mockExam';
 import { PostIncorrectQuestionGradingRequestDto } from './dto/request/incorrectQuestions';
 import { GetExamResultListResponseDto } from './dto/response/examResult';
 import { PatchUserPasswordRequestDto } from './dto/request/myPage';
-import { GetLearningRecordListResponseDto } from './dto/response/myPage';
-import GetUnitGradingResultListResponseDto from './dto/response/myPage/get-unit-grading-result-list.response.dto';
+import { GetLearningRecordListResponseDto, GetUnitGradingResultListResponseDto } from './dto/response/myPage';
 
 // variable: URL 상수 //
 const API_DOMAIN = process.env.REACT_APP_API_DOMAIN;
