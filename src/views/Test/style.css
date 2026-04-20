@@ -119,6 +119,11 @@
     margin-bottom: -5px;
 }
 
+.image-box img {
+    max-width: 600px;
+    max-height: 300px;
+}
+
 .explanation-container {
     display: flex;
     flex-direction: column;
