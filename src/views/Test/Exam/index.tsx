@@ -37,7 +37,7 @@ const QuestionTableItem = memo(({ question, selectedAnswer, onClick }: QuestionT
     const options = [option1, option2, option3, option4];
 
     // variable: 문제 번호 텍스트 //
-    const questionNubmerText = questionOrder > 10 ? `${questionOrder}.` : `0${questionOrder}.`;
+    const questionNubmerText = questionOrder >= 10 ? `${questionOrder}.` : `0${questionOrder}.`;
 
     // function: 텍스트와 수식을 분리해서 렌더링하는 함수 //
     const renderContentWithMath = (text: string) => {
