@@ -1,5 +1,6 @@
 #mypage-wrapper {
     display: flex;
+    align-items: flex-start;
     width:992px;
     padding-bottom: 40px;
 }
