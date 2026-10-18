@@ -1,4 +1,4 @@
-# ADsp QuestionBank React Project <br/>
+# ADsP QuestionBank React Project <br/>
 사용자의 기억력 및 집중력 향상을 위한 검사 및 기록 관리 웹 서비스 <br/>
 
 ## 피그마 디자인
