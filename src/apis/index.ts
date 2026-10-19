@@ -18,7 +18,7 @@ import { PatchUserPasswordRequestDto } from './dto/request/myPage';
 import { GetLearningRecordListResponseDto, GetUnitGradingResultListResponseDto } from './dto/response/myPage';
 
 // variable: URL 상수 //
-const API_DOMAIN = process.env.REACT_APP_API_DOMAIN;
+const API_DOMAIN = process.env.NODE_ENV === 'production' ? '' : (process.env.REACT_APP_API_DOMAIN || '');
 
 const AUTH_MODULE_URL = `${API_DOMAIN}/api/v1/auth`;
 
