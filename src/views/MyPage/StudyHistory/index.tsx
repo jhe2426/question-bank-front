@@ -209,7 +209,7 @@ export default function StudyHistory(props: Props) {
     } = RESPONSE_CODE;
 
     // variable: learningRecordList가 null 또는 비어있는지 확인 //
-    const isLearningRecordListEmpty = learningRecordList === null;
+    const isLearningRecordListEmpty = learningRecordList === null || learningRecordList.length === 0;
 
     // variable: 이전 섹션 버튼 문자열 //
     const preButtonClass = currentSection <= 1 ? 'pagination-button left disable' : 'pagination-button left';
@@ -263,13 +263,6 @@ export default function StudyHistory(props: Props) {
 
         getLearningRecordListRequest(accessToken).then(getLearningRecordListResponse);
     }, [accessToken])
-
-    // effect: 컴포넌트 로드 시 실행할 함수 //
-    useEffect(() => {
-        if (accessToken == null) return;
-
-        getLearningRecordListRequest(accessToken).then(getLearningRecordListResponse);
-    }, [])
 
     // render: 학습기록 화면 컴포넌트 렌더링 //
     return (
