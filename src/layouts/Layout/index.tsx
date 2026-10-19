@@ -92,7 +92,7 @@ export default function Layout() {
 
     // render: 공통 레이아웃 컴포넌트 렌더링 //
     return (
-        <div id='layout-wrapper'>
+        <div id='layout-wrapper' className={pathname.startsWith(MAIN_ABSOLUTE_PATH) ? 'main-page' : undefined}>
             <div id='top-bar'>
                 <div className='navigation-list'>
                     <div onClick={onMyPageClickHandler}>마이페이지</div>

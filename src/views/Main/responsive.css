@@ -1,0 +1,199 @@
+/* 공통 레이아웃 변경은 메인 화면에만 적용합니다. */
+@media (max-width: 1439px) {
+    #layout-wrapper.main-page {
+        min-width: 0;
+    }
+
+    #layout-wrapper.main-page #main {
+        width: calc(100% - 32px);
+        max-width: 992px;
+        min-width: 0;
+        margin-right: auto;
+        margin-left: auto;
+        padding-bottom: 32px;
+    }
+
+    #main-wrapper {
+        width: 100%;
+        min-width: 0;
+    }
+}
+
+/* 태블릿에서는 기존 두 열 배치를 유지하며 고정 너비를 조정합니다. */
+@media (max-width: 1024px) {
+    #layout-wrapper.main-page #main {
+        margin-top: 32px;
+    }
+
+    #main-wrapper .content {
+        align-items: stretch;
+        padding: 0;
+    }
+
+    #main-wrapper .mock-section {
+        min-width: 0;
+        height: auto;
+        min-height: 560px;
+        padding: 24px 20px;
+    }
+
+    #main-wrapper .level-button-container {
+        gap: 10px;
+    }
+
+    #main-wrapper .level-button-container .level-button {
+        flex: 1;
+        width: auto;
+        min-width: 0;
+    }
+
+    #main-wrapper .option-group .option-item,
+    #main-wrapper .mock-button {
+        width: 100%;
+    }
+
+    #main-wrapper .option-group .option-item {
+        height: auto;
+        min-height: 44px;
+        padding: 10px 11px;
+    }
+
+    #main-wrapper .option-item .label {
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+    }
+
+    #main-wrapper .radio-icon,
+    #main-wrapper .arrow-down-button,
+    #main-wrapper .arrow-up-button,
+    #main-wrapper .check-icon {
+        flex-shrink: 0;
+    }
+
+    #main-wrapper .unit-selector,
+    #main-wrapper .past-selector {
+        min-width: 0;
+        height: auto;
+        min-height: 44px;
+        gap: 8px;
+        padding-top: 8px;
+        padding-bottom: 8px;
+    }
+
+    #main-wrapper .unit-selected-item,
+    #main-wrapper .past-selected-item {
+        min-width: 0;
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+    }
+
+    #main-wrapper .unit-selector .unit-selector-box,
+    #main-wrapper .past-selector .past-selector-box {
+        top: 100%;
+        width: calc(100% + 2px);
+        height: auto;
+        max-height: 220px;
+        overflow-y: auto;
+    }
+
+    #main-wrapper .unit-selector .unit-selector-option,
+    #main-wrapper .past-selector .past-selector-option {
+        height: auto;
+        min-height: 44px;
+        padding: 12px;
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+    }
+
+    #main-wrapper .side-panel {
+        flex-shrink: 0;
+        justify-content: center;
+    }
+
+    #main-wrapper .side-panel .past-section {
+        height: auto;
+        min-height: 86px;
+        padding: 12px 9px;
+    }
+
+    #main-wrapper .past-section .past-selector {
+        width: 100%;
+        text-align: left;
+    }
+}
+
+/* 모바일에서는 각 문제 영역을 세로로 배치합니다. */
+@media (max-width: 768px) {
+    #layout-wrapper.main-page #main {
+        margin-top: 24px;
+        gap: 16px;
+    }
+
+    #layout-wrapper.main-page #top-bar {
+        height: auto;
+        min-height: 44px;
+    }
+
+    #layout-wrapper.main-page .navigation-list {
+        justify-content: flex-end;
+        line-height: 44px;
+    }
+
+    #layout-wrapper.main-page #main .header-box {
+        box-sizing: border-box;
+        height: auto;
+        min-height: 70px;
+        padding: 18px 12px;
+    }
+
+    #layout-wrapper.main-page #main .header-box .header {
+        font-size: clamp(20px, 5vw, 30px);
+        line-height: 1.4;
+        overflow-wrap: anywhere;
+    }
+
+    #main-wrapper .content {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    #main-wrapper .mock-section {
+        min-height: 0;
+        padding: 24px 16px;
+    }
+
+    #main-wrapper .selector-container {
+        gap: 28px;
+    }
+
+    #main-wrapper .side-panel {
+        width: 100%;
+        min-width: 0;
+        gap: 16px;
+    }
+
+    #main-wrapper .side-panel .past-section {
+        padding: 16px;
+    }
+
+    #main-wrapper .side-panel .incorrect-section {
+        height: auto;
+        gap: 20px;
+        padding: 20px 16px;
+    }
+
+    #main-wrapper .incorrect-options {
+        align-self: stretch;
+        gap: 8px;
+    }
+
+    #main-wrapper .incorrect-option {
+        min-height: 44px;
+        padding-left: 0;
+    }
+
+    #main-wrapper .incorrect-section .incorrect-button {
+        width: 100%;
+        min-height: 44px;
+    }
+}

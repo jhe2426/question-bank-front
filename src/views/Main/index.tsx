@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import './style.css';
+import './responsive.css';
 import UnitSelector from './UnitSelector';
 import { getPastExamRoundListRequest, getUnitAndChapterListRequest } from 'src/apis';
 import { useAuthStore } from 'src/stores';
