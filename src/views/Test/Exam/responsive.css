@@ -1,0 +1,304 @@
+/* 시험 화면에만 적용하여 공통 시험/채점 CSS 원본을 유지합니다. */
+.exam-page .test-bottom {
+    display: grid;
+    /* 문제 795px + 간격 18px + 답안 표기 180px과 같은 열을 사용합니다. */
+    grid-template-columns: minmax(0, 1fr) 180px;
+    width: 993px;
+    max-width: 100%;
+    gap: 18px;
+    padding-left: 0;
+}
+
+.exam-page #pagination {
+    grid-column: 1;
+    justify-self: center;
+}
+
+.exam-page .submit-button {
+    grid-column: 2;
+    justify-self: end;
+    max-width: 100%;
+}
+
+@media (max-width: 1439px) {
+    #layout-wrapper.exam-page {
+        min-width: 0;
+    }
+
+    #layout-wrapper.exam-page #main {
+        width: calc(100% - 32px);
+        max-width: 998px;
+        min-width: 0;
+        margin-right: auto;
+        margin-left: auto;
+    }
+
+    .exam-page .test-wrapper,
+    .exam-page .test-body,
+    .exam-page .test-main,
+    .exam-page .question-list,
+    .exam-page .test-bottom {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .exam-page .test-top {
+        display: block;
+        text-align: center;
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+    }
+
+    .exam-page .test-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .exam-page .test-sidebar {
+        flex-shrink: 0;
+    }
+
+    .exam-page .question-number {
+        flex-shrink: 0;
+    }
+
+    .exam-page .question-text,
+    .exam-page .option-text {
+        flex: 1;
+        width: auto;
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+
+    .exam-page .image-box img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .exam-page .explanation-container {
+        width: 100%;
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+
+    /* 긴 수식은 크기를 줄이지 않고 해당 수식 안에서 가로로 스크롤합니다. */
+    .exam-page .katex {
+        display: inline-block;
+        box-sizing: border-box;
+        max-width: 100%;
+        padding: 4px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        vertical-align: middle;
+        overflow-wrap: normal;
+    }
+
+}
+
+@media (max-width: 1024px) {
+    .exam-page .question-list {
+        padding: 28px 24px;
+    }
+
+    .exam-page .question-header,
+    .exam-page .option-text {
+        line-height: 1.7;
+    }
+
+    .exam-page .option-list {
+        padding-left: 0;
+        gap: 8px;
+    }
+
+    .exam-page .option-item {
+        align-items: flex-start;
+        gap: 8px;
+        min-height: 44px;
+    }
+
+    .exam-page .option-icon {
+        margin-top: 3px;
+    }
+
+    .exam-page .image-box {
+        padding-left: 0;
+    }
+
+    .exam-page .explanation-container {
+        padding: 16px;
+    }
+
+    .exam-page .explanation-item {
+        padding-right: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    #layout-wrapper.exam-page #main {
+        gap: 16px;
+    }
+
+    #layout-wrapper.exam-page #top-bar {
+        height: auto;
+        min-height: 44px;
+    }
+
+    #layout-wrapper.exam-page .navigation-list {
+        justify-content: flex-end;
+        line-height: 44px;
+    }
+
+    #layout-wrapper.exam-page #main .header-box {
+        box-sizing: border-box;
+        height: auto;
+        min-height: 70px;
+        padding: 18px 12px;
+    }
+
+    #layout-wrapper.exam-page #main .header-box .header {
+        font-size: clamp(20px, 5vw, 30px);
+        line-height: 1.4;
+        overflow-wrap: anywhere;
+    }
+
+    .exam-page .test-main {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 16px;
+    }
+
+    /* DOM을 옮기지 않고 타이머 → 문제 → 답안 표기 순서로 배치합니다. */
+    .exam-page .test-sidebar,
+    .exam-page .test-sidebar-box {
+        display: contents;
+    }
+
+    .exam-page .timer-box {
+        position: sticky;
+        top: 8px;
+        z-index: 2;
+        order: 0;
+        width: 100%;
+        background-color: var(--White);
+    }
+
+    .exam-page .test-content {
+        order: 1;
+        padding-bottom: 0;
+    }
+
+    .exam-page .question-list {
+        min-height: 0;
+        padding: 24px 16px;
+        gap: 32px;
+    }
+
+    .exam-page .answer-sheet {
+        order: 2;
+        width: 100%;
+        max-height: 300px;
+    }
+
+    .exam-page .answer-header {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    .exam-page .answer-row,
+    .exam-page .answer-options {
+        height: 44px;
+    }
+
+    .exam-page .answer-number {
+        width: 44px;
+        flex-shrink: 0;
+        line-height: 44px;
+    }
+
+    .exam-page .answer-options {
+        flex: 1;
+        width: auto;
+        min-width: 0;
+        gap: 0;
+    }
+
+    .exam-page .answer-option {
+        flex: 1;
+        width: auto;
+        height: 44px;
+        background-size: 20px 20px;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+
+    .exam-page .test-bottom {
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        gap: 16px;
+        position: sticky;
+        bottom: 0;
+        z-index: 3;
+        margin-top: 16px;
+        padding: 12px 0 calc(12px + env(safe-area-inset-bottom, 0px));
+        border-top: 1px solid var(--Lightmode-Grey9);
+        background-color: var(--White);
+    }
+
+    .exam-page #pagination {
+        grid-column: 2;
+        align-items: center;
+    }
+
+    .exam-page #pagination .pagination-button {
+        width: 44px;
+        height: 44px;
+        background-size: 23px 23px;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+
+    .exam-page .submit-button {
+        grid-column: 3;
+        width: 100%;
+        max-width: 180px;
+        min-width: 0;
+        min-height: 44px;
+        font-size: 15px;
+        line-height: 44px;
+    }
+}
+
+/* 좁은 화면에서는 제출 버튼을 다음 줄로 내려 중앙 정렬을 유지합니다. */
+@media (max-width: 440px) {
+    .exam-page .test-bottom {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 8px;
+    }
+
+    .exam-page #pagination,
+    .exam-page .submit-button {
+        grid-column: 1;
+    }
+
+    .exam-page .submit-button {
+        max-width: none;
+    }
+}
+
+/* 440px부터 770px까지는 페이지 이동을 왼쪽, 제출 버튼을 오른쪽에 배치합니다. */
+@media (min-width: 440px) and (max-width: 770px) {
+    .exam-page .test-bottom {
+        grid-template-columns: minmax(0, 1fr) 180px;
+        gap: 16px;
+    }
+
+    .exam-page #pagination {
+        grid-column: 1;
+        justify-self: start;
+    }
+
+    .exam-page .submit-button {
+        grid-column: 2;
+        max-width: 180px;
+    }
+}

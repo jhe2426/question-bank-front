@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Outlet, useLocation, useNavigate } from 'react-router';
+import { matchPath, Outlet, useLocation, useNavigate } from 'react-router';
 
 import './style.css';
 import { logoutRequest, refreshAccessTokenRequest } from 'src/apis';
@@ -7,7 +7,7 @@ import { useAuthStore } from 'src/stores';
 import { useCookies } from 'react-cookie';
 import { RefreshAccessTokenResponseDto } from 'src/apis/dto/response/auth';
 import { ResponseDto } from 'src/apis/dto/response';
-import { AUTH_ABSOLUTE_PATH, MAIN_ABSOLUTE_PATH, MY_PAGE_ABSOLUTE_PATH } from 'src/constants';
+import { AUTH_ABSOLUTE_PATH, INCORRECT_QUESTIONS_TEST_PATH, KILLER_EXAM_TEST_PATH, MAIN_ABSOLUTE_PATH, MOCK_EXAM_TEST_PATH, MY_PAGE_ABSOLUTE_PATH, PAST_EXAM_TEST_PATH } from 'src/constants';
 
 // component: 공통 레이아웃 컴포넌트 //
 export default function Layout() {
@@ -29,6 +29,11 @@ export default function Layout() {
 
     // variable: 헤더 클래스 //
     const headerClass = pathname.startsWith(MAIN_ABSOLUTE_PATH) ? 'header-box disable' : 'header-box';
+
+    // variable: 화면별 반응형 스타일 적용 클래스 //
+    const isExamPage = [MOCK_EXAM_TEST_PATH, KILLER_EXAM_TEST_PATH, PAST_EXAM_TEST_PATH, INCORRECT_QUESTIONS_TEST_PATH]
+        .some(path => matchPath(path, pathname));
+    const layoutClass = pathname.startsWith(MAIN_ABSOLUTE_PATH) ? 'main-page' : isExamPage ? 'exam-page' : undefined;
 
     // function: 네비게이터 함수 //
     const navigator = useNavigate();
@@ -92,7 +97,7 @@ export default function Layout() {
 
     // render: 공통 레이아웃 컴포넌트 렌더링 //
     return (
-        <div id='layout-wrapper' className={pathname.startsWith(MAIN_ABSOLUTE_PATH) ? 'main-page' : undefined}>
+        <div id='layout-wrapper' className={layoutClass}>
             <div id='top-bar'>
                 <div className='navigation-list'>
                     <div onClick={onMyPageClickHandler}>마이페이지</div>
@@ -102,7 +107,7 @@ export default function Layout() {
             
             <div id='main' className={mainClass}>
                 <div className={headerClass} onClick={onMainLogoClickHandler}>
-                    <div className='header'>ADSP 문제은행 시스템</div>
+                    <div className='header'>ADsP 문제은행 시스템</div>
                 </div>
                 <Outlet />
             </div>
