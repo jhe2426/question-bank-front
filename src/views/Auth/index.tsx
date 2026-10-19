@@ -4,6 +4,7 @@ import './style.css';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
 import { AuthPage } from 'src/types/aliases';
+import './responsive.css';
 
 // component: 로그인 회원가입 화면 컴포넌트 //
 export default function Auth() {

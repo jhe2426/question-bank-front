@@ -1,0 +1,67 @@
+/* 기존 폼 너비 588px에 좌우 여백 16px을 더한 구간부터 적용합니다. */
+@media (max-width: 620px) {
+    #auth-wrapper {
+        padding-right: 16px;
+        padding-left: 16px;
+    }
+
+    #auth-wrapper .auth-box {
+        width: 100%;
+        max-width: 588px;
+        min-width: 0;
+    }
+
+    #auth-login-container {
+        max-width: 100%;
+        margin-right: auto;
+        margin-left: auto;
+    }
+
+    #auth-sign-up-container {
+        width: 100%;
+        min-width: 0;
+    }
+
+    #auth-wrapper .input-box input {
+        min-width: 0;
+    }
+
+    #auth-wrapper .input-area .button {
+        flex-shrink: 0;
+    }
+
+    #auth-wrapper .input-box .message {
+        height: auto;
+        min-height: 13px;
+        overflow-wrap: anywhere;
+    }
+
+    #auth-sign-up-container .university-selector-container .selector {
+        width: 100%;
+        min-width: 0;
+    }
+
+    #auth-sign-up-container .selector .selected-item {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    #auth-sign-up-container .selector .arrow-down-button,
+    #auth-sign-up-container .selector .arrow-up-button {
+        flex-shrink: 0;
+    }
+
+    /* 선택창의 좌우 테두리까지 펼침 목록 너비에 포함합니다. */
+    #auth-sign-up-container .selector .selector-box {
+        width: calc(100% + 2px);
+    }
+
+    #auth-sign-up-container .selector .selector-option {
+        height: auto;
+        min-height: 35px;
+        padding-bottom: 10px;
+        overflow-wrap: anywhere;
+    }
+}
