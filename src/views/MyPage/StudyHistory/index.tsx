@@ -140,17 +140,17 @@ function TableItem({ accessToken, index, learningRecord }: TableItemProps) {
     return (
             <div className='study-history-row' ref={rowRef}> 
                 <div className='tr'>
-                    <div className='td study-history-number'>{index}</div>
-                    <div className='td study-history-date'>{solvedDate}</div>
-                    <div className='td study-history-source-type'>{detailedType}</div>
-                    <div className='td study-history-score'>{totalScore}</div>
-                    <div className='td study-history-incorrect'>
+                    <div className='td study-history-number' data-label='번호'>{index}</div>
+                    <div className='td study-history-date' data-label='날짜'>{solvedDate}</div>
+                    <div className='td study-history-source-type' data-label='문제 유형'>{detailedType}</div>
+                    <div className='td study-history-score' data-label='점수'>{totalScore}</div>
+                    <div className='td study-history-incorrect' data-label='틀린 문제'>
                         <div className={incorrectClass} onClick={onIncorrectQuestionsClick}></div>
                     </div>
-                    <div className='td study-history-total'>
+                    <div className='td study-history-total' data-label='전체 문제'>
                         <div className='total-question-icon' onClick={onAllQuestionsClick}></div>
                     </div>
-                    <div className={examResultClass}>{examResultText}</div>
+                    <div className={examResultClass} data-label='합격 여부'>{examResultText}</div>
                 </div>
             
                 {isPastExam ?

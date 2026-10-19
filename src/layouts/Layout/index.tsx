@@ -33,7 +33,9 @@ export default function Layout() {
     // variable: 화면별 반응형 스타일 적용 클래스 //
     const isExamPage = [MOCK_EXAM_TEST_PATH, KILLER_EXAM_TEST_PATH, PAST_EXAM_TEST_PATH, INCORRECT_QUESTIONS_TEST_PATH]
         .some(path => matchPath(path, pathname));
-    const layoutClass = pathname.startsWith(MAIN_ABSOLUTE_PATH) ? 'main-page' : isExamPage ? 'exam-page' : undefined;
+    const layoutClass = pathname.startsWith(MAIN_ABSOLUTE_PATH) ? 'main-page'
+        : pathname.startsWith(MY_PAGE_ABSOLUTE_PATH) ? 'mypage-page'
+        : isExamPage ? 'exam-page' : undefined;
 
     // function: 네비게이터 함수 //
     const navigator = useNavigate();

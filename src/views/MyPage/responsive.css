@@ -1,0 +1,330 @@
+/* 기존 스타일은 유지하고 마이페이지에만 반응형 규칙을 적용합니다. */
+@media (max-width: 1439px) {
+    #layout-wrapper.mypage-page {
+        min-width: 0;
+    }
+
+    #layout-wrapper.mypage-page #main {
+        width: calc(100% - 32px);
+        max-width: 992px;
+        min-width: 0;
+        margin-right: auto;
+        margin-left: auto;
+    }
+
+    #mypage-wrapper {
+        width: 100%;
+        min-width: 0;
+    }
+
+    #mypage-wrapper .mypage-sidebar {
+        flex-shrink: 0;
+    }
+
+    #mypage-wrapper .mypage-content {
+        min-width: 0;
+        padding: 0 16px;
+        box-sizing: border-box;
+    }
+
+    #study-history-container,
+    #study-history-container .study-history-table,
+    #study-history-container .study-history-row {
+        width: 100%;
+        min-width: 0;
+    }
+
+    #study-history-container .study-history-table > .tr,
+    #study-history-container .study-history-row > .tr {
+        display: grid;
+        grid-template-columns: 44px minmax(90px, 1fr) minmax(120px, 1.5fr) 52px 60px 60px 65px;
+        width: 100%;
+        height: auto;
+        min-height: 50px;
+    }
+
+    #study-history-container .tr .th,
+    #study-history-container .tr .td {
+        width: auto;
+        min-width: 0;
+        box-sizing: border-box;
+        padding: 8px 4px;
+        line-height: 1.5;
+        text-align: center;
+        overflow-wrap: anywhere;
+    }
+
+    #study-history-container .tr .th {
+        word-break: keep-all;
+        overflow-wrap: normal;
+    }
+
+    #study-history-container .pagination-container,
+    #study-history-container .pagination-box {
+        width: 100%;
+        min-width: 0;
+    }
+
+    #study-history-container .pagination-box {
+        justify-content: center;
+        gap: 8px;
+    }
+
+    #study-history-container .pagination-box .pagination {
+        flex-wrap: wrap;
+        justify-content: center;
+        min-width: 0;
+        gap: 4px;
+    }
+
+    #study-history-container .pagination-box .pagination-button {
+        flex-shrink: 0;
+        width: 44px;
+        height: 44px;
+        background-size: 40px 40px;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+
+    #study-history-container .pagination .page {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    #change-password-page-container {
+        width: 100%;
+        max-width: 450px;
+        min-width: 0;
+    }
+
+    #change-password-page-container .input-container,
+    #change-password-page-container .button-container {
+        width: 100%;
+        min-width: 0;
+    }
+
+    #change-password-page-container input {
+        min-width: 0;
+    }
+
+    #change-password-page-container .message {
+        height: auto;
+        min-height: 13px;
+        overflow-wrap: anywhere;
+    }
+}
+
+@media (max-width: 1024px) {
+    #layout-wrapper.mypage-page #main {
+        margin-top: 32px;
+    }
+
+    #study-history-container {
+        margin-top: 24px;
+        gap: 28px;
+    }
+}
+
+@media (max-width: 768px) {
+    #layout-wrapper.mypage-page #main {
+        margin-top: 24px;
+        gap: 16px;
+    }
+
+    #layout-wrapper.mypage-page #top-bar {
+        height: auto;
+        min-height: 44px;
+    }
+
+    #layout-wrapper.mypage-page #top-bar .navigation-list {
+        justify-content: flex-end;
+        line-height: 44px;
+    }
+
+    #layout-wrapper.mypage-page #main .header-box {
+        box-sizing: border-box;
+        height: auto;
+        min-height: 70px;
+        padding: 18px 12px;
+    }
+
+    #layout-wrapper.mypage-page #main .header-box .header {
+        font-size: clamp(20px, 5vw, 30px);
+        line-height: 1.4;
+        overflow-wrap: anywhere;
+    }
+
+    #mypage-wrapper {
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    #mypage-wrapper .mypage-sidebar {
+        width: 100%;
+        min-height: 0;
+        border-radius: 15px;
+    }
+
+    #mypage-wrapper .mypage-sidebar .title-box {
+        padding: 12px 16px 8px;
+        gap: 6px;
+    }
+
+    #mypage-wrapper .mypage-sidebar .title {
+        font-size: 20px;
+        line-height: 1.3;
+    }
+
+    #mypage-wrapper .mypage-sidebar .navigation-list {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    #mypage-wrapper .mypage-sidebar .navigation {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 1;
+        min-height: 44px;
+        margin: 0;
+        white-space: nowrap;
+    }
+
+    #mypage-wrapper .mypage-content {
+        width: 100%;
+        padding: 0;
+    }
+
+    #study-history-container {
+        margin-top: 0;
+        gap: 16px;
+    }
+
+    /* 작은 화면에서는 표의 각 행을 항목명이 있는 카드로 표시합니다. */
+    #study-history-container .study-history-table > .tr {
+        display: none;
+    }
+
+    #study-history-container .study-history-row {
+        box-sizing: border-box;
+        border: 1px solid var(--Lightmode-Grey11);
+        border-radius: 12px;
+        margin-bottom: 12px;
+        overflow: hidden;
+    }
+
+    #study-history-container .study-history-row > .tr {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-areas: "type type" "number date" "score result" "incorrect total";
+        gap: 12px;
+        border: none;
+        padding: 16px;
+    }
+
+    #study-history-container .tr .td {
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 4px;
+        padding: 0;
+        text-align: center;
+        font-size: 14px;
+    }
+
+    #study-history-container .td::before {
+        content: attr(data-label);
+        color: var(--Lightmode-Grey4);
+        font-family: 'Pretendard';
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    #study-history-container .study-history-number { grid-area: number; }
+    #study-history-container .study-history-date { grid-area: date; }
+    #study-history-container .study-history-source-type { grid-area: type; }
+    #study-history-container .study-history-score { grid-area: score; }
+    #study-history-container .study-history-exam-result { grid-area: result; }
+    #study-history-container .study-history-incorrect { grid-area: incorrect; }
+    #study-history-container .study-history-total { grid-area: total; }
+
+    #study-history-container .study-history-incorrect > div,
+    #study-history-container .study-history-total > div {
+        width: 44px;
+        height: 44px;
+        margin-right: 0;
+        background-size: 30px 30px;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+
+    #study-history-container .past-exam-result-detail-wrapper {
+        width: 100%;
+    }
+
+    #study-history-container .past-exam-result-detail-wrapper.open {
+        max-height: 500px;
+        overflow-y: auto;
+    }
+
+    #study-history-container .unit-score-card,
+    #study-history-container .incorrect-question-button {
+        max-width: calc(100% - 32px);
+    }
+
+    #study-history-container .unit-score-card {
+        height: auto;
+    }
+
+    #study-history-container .unit-score-item {
+        height: auto;
+        min-height: 40px;
+        gap: 8px;
+        padding-top: 8px;
+        padding-bottom: 8px;
+        box-sizing: border-box;
+    }
+
+    #study-history-container .unit-name {
+        min-width: 0;
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+    }
+
+    #study-history-container .unit-score-badge {
+        flex-shrink: 0;
+    }
+
+    #study-history-container .incorrect-question-button {
+        height: 44px;
+        line-height: 44px;
+    }
+
+    #study-history-container .empty-message {
+        justify-content: center;
+        align-items: center;
+        min-height: 160px;
+        margin-bottom: 0;
+        padding: 16px;
+        font-size: 15px;
+        line-height: 1.5;
+        text-align: center;
+    }
+
+    #study-history-container .pagination-container {
+        margin-bottom: 0;
+    }
+
+    #change-password-page-container {
+        height: auto;
+        padding: 8px 0 24px;
+    }
+
+    #change-password-page-container input,
+    #change-password-page-container .button-container .button {
+        height: 44px;
+    }
+}

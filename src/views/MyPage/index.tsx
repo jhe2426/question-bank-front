@@ -4,6 +4,7 @@ import './style.css';
 import MyPagePath from 'src/types/aliases/my-page.alias';
 import ChangePasswordPage from './ChangePasswordPage';
 import StudyHistory from './StudyHistory';
+import './responsive.css';
 
 // component: 학습기록, 비밀번호 변경 화면 컴포넌트 //
 export default function MyPage() {
