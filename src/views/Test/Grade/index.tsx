@@ -2,6 +2,7 @@ import React, { memo, useEffect, useState } from 'react';
 
 import '../style.css';
 import 'katex/dist/katex.min.css';
+import './responsive.css';
 import { InlineMath } from 'react-katex';
 import { usePagination } from 'src/hooks';
 import { ExamResult } from 'src/types/interfaces';

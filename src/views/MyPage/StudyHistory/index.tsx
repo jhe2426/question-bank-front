@@ -82,7 +82,7 @@ function TableItem({ accessToken, index, learningRecord }: TableItemProps) {
             const nextOpen = !isPastExamDetailOpen;
             setIsPastExamDetailOpen(!isPastExamDetailOpen);
             if (nextOpen) {
-                if (accessToken == null) return;
+                if (accessToken === null) return;
                 getUnitGradingResultListRequest(accessToken, groupId).then(getUnitGradingResultListResponse);
             }
             return;
@@ -129,7 +129,7 @@ function TableItem({ accessToken, index, learningRecord }: TableItemProps) {
 
     // effect: 컴포넌트 로드 시 실행할 함수 //
     useEffect(() => {
-        if (accessToken == null) return;
+        if (accessToken === null) return;
 
         if (isPastExam) {
             getUnitGradingResultListRequest(accessToken, groupId).then(getUnitGradingResultListResponse);
@@ -259,7 +259,7 @@ export default function StudyHistory(props: Props) {
 
     // effect: accessToken이 변경될 시 실행할 함수 //
     useEffect(() => {
-        if (accessToken == null) return;
+        if (accessToken === null) return;
 
         getLearningRecordListRequest(accessToken).then(getLearningRecordListResponse);
     }, [accessToken])

@@ -7,7 +7,7 @@ import { useAuthStore } from 'src/stores';
 import { useCookies } from 'react-cookie';
 import { RefreshAccessTokenResponseDto } from 'src/apis/dto/response/auth';
 import { ResponseDto } from 'src/apis/dto/response';
-import { AUTH_ABSOLUTE_PATH, INCORRECT_QUESTIONS_TEST_PATH, KILLER_EXAM_TEST_PATH, MAIN_ABSOLUTE_PATH, MOCK_EXAM_TEST_PATH, MY_PAGE_ABSOLUTE_PATH, PAST_EXAM_TEST_PATH } from 'src/constants';
+import { AUTH_ABSOLUTE_PATH, GRADING_VIEW_PATH, INCORRECT_QUESTIONS_TEST_PATH, KILLER_EXAM_TEST_PATH, MAIN_ABSOLUTE_PATH, MOCK_EXAM_TEST_PATH, MY_PAGE_ABSOLUTE_PATH, PAST_EXAM_TEST_PATH } from 'src/constants';
 
 // component: 공통 레이아웃 컴포넌트 //
 export default function Layout() {
@@ -35,7 +35,8 @@ export default function Layout() {
         .some(path => matchPath(path, pathname));
     const layoutClass = pathname.startsWith(MAIN_ABSOLUTE_PATH) ? 'main-page'
         : pathname.startsWith(MY_PAGE_ABSOLUTE_PATH) ? 'mypage-page'
-        : isExamPage ? 'exam-page' : undefined;
+        : isExamPage ? 'exam-page'
+        : matchPath(GRADING_VIEW_PATH, pathname) ? 'grade-page' : undefined;
 
     // function: 네비게이터 함수 //
     const navigator = useNavigate();
