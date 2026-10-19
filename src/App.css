@@ -44,10 +44,6 @@
     --Pass: rgba(62, 175, 63, 1);
 }
 
-body {
-    font-family: 'Cafe24Ssurround';
-}
-
 .button {
     display: flex;
     justify-content: center;

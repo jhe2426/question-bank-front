@@ -38,7 +38,6 @@
     font-size: 15px;
 }
 .study-history-table>.study-history-row .tr .td {
-    font-family: 'Cafe24SsurroundAir';
     font-size: 13px;
 }
 
@@ -99,7 +98,6 @@
     display: flex;
     justify-self: center;
 
-    font-family: 'Cafe24SsurroundAir';
     font-size: 17px;
 
     padding-top: 20px;
@@ -132,7 +130,6 @@
     box-sizing: border-box;
     border-bottom: 1px solid var(--Lightmode-Grey11);
 
-    font-family: 'Cafe24SsurroundAir';
 }
 
 .unit-score-card {
@@ -186,7 +183,6 @@
     height: 16px;
     border-radius: 3px;
 
-    font-family: 'Cafe24Ssurround';
     font-size: 8px;
     color: var(--White);
 }
@@ -207,7 +203,6 @@
     background-color: var(--Primary);
 
     color: var(--White);
-    font-family: 'Cafe24Ssurround';
     font-size: 14px;
     line-height: 30px;
     text-align: center;

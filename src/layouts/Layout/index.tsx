@@ -72,6 +72,11 @@ export default function Layout() {
         navigator(MY_PAGE_ABSOLUTE_PATH);
     };
 
+    // event handler: 마이페이지 클릭 이벤트 처리 //
+    const onMainPageClickHandler = () => {
+        navigator(MAIN_ABSOLUTE_PATH);
+    };
+
     // event handler: 로그아웃 클릭 이벤트 처리 //
     const onLogoutClickHandler = () => {
         if (accessToken == null) {
@@ -103,6 +108,7 @@ export default function Layout() {
         <div id='layout-wrapper' className={layoutClass}>
             <div id='top-bar'>
                 <div className='navigation-list'>
+                    <div onClick={onMainPageClickHandler}>메인페이지</div>
                     <div onClick={onMyPageClickHandler}>마이페이지</div>
                     <div onClick={onLogoutClickHandler}>로그아웃</div>
                 </div>

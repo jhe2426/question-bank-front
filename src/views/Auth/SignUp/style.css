@@ -43,7 +43,6 @@
     width: 588px;
     height: 35px;
 
-    font-family: 'Pretendard';
 
     cursor: pointer;
 }
@@ -150,7 +149,6 @@
     display: flex;
     gap: 18px;
 
-    font-family: 'Pretendard';
     font-size: 15px;
     font-weight: 400;
 }
@@ -186,7 +184,6 @@
 .gender-selector-container .message {
     height: 13px;
 
-    font-family: 'Pretendard';
     font-size: 13px;
     font-weight: 400;
 }
